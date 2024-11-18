@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:parking_user/widgets/login.dart';
+import 'package:parking_user/screens/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
         useMaterial3: true,
