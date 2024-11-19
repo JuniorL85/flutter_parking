@@ -5,7 +5,9 @@ import 'package:parking_user/widgets/personal_settings.dart';
 import 'package:parking_user/widgets/start_parking.dart';
 
 class ManageAccount extends StatefulWidget {
-  const ManageAccount({super.key});
+  const ManageAccount({super.key, this.onSetNewState});
+
+  final void Function(int index)? onSetNewState;
 
   @override
   State<ManageAccount> createState() => _ManageAccountState();
@@ -14,18 +16,23 @@ class ManageAccount extends StatefulWidget {
 class _ManageAccountState extends State<ManageAccount> {
   int currentPageIndex = 0;
 
+  setPageIndex(int index) {
+    setState(() {
+      currentPageIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Välkommen'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        automaticallyImplyLeading: false,
       ),
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
-          setState(() {
-            currentPageIndex = index;
-          });
+          setPageIndex(index);
         },
         indicatorColor: Theme.of(context).colorScheme.inversePrimary,
         selectedIndex: currentPageIndex,
