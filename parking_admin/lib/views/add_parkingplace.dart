@@ -55,7 +55,15 @@ class _AddParkingplaceState extends State<AddParkingplace> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  duration: Duration(seconds: 3),
+                  backgroundColor: Colors.lightGreen,
+                  content: Text('Du har lagt till en ny parkeringsplats!'),
+                ),
+              );
+            },
             child: const Text('Lägg till'),
           )
         ],

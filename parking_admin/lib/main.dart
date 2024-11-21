@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:parking_admin/views/add_parkingplace.dart';
 import 'package:parking_admin/views/delete_parkingplace.dart';
+import 'package:parking_admin/views/show_parkingplaces.dart';
 import 'package:parking_admin/views/update_parkingplace.dart';
 
 void main() {
@@ -55,12 +56,17 @@ class _MyHomePageState extends State<HomePage> {
       selectedIcon: Icon(Icons.delete_sharp),
       label: Text('Ta bort'),
     ),
+    NavigationRailDestination(
+      icon: Icon(Icons.local_parking_sharp),
+      label: Text('Visa alla'),
+    ),
   ];
 
   var views = [
     const AddParkingplace(),
     const UpdateParkingplace(),
     const DeleteParkingplace(),
+    const ShowParkingplaces(),
   ];
 
   @override

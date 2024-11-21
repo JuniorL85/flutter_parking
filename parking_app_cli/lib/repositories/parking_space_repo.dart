@@ -23,7 +23,7 @@ class ParkingSpaceRepository extends SetMain {
     return response;
   }
 
-  Future<dynamic> getAllParkingSpaces() async {
+  Future<List<ParkingSpace>> getAllParkingSpaces() async {
     final uri = Uri.parse('$host:$port/$resource');
 
     final response =
