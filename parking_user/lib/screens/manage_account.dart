@@ -38,8 +38,8 @@ class _ManageAccountState extends State<ManageAccount> {
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
-            selectedIcon: Icon(Icons.home),
             icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
             label: 'Hem',
           ),
           NavigationDestination(
@@ -47,11 +47,13 @@ class _ManageAccountState extends State<ManageAccount> {
             label: 'Starta parkering',
           ),
           NavigationDestination(
-            icon: Icon(Icons.directions_car_sharp),
+            icon: Icon(Icons.directions_car_filled_outlined),
+            selectedIcon: Icon(Icons.directions_car_filled_sharp),
             label: 'Lägg till fordon',
           ),
           NavigationDestination(
-            icon: Icon(Icons.manage_accounts_sharp),
+            icon: Icon(Icons.manage_accounts_outlined),
+            selectedIcon: Icon(Icons.manage_accounts_sharp),
             label: 'Inställningar',
           ),
         ],
