@@ -21,19 +21,24 @@ class ShowParkingplaces extends StatelessWidget {
             return GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
+                  mainAxisSpacing: 8,
                 ),
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   var parkingPlace = snapshot.data![index];
                   return ListTile(
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Id: ${parkingPlace.id.toString()}'),
-                        Text('Adress: ${parkingPlace.address}'),
-                        Text('Pris/h: ${parkingPlace.pricePerHour.toString()}'),
-                        const Divider(thickness: 1, height: 10),
-                      ],
+                    title: SizedBox(
+                      height: 200,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Id: ${parkingPlace.id.toString()}'),
+                          Text('Adress: ${parkingPlace.address}'),
+                          Text(
+                              'Pris: ${parkingPlace.pricePerHour.toString()}kr/h'),
+                          const Divider(thickness: 1, height: 10),
+                        ],
+                      ),
                     ),
                   );
                 });

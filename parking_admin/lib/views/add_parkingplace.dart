@@ -1,4 +1,6 @@
+import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:parking_app_cli/parking_app_cli.dart';
 
 class AddParkingplace extends StatefulWidget {
   const AddParkingplace({super.key});
@@ -8,6 +10,16 @@ class AddParkingplace extends StatefulWidget {
 }
 
 class _AddParkingplaceState extends State<AddParkingplace> {
+  final _addressController = TextEditingController();
+  final _pricePerHourController = TextEditingController();
+
+  @override
+  void dispose() {
+    _addressController.dispose();
+    _pricePerHourController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -21,6 +33,7 @@ class _AddParkingplaceState extends State<AddParkingplace> {
           SizedBox(
             width: 300,
             child: TextField(
+              controller: _addressController,
               decoration: InputDecoration(
                 label: const Text(
                   'Ange adress',
@@ -39,6 +52,8 @@ class _AddParkingplaceState extends State<AddParkingplace> {
           SizedBox(
             width: 300,
             child: TextField(
+              controller: _pricePerHourController,
+              keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 label: const Text(
                   'Ange timpris',
@@ -54,17 +69,63 @@ class _AddParkingplaceState extends State<AddParkingplace> {
             ),
           ),
           const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  duration: Duration(seconds: 3),
-                  backgroundColor: Colors.lightGreen,
-                  content: Text('Du har lagt till en ny parkeringsplats!'),
-                ),
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _addressController,
+            builder: (context, value, child) {
+              return ElevatedButton(
+                onPressed: value.text.isNotEmpty
+                    ? () async {
+                        if (validateNumber(_pricePerHourController.text)) {
+                          final res = await ParkingSpaceRepository.instance
+                              .addParkingSpace(
+                            ParkingSpace(
+                              address: _addressController.text,
+                              pricePerHour:
+                                  int.parse(_pricePerHourController.text),
+                            ),
+                          );
+                          if (res.statusCode == 200) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  duration: Duration(seconds: 3),
+                                  backgroundColor: Colors.lightGreen,
+                                  content: Text(
+                                      'Du har lagt till en ny parkeringsplats!'),
+                                ),
+                              );
+                            }
+                            _addressController.clear();
+                            _pricePerHourController.clear();
+                          } else {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  duration: Duration(seconds: 3),
+                                  backgroundColor: Colors.redAccent,
+                                  content: Text(
+                                      'Något gick fel vänligen försök igen senare'),
+                                ),
+                              );
+                            }
+                          }
+                        } else {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                duration: Duration(seconds: 3),
+                                backgroundColor: Colors.redAccent,
+                                content: Text(
+                                    'Du måste ange pris per timme i siffror!'),
+                              ),
+                            );
+                          }
+                        }
+                      }
+                    : null,
+                child: const Text('Lägg till'),
               );
             },
-            child: const Text('Lägg till'),
           )
         ],
       ),
