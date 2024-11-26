@@ -10,124 +10,138 @@ class AddParkingplace extends StatefulWidget {
 }
 
 class _AddParkingplaceState extends State<AddParkingplace> {
-  final _addressController = TextEditingController();
-  final _pricePerHourController = TextEditingController();
-
-  @override
-  void dispose() {
-    _addressController.dispose();
-    _pricePerHourController.dispose();
-    super.dispose();
-  }
+  final formKey = GlobalKey<FormState>();
+  String? address;
+  String? pricePerHour;
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        children: [
-          const Text(
-            'Lägg till parkeringsplats',
-            style: TextStyle(fontSize: 24, color: Colors.blueGrey),
-          ),
-          const SizedBox(height: 70),
-          SizedBox(
-            width: 300,
-            child: TextField(
-              controller: _addressController,
-              decoration: InputDecoration(
-                label: const Text(
-                  'Ange adress',
-                  style: TextStyle(fontSize: 14),
+      child: Form(
+        key: formKey,
+        child: Column(
+          children: [
+            const Text(
+              'Lägg till parkeringsplats',
+              style: TextStyle(fontSize: 24, color: Colors.blueGrey),
+            ),
+            const SizedBox(height: 70),
+            SizedBox(
+              width: 300,
+              child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Ange en adress";
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                  label: const Text(
+                    'Ange adress',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(
+                        width: 0.8,
+                        color: Colors.blueGrey,
+                      )),
                 ),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(
-                      width: 0.8,
-                      color: Colors.blueGrey,
-                    )),
+                onChanged: (value) => address = value,
               ),
             ),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: 300,
-            child: TextField(
-              controller: _pricePerHourController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                label: const Text(
-                  'Ange timpris',
-                  style: TextStyle(fontSize: 14),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: 300,
+              child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Ange ett timpris";
+                  }
+                  return null;
+                },
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  label: const Text(
+                    'Ange timpris',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(
+                        width: 0.8,
+                        color: Colors.blueGrey,
+                      )),
                 ),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(
-                      width: 0.8,
-                      color: Colors.blueGrey,
-                    )),
+                onChanged: (value) => pricePerHour = value,
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-          ValueListenableBuilder<TextEditingValue>(
-            valueListenable: _addressController,
-            builder: (context, value, child) {
-              return ElevatedButton(
-                onPressed: value.text.isNotEmpty
-                    ? () async {
-                        if (validateNumber(_pricePerHourController.text)) {
-                          final res = await ParkingSpaceRepository.instance
-                              .addParkingSpace(
-                            ParkingSpace(
-                              address: _addressController.text,
-                              pricePerHour:
-                                  int.parse(_pricePerHourController.text),
-                            ),
-                          );
-                          if (res.statusCode == 200) {
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  duration: Duration(seconds: 3),
-                                  backgroundColor: Colors.lightGreen,
-                                  content: Text(
-                                      'Du har lagt till en ny parkeringsplats!'),
-                                ),
-                              );
-                            }
-                            _addressController.clear();
-                            _pricePerHourController.clear();
-                          } else {
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  duration: Duration(seconds: 3),
-                                  backgroundColor: Colors.redAccent,
-                                  content: Text(
-                                      'Något gick fel vänligen försök igen senare'),
-                                ),
-                              );
-                            }
-                          }
-                        } else {
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                duration: Duration(seconds: 3),
-                                backgroundColor: Colors.redAccent,
-                                content: Text(
-                                    'Du måste ange pris per timme i siffror!'),
-                              ),
-                            );
-                          }
-                        }
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  if (validateNumber(pricePerHour!)) {
+                    final res =
+                        await ParkingSpaceRepository.instance.addParkingSpace(
+                      ParkingSpace(
+                        address: address!,
+                        pricePerHour: int.parse(pricePerHour!),
+                      ),
+                    );
+                    if (res.statusCode == 200) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            duration: Duration(seconds: 3),
+                            backgroundColor: Colors.lightGreen,
+                            content:
+                                Text('Du har lagt till en ny parkeringsplats!'),
+                          ),
+                        );
                       }
-                    : null,
-                child: const Text('Lägg till'),
-              );
-            },
-          )
-        ],
+                      formKey.currentState?.reset();
+                    } else {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            duration: Duration(seconds: 3),
+                            backgroundColor: Colors.redAccent,
+                            content: Text(
+                                'Något gick fel vänligen försök igen senare'),
+                          ),
+                        );
+                      }
+                    }
+                  } else {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          duration: Duration(seconds: 3),
+                          backgroundColor: Colors.redAccent,
+                          content:
+                              Text('Du måste ange pris per timme i siffror!'),
+                        ),
+                      );
+                    }
+                  }
+                } else {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        duration: Duration(seconds: 3),
+                        backgroundColor: Colors.redAccent,
+                        content:
+                            Text('Något gick fel vänligen försök igen senare'),
+                      ),
+                    );
+                  }
+                  return;
+                }
+              },
+              child: const Text('Lägg till'),
+            ),
+          ],
+        ),
       ),
     );
   }
