@@ -164,15 +164,47 @@ class _UpdateParkingplaceState extends State<UpdateParkingplace> {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (formKey.currentState!.validate()) {
-                        setState(() {
-                          formKey.currentState!.save();
-                          print(address);
-                          print(pricePerHour);
-                          print(chosenParkingSpace!.id);
-                          isId = false;
-                        });
+                        formKey.currentState!.save();
+
+                        final res = await ParkingSpaceRepository.instance
+                            .updateParkingSpace(
+                          ParkingSpace(
+                            id: chosenParkingSpace!.id,
+                            address: address!,
+                            pricePerHour: int.parse(pricePerHour!),
+                          ),
+                        );
+
+                        if (res.statusCode == 200) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                duration: const Duration(seconds: 3),
+                                backgroundColor: Colors.lightGreen,
+                                content: Text(
+                                    'Du har uppdaterat parkeringsplats med id: ${chosenParkingSpace!.id}'),
+                              ),
+                            );
+                          }
+                          formKey.currentState?.reset();
+                          setState(() {
+                            isId = false;
+                            getParkingSpaceList();
+                          });
+                        } else {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                duration: Duration(seconds: 3),
+                                backgroundColor: Colors.redAccent,
+                                content: Text(
+                                    'Något gick fel vänligen försök igen senare'),
+                              ),
+                            );
+                          }
+                        }
                       }
                     },
                     child: const Text('Uppdatera parkeringsplats'),
