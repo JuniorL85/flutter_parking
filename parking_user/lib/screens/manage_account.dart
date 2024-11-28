@@ -1,3 +1,4 @@
+import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_user/widgets/add_vehicle.dart';
 import 'package:parking_user/widgets/home.dart';
@@ -5,9 +6,10 @@ import 'package:parking_user/widgets/personal_settings.dart';
 import 'package:parking_user/widgets/start_parking.dart';
 
 class ManageAccount extends StatefulWidget {
-  const ManageAccount({super.key, this.onSetNewState});
+  const ManageAccount({super.key, this.onSetNewState, this.person});
 
   final void Function(int index)? onSetNewState;
+  final Person? person;
 
   @override
   State<ManageAccount> createState() => _ManageAccountState();
@@ -26,7 +28,7 @@ class _ManageAccountState extends State<ManageAccount> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Välkommen'),
+        title: Text('Välkommen ${widget.person?.name}'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         automaticallyImplyLeading: false,
       ),

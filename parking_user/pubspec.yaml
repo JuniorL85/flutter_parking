@@ -30,6 +30,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  cli_shared:
+    path: '../cli_shared'
+  parking_app_cli: 
+    path: '../parking_app_cli'
 
 
   # The following adds the Cupertino Icons font to your application.
