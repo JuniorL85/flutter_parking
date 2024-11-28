@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import '../logic/set_main.dart';
 import 'package:http/http.dart' as http;
@@ -9,7 +10,7 @@ class ParkingSpaceRepository extends SetMain {
 
   static final instance = ParkingSpaceRepository._privateConstructor();
 
-  String host = 'http://localhost';
+  String host = Platform.isAndroid ? 'http://10.0.2.2' : 'http://localhost';
   String port = '8080';
   String resource = 'parkingSpaces';
 
