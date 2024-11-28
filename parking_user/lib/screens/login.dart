@@ -1,12 +1,11 @@
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
-import 'package:parking_app_cli/repositories/person_repo.dart';
 import 'package:parking_user/screens/create_account.dart';
 import 'package:parking_user/screens/manage_account.dart';
 
 class Login extends StatefulWidget {
-  Login({super.key});
+  const Login({super.key});
 
   @override
   State<Login> createState() => _LoginState();
@@ -68,8 +67,6 @@ class _LoginState extends State<Login> {
                 ElevatedButton(
                   onPressed: () async {
                     if (formKey.currentState!.validate()) {
-                      print(socialSecurityNumber);
-                      print(personList);
                       final index = personList.indexWhere((i) =>
                           i.socialSecurityNumber == socialSecurityNumber!);
 
