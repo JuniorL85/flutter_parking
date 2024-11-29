@@ -1,6 +1,6 @@
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:parking_user/widgets/add_vehicle.dart';
+import 'package:parking_user/screens/manage_vehicle.dart';
 import 'package:parking_user/widgets/home.dart';
 import 'package:parking_user/widgets/personal_settings.dart';
 import 'package:parking_user/widgets/start_parking.dart';
@@ -31,6 +31,14 @@ class _ManageAccountState extends State<ManageAccount> {
         title: Text('Välkommen ${widget.person?.name}'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.logout_sharp),
+          )
+        ],
       ),
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
@@ -51,7 +59,7 @@ class _ManageAccountState extends State<ManageAccount> {
           NavigationDestination(
             icon: Icon(Icons.directions_car_filled_outlined),
             selectedIcon: Icon(Icons.directions_car_filled_sharp),
-            label: 'Lägg till fordon',
+            label: 'Hantera fordon',
           ),
           NavigationDestination(
             icon: Icon(Icons.manage_accounts_outlined),
@@ -63,7 +71,7 @@ class _ManageAccountState extends State<ManageAccount> {
       body: <Widget>[
         const Home(),
         const StartParking(),
-        const AddVehicle(),
+        ManageVehicle(person: widget.person),
         const PersonalSettings(),
       ][currentPageIndex],
     );

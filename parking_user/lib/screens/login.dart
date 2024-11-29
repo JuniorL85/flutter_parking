@@ -80,6 +80,7 @@ class _LoginState extends State<Login> {
                               builder: (ctx) => ManageAccount(person: person),
                             ),
                           );
+                          formKey.currentState?.reset();
                         }
                       } else {
                         if (mounted) {
@@ -106,6 +107,7 @@ class _LoginState extends State<Login> {
                         builder: (ctx) => const CreateAccount(),
                       ),
                     );
+                    formKey.currentState?.reset();
                   },
                   child: const Text('Skapa konto'),
                 )
