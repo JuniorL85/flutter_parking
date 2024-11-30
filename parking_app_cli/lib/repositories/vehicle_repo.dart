@@ -24,7 +24,7 @@ class VehicleRepository extends SetMain {
     return response;
   }
 
-  Future<dynamic> getAllVehicles() async {
+  Future<List<Vehicle>> getAllVehicles() async {
     final uri = Uri.parse('$host:$port/$resource');
 
     final response =

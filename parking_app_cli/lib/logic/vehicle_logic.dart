@@ -166,7 +166,7 @@ class VehicleLogic extends SetMain {
     if (vehicleList.isNotEmpty) {
       for (var vehicle in vehicleList) {
         printColor(
-            'Id: ${vehicle.id}\n RegNr: ${vehicle.regNr}\n Ägare: ${vehicle.owner.name}-${vehicle.owner.socialSecurityNumber}\n Typ: ${vehicle.vehicleType}',
+            'Id: ${vehicle.id}\n RegNr: ${vehicle.regNr}\n Ägare: ${vehicle.owner!.name}-${vehicle.owner!.socialSecurityNumber}\n Typ: ${vehicle.vehicleType}',
             'info');
       }
     } else {
