@@ -59,7 +59,7 @@ class ManageVehicle extends StatelessWidget {
                     case 3:
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (ctx) => const ShowVehicles(),
+                          builder: (ctx) => ShowVehicles(person: person),
                         ),
                       );
                       break;
@@ -67,7 +67,11 @@ class ManageVehicle extends StatelessWidget {
                   }
                 },
                 child: Card(
-                    color: Colors.orange.shade400,
+                    color: Colors.deepOrange.shade100,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(color: Colors.deepOrange.shade300),
+                    ),
                     borderOnForeground: true,
                     child: Align(
                       alignment: Alignment.center,

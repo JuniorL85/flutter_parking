@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
 
 class ShowVehicles extends StatelessWidget {
-  const ShowVehicles({super.key});
+  const ShowVehicles({super.key, this.person});
+
+  final Person? person;
 
   getIcon(String type) {
     switch (type) {
@@ -32,23 +34,29 @@ class ShowVehicles extends StatelessWidget {
         future: getVehicles,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            var formattedSnapshot = snapshot.data!
+                .where((vehicle) =>
+                    vehicle.owner!.socialSecurityNumber ==
+                    person!.socialSecurityNumber)
+                .toList();
             return ListView.builder(
-                itemCount: snapshot.data!.length,
+                itemCount: formattedSnapshot.length,
                 itemBuilder: (context, index) {
-                  var vehicle = snapshot.data![index];
-                  return ListTile(
-                    leading: Container(
-                      width: 24,
-                      height: 24,
-                      color: Colors.deepOrange.shade100,
-                      child: Center(child: Text(vehicle.id.toString())),
-                    ),
-                    title: Text(
-                      vehicle.regNr,
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface),
-                    ),
-                    trailing: getIcon(vehicle.vehicleType),
+                  var vehicle = formattedSnapshot[index];
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                        leading: getIcon(vehicle.vehicleType),
+                        title: Text(
+                          vehicle.regNr,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface),
+                        ),
+                        tileColor: Colors.deepOrange.shade100,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(color: Colors.deepOrange.shade300),
+                        )),
                   );
                 });
           }
