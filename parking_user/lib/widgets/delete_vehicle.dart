@@ -59,7 +59,7 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
                   icon: const Icon(Icons.arrow_drop_down_sharp),
                   elevation: 16,
                   decoration: InputDecoration(
-                    label: const Text('Fordonstyp'),
+                    label: const Text('Registreringsnummer'),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: const BorderSide(

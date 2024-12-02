@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:parking_user/widgets/add_vehicle.dart';
 import 'package:parking_user/widgets/delete_vehicle.dart';
 import 'package:parking_user/widgets/show_vehicles.dart';
+import 'package:parking_user/widgets/update_vehicle.dart';
 
 class ManageVehicleTitle {
   IconData titleIcon;
@@ -53,6 +54,13 @@ class ManageVehicle extends StatelessWidget {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (ctx) => DeleteVehicle(person: person),
+                        ),
+                      );
+                      break;
+                    case 2:
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (ctx) => UpdateVehicle(person: person),
                         ),
                       );
                       break;
