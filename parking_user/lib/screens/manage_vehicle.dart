@@ -67,10 +67,11 @@ class ManageVehicle extends StatelessWidget {
                   }
                 },
                 child: Card(
-                    color: Colors.deepOrange.shade100,
+                    color: Theme.of(context).colorScheme.inversePrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(color: Colors.deepOrange.shade300),
+                      side: BorderSide(
+                          color: Theme.of(context).colorScheme.onSecondary),
                     ),
                     borderOnForeground: true,
                     child: Align(

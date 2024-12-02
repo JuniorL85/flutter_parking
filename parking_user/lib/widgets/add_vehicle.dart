@@ -52,10 +52,11 @@ class _AddVehicleState extends State<AddVehicle> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   'Lägg till fordon',
-                  style:
-                      TextStyle(fontSize: 24, color: Colors.deepOrangeAccent),
+                  style: TextStyle(
+                      fontSize: 24,
+                      color: Theme.of(context).colorScheme.inversePrimary),
                 ),
                 const SizedBox(height: 100),
                 TextFormField(
@@ -71,7 +72,6 @@ class _AddVehicleState extends State<AddVehicle> {
                         borderRadius: BorderRadius.circular(10),
                         borderSide: const BorderSide(
                           width: 0.8,
-                          color: Colors.deepOrangeAccent,
                         )),
                   ),
                   onChanged: (value) => regNr = value,
@@ -88,10 +88,10 @@ class _AddVehicleState extends State<AddVehicle> {
                         borderRadius: BorderRadius.circular(10),
                         borderSide: const BorderSide(
                           width: 0.8,
-                          color: Colors.deepOrangeAccent,
                         )),
                   ),
-                  style: const TextStyle(color: Colors.deepOrange),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.inversePrimary),
                   onChanged: (String? value) {
                     setState(() {
                       dropdownValue = value!;

@@ -46,10 +46,11 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   'Radera fordon',
-                  style:
-                      TextStyle(fontSize: 24, color: Colors.deepOrangeAccent),
+                  style: TextStyle(
+                      fontSize: 24,
+                      color: Theme.of(context).colorScheme.inversePrimary),
                 ),
                 const SizedBox(height: 100),
                 DropdownButtonFormField(
@@ -63,10 +64,10 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
                         borderRadius: BorderRadius.circular(10),
                         borderSide: const BorderSide(
                           width: 0.8,
-                          color: Colors.deepOrangeAccent,
                         )),
                   ),
-                  style: const TextStyle(color: Colors.deepOrange),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.inversePrimary),
                   onChanged: (value) {
                     setState(() {
                       _selectedRegNr = value!;

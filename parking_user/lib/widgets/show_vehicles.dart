@@ -52,10 +52,11 @@ class ShowVehicles extends StatelessWidget {
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface),
                         ),
-                        tileColor: Colors.deepOrange.shade100,
+                        tileColor: Theme.of(context).colorScheme.inversePrimary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(color: Colors.deepOrange.shade300),
+                          side: BorderSide(
+                              color: Theme.of(context).colorScheme.onSecondary),
                         )),
                   );
                 });
