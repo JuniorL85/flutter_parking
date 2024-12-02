@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:parking_user/screens/manage_account.dart';
 
 List<String> listRegNr = <String>['GDO444'];
@@ -89,9 +90,11 @@ class _StartParkingState extends State<StartParking> {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'Starta parkering',
-                style: TextStyle(fontSize: 24, color: Colors.deepOrangeAccent),
+                style: TextStyle(
+                    fontSize: 24,
+                    color: Theme.of(context).colorScheme.inversePrimary),
               ),
               const SizedBox(height: 100),
               Row(
@@ -110,10 +113,10 @@ class _StartParkingState extends State<StartParking> {
                             borderRadius: BorderRadius.circular(10),
                             borderSide: const BorderSide(
                               width: 0.8,
-                              color: Colors.deepOrangeAccent,
                             )),
                       ),
-                      style: const TextStyle(color: Colors.deepOrange),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.inversePrimary),
                       onChanged: (String? value) {
                         setState(() {
                           dropdownRegNr = value!;
@@ -141,10 +144,10 @@ class _StartParkingState extends State<StartParking> {
                             borderRadius: BorderRadius.circular(10),
                             borderSide: const BorderSide(
                               width: 0.8,
-                              color: Colors.deepOrangeAccent,
                             )),
                       ),
-                      style: const TextStyle(color: Colors.deepOrange),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.inversePrimary),
                       onChanged: (String? value) {
                         setState(() {
                           dropdownAvailableParkingSpaces = value!;
@@ -169,7 +172,7 @@ class _StartParkingState extends State<StartParking> {
                   Text(
                     _selectedDate == null
                         ? 'Inget valt datum'
-                        : _selectedDate.toString(),
+                        : DateFormat('yyyy-MM-dd kk:mm').format(_selectedDate!),
                   ),
                   IconButton(
                       onPressed: _presentDatePicker,
