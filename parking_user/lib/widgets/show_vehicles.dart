@@ -27,47 +27,75 @@ class ShowVehicles extends StatelessWidget {
         VehicleRepository.instance.getAllVehicles();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Dina fordon"),
-      ),
-      body: FutureBuilder<List<Vehicle>>(
-        future: getVehicles,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            var formattedSnapshot = snapshot.data!
-                .where((vehicle) =>
-                    vehicle.owner!.socialSecurityNumber ==
-                    person!.socialSecurityNumber)
-                .toList();
-            return ListView.builder(
-                itemCount: formattedSnapshot.length,
-                itemBuilder: (context, index) {
-                  var vehicle = formattedSnapshot[index];
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                        leading: getIcon(vehicle.vehicleType),
-                        title: Text(
-                          vehicle.regNr,
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
-                        ),
-                        tileColor: Theme.of(context).colorScheme.inversePrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(
-                              color: Theme.of(context).colorScheme.onSecondary),
-                        )),
-                  );
-                });
-          }
+      body: Column(
+        children: [
+          const SizedBox(height: 50),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Dina fordon',
+                  style: TextStyle(
+                      fontSize: 24,
+                      color: Theme.of(context).colorScheme.inversePrimary),
+                ),
+                TextButton.icon(
+                  label: const Text('Tillbaka'),
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            ),
+          ),
+          FutureBuilder<List<Vehicle>>(
+            future: getVehicles,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                var formattedSnapshot = snapshot.data!
+                    .where((vehicle) =>
+                        vehicle.owner!.socialSecurityNumber ==
+                        person!.socialSecurityNumber)
+                    .toList();
+                return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: formattedSnapshot.length,
+                    itemBuilder: (context, index) {
+                      var vehicle = formattedSnapshot[index];
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListTile(
+                            leading: getIcon(vehicle.vehicleType),
+                            title: Text(
+                              vehicle.regNr,
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
+                            ),
+                            tileColor:
+                                Theme.of(context).colorScheme.inversePrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: BorderSide(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondary),
+                            )),
+                      );
+                    });
+              }
 
-          if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          }
+              if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              }
 
-          return const CircularProgressIndicator();
-        },
+              return const CircularProgressIndicator();
+            },
+          ),
+        ],
       ),
     );
   }

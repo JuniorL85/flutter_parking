@@ -58,7 +58,7 @@ class _AddVehicleState extends State<AddVehicle> {
                       fontSize: 24,
                       color: Theme.of(context).colorScheme.inversePrimary),
                 ),
-                const SizedBox(height: 100),
+                const SizedBox(height: 50),
                 TextFormField(
                   validator: (value) {
                     if (value == null || value.isEmpty) {

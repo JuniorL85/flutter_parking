@@ -1,8 +1,8 @@
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:parking_user/screens/manage_settings.dart';
 import 'package:parking_user/screens/manage_vehicle.dart';
 import 'package:parking_user/widgets/home.dart';
-import 'package:parking_user/widgets/personal_settings.dart';
 import 'package:parking_user/widgets/start_parking.dart';
 
 class ManageAccount extends StatefulWidget {
@@ -34,7 +34,7 @@ class _ManageAccountState extends State<ManageAccount> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.popUntil(context, ModalRoute.withName('/'));
             },
             icon: const Icon(Icons.logout_sharp),
           )
@@ -72,7 +72,7 @@ class _ManageAccountState extends State<ManageAccount> {
         const Home(),
         const StartParking(),
         ManageVehicle(person: widget.person),
-        const PersonalSettings(),
+        const ManageSettings(),
       ][currentPageIndex],
     );
   }

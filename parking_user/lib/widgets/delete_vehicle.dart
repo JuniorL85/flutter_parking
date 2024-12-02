@@ -52,7 +52,7 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
                       fontSize: 24,
                       color: Theme.of(context).colorScheme.inversePrimary),
                 ),
-                const SizedBox(height: 100),
+                const SizedBox(height: 50),
                 DropdownButtonFormField(
                   isExpanded: true,
                   value: _selectedRegNr,
