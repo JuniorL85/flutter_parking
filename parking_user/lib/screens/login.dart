@@ -1,8 +1,9 @@
-import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:parking_user/providers/get_person_provider.dart';
 import 'package:parking_user/screens/create_account.dart';
 import 'package:parking_user/screens/manage_account.dart';
+import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -14,20 +15,10 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final formKey = GlobalKey<FormState>();
   String? socialSecurityNumber;
-  List<Person> personList = [];
-
-  @override
-  void initState() {
-    super.initState();
-    getpersonList();
-  }
-
-  getpersonList() async {
-    personList = await PersonRepository.instance.getAllPersons();
-  }
 
   @override
   Widget build(BuildContext context) {
+    context.watch<GetPerson>().getAllPersons();
     return Scaffold(
       appBar: AppBar(
         title: const Text('ParkHere'),
@@ -67,17 +58,19 @@ class _LoginState extends State<Login> {
                 ElevatedButton(
                   onPressed: () async {
                     if (formKey.currentState!.validate()) {
+                      final personList = context.read<GetPerson>().personList;
                       final index = personList.indexWhere((i) =>
                           i.socialSecurityNumber == socialSecurityNumber!);
 
                       if (index != -1) {
-                        final person = await PersonRepository.instance
-                            .getPersonById(personList[index].id);
+                        context
+                            .read<GetPerson>()
+                            .getPerson(personList[index].id);
 
                         if (context.mounted) {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (ctx) => ManageAccount(person: person),
+                              builder: (ctx) => const ManageAccount(),
                             ),
                           );
                           formKey.currentState?.reset();

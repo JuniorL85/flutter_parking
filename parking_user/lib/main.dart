@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
+import 'package:parking_user/providers/get_vehicle_provider.dart';
 import 'package:parking_user/screens/login.dart';
 import 'package:provider/provider.dart';
 
@@ -10,8 +11,15 @@ void main() {
     DeviceOrientation.portraitUp,
   ]).then((fn) {
     runApp(
-      ChangeNotifierProvider(
-        create: (_) => GetPerson(),
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => GetPerson(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => GetVehicle(),
+          ),
+        ],
         child: const MyApp(),
       ),
     );

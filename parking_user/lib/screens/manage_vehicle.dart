@@ -1,4 +1,3 @@
-import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_user/widgets/add_vehicle.dart';
 import 'package:parking_user/widgets/delete_vehicle.dart';
@@ -13,9 +12,7 @@ class ManageVehicleTitle {
 }
 
 class ManageVehicle extends StatelessWidget {
-  ManageVehicle({super.key, this.person});
-
-  final Person? person;
+  ManageVehicle({super.key});
 
   final List<ManageVehicleTitle> manageVehicleTitle = [
     ManageVehicleTitle(titleIcon: Icons.add, titleText: 'Lägg till fordon'),
@@ -56,28 +53,28 @@ class ManageVehicle extends StatelessWidget {
                         case 0:
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (ctx) => AddVehicle(person: person),
+                              builder: (ctx) => const AddVehicle(),
                             ),
                           );
                           break;
                         case 1:
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (ctx) => DeleteVehicle(person: person),
+                              builder: (ctx) => const DeleteVehicle(),
                             ),
                           );
                           break;
                         case 2:
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (ctx) => UpdateVehicle(person: person),
+                              builder: (ctx) => const UpdateVehicle(),
                             ),
                           );
                           break;
                         case 3:
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (ctx) => ShowVehicles(person: person),
+                              builder: (ctx) => const ShowVehicles(),
                             ),
                           );
                           break;

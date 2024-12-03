@@ -1,11 +1,11 @@
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:parking_user/providers/get_person_provider.dart';
+import 'package:provider/provider.dart';
 
 class ManageSettings extends StatefulWidget {
-  const ManageSettings({super.key, required this.person});
-
-  final Person? person;
+  const ManageSettings({super.key});
 
   @override
   State<ManageSettings> createState() => _ManageSettingsState();
@@ -17,6 +17,8 @@ class _ManageSettingsState extends State<ManageSettings> {
 
   @override
   Widget build(BuildContext context) {
+    final person = context.read<GetPerson>().person;
+
     return Scaffold(
       body: Container(
         margin: const EdgeInsets.only(top: 50),
@@ -56,7 +58,7 @@ class _ManageSettingsState extends State<ManageSettings> {
                           content: Padding(
                             padding: const EdgeInsets.all(20.0),
                             child: TextFormField(
-                              initialValue: widget.person!.name,
+                              initialValue: person.name,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return "Ange ett namn";
@@ -82,12 +84,16 @@ class _ManageSettingsState extends State<ManageSettings> {
                                   formKey.currentState!.save();
                                   final res = await PersonRepository.instance
                                       .updatePersons(Person(
-                                          id: widget.person!.id,
+                                          id: person.id,
                                           name: name!,
-                                          socialSecurityNumber: widget
-                                              .person!.socialSecurityNumber));
+                                          socialSecurityNumber:
+                                              person.socialSecurityNumber));
                                   if (res.statusCode == 200) {
                                     if (context.mounted) {
+                                      context
+                                          .read<GetPerson>()
+                                          .getPerson(person.id);
+
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
@@ -152,9 +158,11 @@ class _ManageSettingsState extends State<ManageSettings> {
                           TextButton(
                             onPressed: () async {
                               final res = await PersonRepository.instance
-                                  .deletePerson(widget.person!);
+                                  .deletePerson(person);
                               if (res.statusCode == 200) {
                                 if (context.mounted) {
+                                  Provider.of<GetPerson>(context, listen: false)
+                                      .getAllPersons();
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       duration: Duration(seconds: 3),

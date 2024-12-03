@@ -1,15 +1,15 @@
-import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:parking_user/providers/get_person_provider.dart';
 import 'package:parking_user/screens/manage_parkings.dart';
 import 'package:parking_user/screens/manage_settings.dart';
 import 'package:parking_user/screens/manage_vehicle.dart';
 import 'package:parking_user/widgets/home.dart';
+import 'package:provider/provider.dart';
 
 class ManageAccount extends StatefulWidget {
-  const ManageAccount({super.key, this.onSetNewState, this.person});
+  const ManageAccount({super.key, this.onSetNewState});
 
   final void Function(int index)? onSetNewState;
-  final Person? person;
 
   @override
   State<ManageAccount> createState() => _ManageAccountState();
@@ -26,9 +26,10 @@ class _ManageAccountState extends State<ManageAccount> {
 
   @override
   Widget build(BuildContext context) {
+    final person = context.watch<GetPerson>().person;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Välkommen ${widget.person?.name}'),
+        title: Text('Välkommen ${person.name}'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         automaticallyImplyLeading: false,
         actions: [
@@ -71,8 +72,8 @@ class _ManageAccountState extends State<ManageAccount> {
       body: <Widget>[
         const Home(),
         ManageParkings(),
-        ManageVehicle(person: widget.person),
-        ManageSettings(person: widget.person),
+        ManageVehicle(),
+        const ManageSettings(),
       ][currentPageIndex],
     );
   }

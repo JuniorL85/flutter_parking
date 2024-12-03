@@ -1,13 +1,14 @@
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:parking_user/providers/get_person_provider.dart';
+import 'package:parking_user/providers/get_vehicle_provider.dart';
+import 'package:provider/provider.dart';
 
 List<String> list = <String>['Bil', 'Motorcykel', 'Annan'];
 
 class UpdateVehicle extends StatefulWidget {
-  const UpdateVehicle({super.key, required this.person});
-
-  final Person? person;
+  const UpdateVehicle({super.key});
 
   @override
   State<UpdateVehicle> createState() => _UpdateVehicleState();
@@ -27,19 +28,24 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
   }
 
   getVehicleList() async {
-    List<Vehicle> list = await VehicleRepository.instance.getAllVehicles();
-    vehicleList = list
-        .where((vehicle) =>
-            vehicle.owner!.socialSecurityNumber ==
-            widget.person!.socialSecurityNumber)
-        .toList();
-    setState(() {
-      _selectedRegNr = vehicleList.first.regNr;
-    });
+    if (mounted) {
+      Person person = super.context.read<GetPerson>().person;
+      List<Vehicle> list =
+          await super.context.read<GetVehicle>().getAllVehicles();
+      vehicleList = list
+          .where((vehicle) =>
+              vehicle.owner!.socialSecurityNumber ==
+              person.socialSecurityNumber)
+          .toList();
+      setState(() {
+        _selectedRegNr = vehicleList.first.regNr;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final person = context.read<GetPerson>().person;
     return Scaffold(
       body: Center(
         child: Padding(
@@ -158,10 +164,10 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                                   regNr: _selectedRegNr,
                                   vehicleType: dropdownValue,
                                   owner: Person(
-                                    id: widget.person!.id,
-                                    name: widget.person!.name,
+                                    id: person.id,
+                                    name: person.name,
                                     socialSecurityNumber:
-                                        widget.person!.socialSecurityNumber,
+                                        person.socialSecurityNumber,
                                   ),
                                 ),
                               );

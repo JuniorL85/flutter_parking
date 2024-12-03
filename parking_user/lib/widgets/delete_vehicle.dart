@@ -1,11 +1,12 @@
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:parking_user/providers/get_person_provider.dart';
+import 'package:parking_user/providers/get_vehicle_provider.dart';
+import 'package:provider/provider.dart';
 
 class DeleteVehicle extends StatefulWidget {
-  const DeleteVehicle({super.key, required this.person});
-
-  final Person? person;
+  const DeleteVehicle({super.key});
 
   @override
   State<DeleteVehicle> createState() => _DeleteVehicleState();
@@ -24,19 +25,24 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
   }
 
   getVehicleList() async {
-    List<Vehicle> list = await VehicleRepository.instance.getAllVehicles();
-    vehicleList = list
-        .where((vehicle) =>
-            vehicle.owner!.socialSecurityNumber ==
-            widget.person!.socialSecurityNumber)
-        .toList();
-    setState(() {
-      _selectedRegNr = vehicleList.first.regNr;
-    });
+    if (mounted) {
+      Person person = super.context.read<GetPerson>().person;
+      List<Vehicle> list =
+          await super.context.read<GetVehicle>().getAllVehicles();
+      vehicleList = list
+          .where((vehicle) =>
+              vehicle.owner!.socialSecurityNumber ==
+              person.socialSecurityNumber)
+          .toList();
+      setState(() {
+        _selectedRegNr = vehicleList.first.regNr;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    Person person = context.read<GetPerson>().person;
     return Scaffold(
       body: Center(
         child: Padding(
@@ -111,15 +117,15 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
                                 regNr: _selectedRegNr,
                                 vehicleType: vehicleList[index].vehicleType,
                                 owner: Person(
-                                  id: widget.person!.id,
-                                  name: widget.person!.name,
+                                  id: person.id,
+                                  name: person.name,
                                   socialSecurityNumber:
-                                      widget.person!.socialSecurityNumber,
+                                      person.socialSecurityNumber,
                                 ),
                               ),
                             );
                             if (res.statusCode == 200) {
-                              if (mounted) {
+                              if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     duration: const Duration(seconds: 3),
@@ -128,11 +134,11 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
                                         'Du har raderat fordon med registreringsnummer $_selectedRegNr'),
                                   ),
                                 );
+                                formKey.currentState?.reset();
+                                Navigator.of(context).pop();
                               }
-                              formKey.currentState?.reset();
-                              Navigator.of(context).pop();
                             } else {
-                              if (mounted) {
+                              if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     duration: Duration(seconds: 3),

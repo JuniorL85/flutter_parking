@@ -1,14 +1,14 @@
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:parking_user/providers/get_person_provider.dart';
 import 'package:parking_user/screens/manage_account.dart';
+import 'package:provider/provider.dart';
 
 List<String> list = <String>['Bil', 'Motorcykel', 'Annan'];
 
 class AddVehicle extends StatefulWidget {
-  const AddVehicle({super.key, required this.person});
-
-  final Person? person;
+  const AddVehicle({super.key});
 
   @override
   State<AddVehicle> createState() => _AddVehicleState();
@@ -18,18 +18,6 @@ class _AddVehicleState extends State<AddVehicle> {
   final formKey = GlobalKey<FormState>();
   String dropdownValue = list.first;
   String? regNr;
-
-  List<Person> personList = [];
-
-  @override
-  void initState() {
-    super.initState();
-    getpersonList();
-  }
-
-  getpersonList() async {
-    personList = await PersonRepository.instance.getAllPersons();
-  }
 
   setHomePageState() {
     Navigator.of(context).push(
@@ -118,16 +106,17 @@ class _AddVehicleState extends State<AddVehicle> {
                     ElevatedButton(
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
+                          final person = context.read<GetPerson>().person;
                           final res =
                               await VehicleRepository.instance.addVehicle(
                             Vehicle(
                               regNr: regNr!,
                               vehicleType: dropdownValue,
                               owner: Person(
-                                id: widget.person!.id,
-                                name: widget.person!.name,
+                                id: person.id,
+                                name: person.name,
                                 socialSecurityNumber:
-                                    widget.person!.socialSecurityNumber,
+                                    person.socialSecurityNumber,
                               ),
                             ),
                           );

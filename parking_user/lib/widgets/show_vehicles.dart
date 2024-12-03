@@ -1,11 +1,11 @@
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:parking_user/providers/get_person_provider.dart';
+import 'package:provider/provider.dart';
 
 class ShowVehicles extends StatelessWidget {
-  const ShowVehicles({super.key, this.person});
-
-  final Person? person;
+  const ShowVehicles({super.key});
 
   getIcon(String type) {
     switch (type) {
@@ -25,6 +25,8 @@ class ShowVehicles extends StatelessWidget {
   Widget build(BuildContext context) {
     Future<List<Vehicle>> getVehicles =
         VehicleRepository.instance.getAllVehicles();
+
+    final person = context.read<GetPerson>().person;
 
     return Scaffold(
       body: Column(
@@ -58,7 +60,7 @@ class ShowVehicles extends StatelessWidget {
                 var formattedSnapshot = snapshot.data!
                     .where((vehicle) =>
                         vehicle.owner!.socialSecurityNumber ==
-                        person!.socialSecurityNumber)
+                        person.socialSecurityNumber)
                     .toList();
                 return ListView.builder(
                     shrinkWrap: true,
