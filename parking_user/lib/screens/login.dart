@@ -74,7 +74,7 @@ class _LoginState extends State<Login> {
                         final person = await PersonRepository.instance
                             .getPersonById(personList[index].id);
 
-                        if (mounted) {
+                        if (context.mounted) {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (ctx) => ManageAccount(person: person),
@@ -83,7 +83,7 @@ class _LoginState extends State<Login> {
                           formKey.currentState?.reset();
                         }
                       } else {
-                        if (mounted) {
+                        if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               duration: Duration(seconds: 3),

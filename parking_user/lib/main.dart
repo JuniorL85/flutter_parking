@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:parking_user/providers/get_person_provider.dart';
 import 'package:parking_user/screens/login.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]).then((fn) {
-    runApp(const MyApp());
+    runApp(
+      ChangeNotifierProvider(
+        create: (_) => GetPerson(),
+        child: const MyApp(),
+      ),
+    );
   });
 }
 

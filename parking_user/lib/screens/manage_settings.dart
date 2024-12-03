@@ -12,6 +12,9 @@ class ManageSettings extends StatefulWidget {
 }
 
 class _ManageSettingsState extends State<ManageSettings> {
+  final formKey = GlobalKey<FormState>();
+  String? name;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,18 +34,94 @@ class _ManageSettingsState extends State<ManageSettings> {
               child: ListView(
                 shrinkWrap: true,
                 children: <Widget>[
-                  ListTile(
-                    leading: const Icon(Icons.person),
-                    title: Text(
-                      'Uppdatera namn',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface),
-                    ),
-                    tileColor: Theme.of(context).colorScheme.inversePrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(
-                          color: Theme.of(context).colorScheme.onSecondary),
+                  Form(
+                    key: formKey,
+                    child: ListTile(
+                      leading: const Icon(Icons.person),
+                      title: Text(
+                        'Uppdatera namn',
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface),
+                      ),
+                      tileColor: Theme.of(context).colorScheme.inversePrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.onSecondary),
+                      ),
+                      onTap: () => showDialog<String>(
+                        context: context,
+                        builder: (BuildContext context) => AlertDialog(
+                          title: const Text('Uppdatera'),
+                          content: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: TextFormField(
+                              initialValue: widget.person!.name,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Ange ett namn";
+                                }
+                                return null;
+                              },
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Ange namn',
+                              ),
+                              onChanged: (value) => name = value,
+                              onSaved: (value) => name = value,
+                            ),
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, 'Avbryt'),
+                              child: const Text('Avbryt'),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                if (formKey.currentState!.validate()) {
+                                  formKey.currentState!.save();
+                                  final res = await PersonRepository.instance
+                                      .updatePersons(Person(
+                                          id: widget.person!.id,
+                                          name: name!,
+                                          socialSecurityNumber: widget
+                                              .person!.socialSecurityNumber));
+                                  if (res.statusCode == 200) {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          duration: Duration(seconds: 3),
+                                          backgroundColor: Colors.lightGreen,
+                                          content: Text(
+                                              'Du har uppdaterat ditt konto'),
+                                        ),
+                                      );
+                                      setState(() {
+                                        Navigator.pop(context);
+                                      });
+                                    }
+                                  } else {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          duration: Duration(seconds: 3),
+                                          backgroundColor: Colors.redAccent,
+                                          content: Text(
+                                              'Något gick fel vänligen försök igen senare'),
+                                        ),
+                                      );
+                                      Navigator.pop(context);
+                                    }
+                                  }
+                                }
+                              },
+                              child: const Text('Uppdatera'),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 5),
