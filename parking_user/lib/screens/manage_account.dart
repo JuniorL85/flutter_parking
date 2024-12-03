@@ -1,9 +1,9 @@
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:parking_user/screens/manage_parkings.dart';
 import 'package:parking_user/screens/manage_settings.dart';
 import 'package:parking_user/screens/manage_vehicle.dart';
 import 'package:parking_user/widgets/home.dart';
-import 'package:parking_user/widgets/start_parking.dart';
 
 class ManageAccount extends StatefulWidget {
   const ManageAccount({super.key, this.onSetNewState, this.person});
@@ -54,7 +54,7 @@ class _ManageAccountState extends State<ManageAccount> {
           ),
           NavigationDestination(
             icon: Icon(Icons.local_parking_sharp),
-            label: 'Starta parkering',
+            label: 'Parkering',
           ),
           NavigationDestination(
             icon: Icon(Icons.directions_car_filled_outlined),
@@ -70,7 +70,7 @@ class _ManageAccountState extends State<ManageAccount> {
       ),
       body: <Widget>[
         const Home(),
-        const StartParking(),
+        ManageParkings(),
         ManageVehicle(person: widget.person),
         ManageSettings(person: widget.person),
       ][currentPageIndex],
