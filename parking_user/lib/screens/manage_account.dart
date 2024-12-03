@@ -72,7 +72,7 @@ class _ManageAccountState extends State<ManageAccount> {
         const Home(),
         const StartParking(),
         ManageVehicle(person: widget.person),
-        const ManageSettings(),
+        ManageSettings(person: widget.person),
       ][currentPageIndex],
     );
   }
