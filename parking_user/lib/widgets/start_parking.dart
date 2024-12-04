@@ -1,15 +1,14 @@
+import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:parking_user/providers/get_parking_spaces_provider.dart';
+import 'package:parking_user/providers/get_person_provider.dart';
+import 'package:parking_user/providers/get_vehicle_provider.dart';
 import 'package:parking_user/screens/manage_account.dart';
+import 'package:provider/provider.dart';
 
-List<String> listRegNr = <String>['GDO444'];
-List<String> listAvailableParkingSpaces = <String>[
-  'P1',
-  'P2',
-  'P3',
-  'P4',
-  'P5'
-];
+List<ParkingSpace> listAvailableParkingSpaces = [];
 
 class StartParking extends StatefulWidget {
   const StartParking({super.key});
@@ -19,14 +18,17 @@ class StartParking extends StatefulWidget {
 }
 
 class _StartParkingState extends State<StartParking> {
-  String dropdownRegNr = listRegNr.first;
-  String dropdownAvailableParkingSpaces = listAvailableParkingSpaces.first;
+  final formKey = GlobalKey<FormState>();
+  String? dropdownAvailableParkingSpaces;
   DateTime? _selectedDate;
+  late List<Vehicle> vehicleList = [];
+  var _selectedRegNr;
 
   @override
   void initState() {
     super.initState();
-    // Här ska anropen för att fylla listor med Fordon (regnr), och parkeringsplatser göras
+    listParkingSpaces();
+    getVehicleList();
   }
 
   setHomePageState() {
@@ -81,6 +83,29 @@ class _StartParkingState extends State<StartParking> {
     }
   }
 
+  listParkingSpaces() async {
+    listAvailableParkingSpaces =
+        await super.context.read<GetParkingSpaces>().getAllParkingSpaces();
+    dropdownAvailableParkingSpaces =
+        listAvailableParkingSpaces.first.id.toString();
+  }
+
+  getVehicleList() async {
+    if (mounted) {
+      Person person = super.context.read<GetPerson>().person;
+      List<Vehicle> list =
+          await super.context.read<GetVehicle>().getAllVehicles();
+      vehicleList = list
+          .where((vehicle) =>
+              vehicle.owner!.socialSecurityNumber ==
+              person.socialSecurityNumber)
+          .toList();
+      setState(() {
+        _selectedRegNr = vehicleList.first.regNr;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,117 +113,196 @@ class _StartParkingState extends State<StartParking> {
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: LayoutBuilder(builder: (context, constraints) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Starta parkering',
-                  style: TextStyle(
-                      fontSize: 24,
-                      color: Theme.of(context).colorScheme.inversePrimary),
-                ),
-                const SizedBox(height: 100),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: constraints.maxWidth * 0.5,
-                      child: DropdownButtonFormField<String>(
-                        value: dropdownRegNr,
-                        padding: const EdgeInsets.all(10),
-                        icon: const Icon(Icons.arrow_drop_down_sharp),
-                        elevation: 16,
-                        decoration: InputDecoration(
-                          label: const Text('Registreringsnummer'),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                width: 0.8,
-                              )),
+            return Form(
+              key: formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Starta parkering',
+                    style: TextStyle(
+                        fontSize: 24,
+                        color: Theme.of(context).colorScheme.inversePrimary),
+                  ),
+                  const SizedBox(height: 100),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: constraints.maxWidth * 0.5,
+                        child: DropdownButtonFormField(
+                          isExpanded: true,
+                          value: _selectedRegNr,
+                          padding: const EdgeInsets.all(10),
+                          icon: const Icon(Icons.arrow_drop_down_sharp),
+                          elevation: 16,
+                          decoration: InputDecoration(
+                            label: const Text('Registreringsnummer'),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: const BorderSide(
+                                  width: 0.8,
+                                )),
+                          ),
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).colorScheme.inversePrimary),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedRegNr = value!;
+                            });
+                          },
+                          items: [
+                            for (final vehicle in vehicleList)
+                              DropdownMenuItem(
+                                value: vehicle.regNr,
+                                child: Text(
+                                  vehicle.regNr,
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
-                        style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.inversePrimary),
-                        onChanged: (String? value) {
-                          setState(() {
-                            dropdownRegNr = value!;
-                          });
-                        },
-                        items: listRegNr
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
                       ),
-                    ),
-                    SizedBox(
-                      width: constraints.maxWidth * 0.5,
-                      child: DropdownButtonFormField<String>(
-                        value: dropdownAvailableParkingSpaces,
-                        padding: const EdgeInsets.all(10),
-                        icon: const Icon(Icons.arrow_drop_down_sharp),
-                        elevation: 16,
-                        decoration: InputDecoration(
-                          label: const Text('Parkeringsområde'),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                width: 0.8,
-                              )),
-                        ),
-                        style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.inversePrimary),
-                        onChanged: (String? value) {
-                          setState(() {
-                            dropdownAvailableParkingSpaces = value!;
-                          });
-                        },
-                        items: listAvailableParkingSpaces
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            _selectedDate == null
+                                ? 'Inget valt datum'
+                                : DateFormat('yyyy-MM-dd kk:mm')
+                                    .format(_selectedDate!),
+                          ),
+                          IconButton(
+                              onPressed: _presentDatePicker,
+                              icon: const Icon(Icons.calendar_view_month))
+                        ],
                       ),
+                    ],
+                  ),
+                  SizedBox(
+                    child: DropdownButtonFormField<String>(
+                      value: dropdownAvailableParkingSpaces,
+                      padding: const EdgeInsets.all(10),
+                      icon: const Icon(Icons.arrow_drop_down_sharp),
+                      elevation: 16,
+                      decoration: InputDecoration(
+                        label: const Text('Parkeringsområde'),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              width: 0.8,
+                            )),
+                      ),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.inversePrimary),
+                      onChanged: (String? value) {
+                        setState(() {
+                          dropdownAvailableParkingSpaces = value!;
+                        });
+                      },
+                      items: [
+                        for (final parkingSpace in listAvailableParkingSpaces)
+                          DropdownMenuItem(
+                            value: parkingSpace.id.toString(),
+                            child: Text(
+                              '${parkingSpace.id}: ${parkingSpace.address} - ${parkingSpace.pricePerHour}kr/h',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      _selectedDate == null
-                          ? 'Inget valt datum'
-                          : DateFormat('yyyy-MM-dd kk:mm')
-                              .format(_selectedDate!),
-                    ),
-                    IconButton(
-                        onPressed: _presentDatePicker,
-                        icon: const Icon(Icons.calendar_view_month))
-                  ],
-                ),
-                const SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Avbryt'),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: setHomePageState,
-                      child: const Text('Starta parkering'),
-                    )
-                  ],
-                )
-              ],
+                  ),
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Avbryt'),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (formKey.currentState!.validate()) {
+                            final vehicleType = vehicleList
+                                .where((vehicle) =>
+                                    vehicle.regNr == _selectedRegNr)
+                                .first
+                                .vehicleType;
+
+                            final parkingSpace = listAvailableParkingSpaces
+                                .where((parkingSpace) =>
+                                    parkingSpace.id ==
+                                    int.parse(dropdownAvailableParkingSpaces!))
+                                .first;
+
+                            final person = context.read<GetPerson>().person;
+
+                            final res = await ParkingRepository.instance
+                                .addParking(Parking(
+                                    vehicle: Vehicle(
+                                        regNr: _selectedRegNr,
+                                        vehicleType: vehicleType,
+                                        owner: person),
+                                    parkingSpace: ParkingSpace(
+                                        id: parkingSpace.id,
+                                        address: parkingSpace.address,
+                                        pricePerHour:
+                                            parkingSpace.pricePerHour),
+                                    startTime: DateTime.now(),
+                                    endTime: _selectedDate!));
+
+                            if (res.statusCode == 200) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    duration: const Duration(seconds: 3),
+                                    backgroundColor: Colors.lightGreen,
+                                    content: Text(
+                                        'Du har uppdaterat fordon med registreringsnummer $_selectedRegNr'),
+                                  ),
+                                );
+                                Navigator.of(context).pop();
+                                formKey.currentState!.reset();
+                              }
+                            } else {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    duration: Duration(seconds: 3),
+                                    backgroundColor: Colors.redAccent,
+                                    content: Text(
+                                        'Något gick fel vänligen försök igen senare'),
+                                  ),
+                                );
+                              }
+                            }
+                          } else {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  duration: Duration(seconds: 3),
+                                  backgroundColor: Colors.redAccent,
+                                  content: Text(
+                                      'Något gick fel vänligen försök igen senare'),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        child: const Text('Starta parkering'),
+                      )
+                    ],
+                  )
+                ],
+              ),
             );
           }),
         ),

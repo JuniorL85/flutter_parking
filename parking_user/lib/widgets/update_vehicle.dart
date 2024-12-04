@@ -172,7 +172,7 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                                 ),
                               );
                               if (res.statusCode == 200) {
-                                if (mounted) {
+                                if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       duration: const Duration(seconds: 3),
@@ -181,12 +181,12 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                                           'Du har uppdaterat fordon med registreringsnummer $_selectedRegNr'),
                                     ),
                                   );
+                                  formKey.currentState?.reset();
+                                  isRegNrPicked = false;
+                                  Navigator.of(context).pop();
                                 }
-                                formKey.currentState?.reset();
-                                isRegNrPicked = false;
-                                Navigator.of(context).pop();
                               } else {
-                                if (mounted) {
+                                if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       duration: Duration(seconds: 3),

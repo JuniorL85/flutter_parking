@@ -73,7 +73,7 @@ class ParkingLogic extends SetMain {
     }
 
     final foundActiveParking = parkingList.indexWhere(
-      (activeParking) => (activeParking.vehicle.regNr.toUpperCase() ==
+      (activeParking) => (activeParking.vehicle!.regNr.toUpperCase() ==
               regNrInput!.toUpperCase() &&
           activeParking.endTime.microsecondsSinceEpoch >
               DateTime.now().microsecondsSinceEpoch),
@@ -190,7 +190,7 @@ class ParkingLogic extends SetMain {
       if (parkingList.isNotEmpty) {
         for (var park in parkingList) {
           printColor(
-              'Id: ${park.id}\n Parkering: ${park.parkingSpace.address}\n Time (start and end): ${park.startTime}-${park.endTime}\n RegNr: ${park.vehicle.regNr}',
+              'Id: ${park.id}\n Parkering: ${park.parkingSpace!.address}\n Time (start and end): ${park.startTime}-${park.endTime}\n RegNr: ${park.vehicle!.regNr}',
               'info');
         }
       } else {
@@ -230,7 +230,7 @@ class ParkingLogic extends SetMain {
     }
 
     final foundParkingIndexId = parkingList
-        .indexWhere((i) => (i.vehicle.regNr == regNrInput!.toUpperCase()));
+        .indexWhere((i) => (i.vehicle!.regNr == regNrInput!.toUpperCase()));
 
     if (foundParkingIndexId != -1) {
       print('Vill du uppdatera parkeringens sluttid? Annars tryck Enter: ');
@@ -304,7 +304,7 @@ class ParkingLogic extends SetMain {
     }
 
     final foundParkingIndexId = parkingList
-        .indexWhere((i) => (i.vehicle.regNr == regNrInput!.toUpperCase()));
+        .indexWhere((i) => (i.vehicle!.regNr == regNrInput!.toUpperCase()));
 
     if (foundParkingIndexId != -1) {
       final parking = parkingList[foundParkingIndexId];

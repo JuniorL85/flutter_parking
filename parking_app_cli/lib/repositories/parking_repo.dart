@@ -31,7 +31,7 @@ class ParkingRepository extends SetMain {
     return response;
   }
 
-  Future<dynamic> getAllParkings() async {
+  Future<List<Parking>> getAllParkings() async {
     final uri = Uri.parse('$host:$port/$resource');
 
     final response =
