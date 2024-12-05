@@ -1,6 +1,5 @@
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
-// import 'package:intl/intl.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
 import 'package:parking_user/providers/get_parking_spaces_provider.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
@@ -21,7 +20,6 @@ class StartParking extends StatefulWidget {
 class _StartParkingState extends State<StartParking> {
   final formKey = GlobalKey<FormState>();
   String? dropdownAvailableParkingSpaces;
-  // DateTime? _selectedDate;
   final ValueNotifier<DateTime?> _selectedDate = ValueNotifier(null);
   late List<Vehicle> vehicleList = [];
   String? _selectedRegNr;
@@ -135,28 +133,13 @@ class _StartParkingState extends State<StartParking> {
                       ValueListenableBuilder(
                           valueListenable: _selectedDate,
                           builder: (context, value, child) {
-                            return Text('');
+                            return const Text('');
                           }),
                       Datepicker(DateTime.now(), (value) {
                         setState(() {
                           _selectedDate.value = value;
                         });
                       })
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.end,
-                      //   crossAxisAlignment: CrossAxisAlignment.center,
-                      //   children: [
-                      //     Text(
-                      //       _selectedDate == null
-                      //           ? 'Inget valt datum'
-                      //           : DateFormat('yyyy-MM-dd kk:mm')
-                      //               .format(_selectedDate!),
-                      //     ),
-                      //     IconButton(
-                      //         onPressed: _presentDatePicker,
-                      //         icon: const Icon(Icons.calendar_view_month))
-                      //   ],
-                      // ),
                     ],
                   ),
                   SizedBox(
