@@ -11,7 +11,8 @@ class GetPerson extends ChangeNotifier {
     notifyListeners();
   }
 
-  Person get person => _person!;
+  Person get person =>
+      _person != null ? _person! : Person(name: '', socialSecurityNumber: '');
 
   Future<List<Person>> getAllPersons() async {
     _personList = await PersonRepository.instance.getAllPersons();

@@ -1,6 +1,8 @@
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:parking_app_cli/utils/calculate.dart';
 import 'package:parking_user/providers/get_parking_provider.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
 import 'package:parking_user/providers/get_vehicle_provider.dart';
@@ -8,17 +10,20 @@ import 'package:parking_user/widgets/start_parking.dart';
 import 'package:provider/provider.dart';
 
 class ManageParkings extends StatefulWidget {
-  ManageParkings(this.findActive, {super.key});
+  ManageParkings({super.key});
 
   bool isActiveParking = false;
-
-  final void Function() findActive;
 
   @override
   State<ManageParkings> createState() => _ManageParkingsState();
 }
 
 class _ManageParkingsState extends State<ManageParkings> {
+  List<Parking> parkingList = [];
+  int? foundActiveParking;
+  Person? person;
+  List<Vehicle> vehicleList = [];
+
   @override
   void initState() {
     super.initState();
@@ -26,19 +31,19 @@ class _ManageParkingsState extends State<ManageParkings> {
   }
 
   findActiveParking() async {
-    var parkingList = await super.context.read<GetParking>().getAllParkings();
+    parkingList = await super.context.read<GetParking>().getAllParkings();
 
     if (mounted) {
-      Person person = super.context.read<GetPerson>().person;
+      person = super.context.read<GetPerson>().person;
       List<Vehicle> list =
           await super.context.read<GetVehicle>().getAllVehicles();
-      var vehicleList = list
+      vehicleList = list
           .where((vehicle) =>
               vehicle.owner!.socialSecurityNumber ==
-              person.socialSecurityNumber)
+              person!.socialSecurityNumber)
           .toList();
 
-      final foundActiveParking = parkingList.indexWhere(
+      foundActiveParking = parkingList.indexWhere(
         (activeParking) => (vehicleList.any((v) =>
                 v.regNr.toUpperCase() ==
                 activeParking.vehicle!.regNr.toUpperCase()) &&
@@ -117,6 +122,24 @@ class _ManageParkingsState extends State<ManageParkings> {
                 child: ListView(
                   shrinkWrap: true,
                   children: <Widget>[
+                    Column(
+                      children: [
+                        Text(
+                            'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}'),
+                        Text(
+                            'Parkeringen startade: ${DateFormat('yyyy-MM-dd kk:mm').format(parkingList[foundActiveParking!].startTime)}'),
+                        Text(
+                            'Parkeringen avslutas: ${DateFormat('yyyy-MM-dd kk:mm').format(parkingList[foundActiveParking!].endTime)}'),
+                        Text(calculateDuration(
+                          parkingList[foundActiveParking!].startTime,
+                          parkingList[foundActiveParking!].endTime,
+                          parkingList[foundActiveParking!]
+                              .parkingSpace!
+                              .pricePerHour,
+                        ))
+                      ],
+                    ),
+                    const SizedBox(height: 30),
                     ListTile(
                       leading: const Icon(Icons.update),
                       title: Text(
@@ -158,67 +181,36 @@ class _ManageParkingsState extends State<ManageParkings> {
                             ),
                             TextButton(
                               onPressed: () async {
-                                var parkingList = await context
-                                    .read<GetParking>()
-                                    .getAllParkings();
+                                final res = await ParkingRepository.instance
+                                    .deleteParkings(
+                                        parkingList[foundActiveParking!]);
 
-                                if (context.mounted) {
-                                  Person person =
-                                      context.read<GetPerson>().person;
-                                  List<Vehicle> list = await context
-                                      .read<GetVehicle>()
-                                      .getAllVehicles();
-                                  var vehicleList = list
-                                      .where((vehicle) =>
-                                          vehicle.owner!.socialSecurityNumber ==
-                                          person.socialSecurityNumber)
-                                      .toList();
-
-                                  final foundActiveParking =
-                                      parkingList.indexWhere(
-                                    (activeParking) => (vehicleList.any((v) =>
-                                            v.regNr.toUpperCase() ==
-                                            activeParking.vehicle!.regNr
-                                                .toUpperCase()) &&
-                                        activeParking.endTime
-                                                .microsecondsSinceEpoch >
-                                            DateTime.now()
-                                                .microsecondsSinceEpoch),
-                                  );
-
-                                  final res = await ParkingRepository.instance
-                                      .deleteParkings(
-                                          parkingList[foundActiveParking]);
-
-                                  if (res.statusCode == 200) {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          duration: Duration(seconds: 3),
-                                          backgroundColor: Colors.lightGreen,
-                                          content: Text(
-                                              'Du har avslutat din parkering'),
-                                        ),
-                                      );
-                                      setState(() {
-                                        Navigator.pop(context);
-                                        findActiveParking();
-                                      });
-                                    }
-                                  } else {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          duration: Duration(seconds: 3),
-                                          backgroundColor: Colors.redAccent,
-                                          content: Text(
-                                              'Något gick fel vänligen försök igen senare'),
-                                        ),
-                                      );
+                                if (res.statusCode == 200) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        duration: Duration(seconds: 3),
+                                        backgroundColor: Colors.lightGreen,
+                                        content: Text(
+                                            'Du har avslutat din parkering'),
+                                      ),
+                                    );
+                                    setState(() {
                                       Navigator.pop(context);
-                                    }
+                                      findActiveParking();
+                                    });
+                                  }
+                                } else {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        duration: Duration(seconds: 3),
+                                        backgroundColor: Colors.redAccent,
+                                        content: Text(
+                                            'Något gick fel vänligen försök igen senare'),
+                                      ),
+                                    );
+                                    Navigator.pop(context);
                                   }
                                 }
                               },

@@ -1,11 +1,12 @@
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+// import 'package:intl/intl.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
 import 'package:parking_user/providers/get_parking_spaces_provider.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
 import 'package:parking_user/providers/get_vehicle_provider.dart';
 import 'package:parking_user/screens/manage_account.dart';
+import 'package:parking_user/widgets/datepicker_parking.dart';
 import 'package:provider/provider.dart';
 
 List<ParkingSpace> listAvailableParkingSpaces = [];
@@ -20,9 +21,10 @@ class StartParking extends StatefulWidget {
 class _StartParkingState extends State<StartParking> {
   final formKey = GlobalKey<FormState>();
   String? dropdownAvailableParkingSpaces;
-  DateTime? _selectedDate;
+  // DateTime? _selectedDate;
+  final ValueNotifier<DateTime?> _selectedDate = ValueNotifier(null);
   late List<Vehicle> vehicleList = [];
-  var _selectedRegNr;
+  String? _selectedRegNr;
 
   @override
   void initState() {
@@ -39,48 +41,6 @@ class _StartParkingState extends State<StartParking> {
         ),
       ),
     );
-  }
-
-  void _presentDatePicker() async {
-    final now = DateTime.now();
-    final lastDate = DateTime(now.year + 1, now.month, now.day);
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: now,
-      firstDate: now,
-      lastDate: lastDate,
-    );
-
-    if (pickedDate == null) return null;
-
-    if (mounted) {
-      final TimeOfDay? selectedTime = await showTimePicker(
-        context: context,
-        builder: (BuildContext context, Widget? child) {
-          return MediaQuery(
-            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-            child: child ?? Container(),
-          );
-        },
-        initialTime: TimeOfDay.fromDateTime(now),
-      );
-
-      setState(() {
-        selectedTime == null
-            ? now
-            : _selectedDate = DateTime(
-                now.year,
-                now.month,
-                now.day,
-                selectedTime.hour,
-                selectedTime.minute,
-              );
-      });
-    } else {
-      setState(() {
-        _selectedDate = pickedDate;
-      });
-    }
   }
 
   listParkingSpaces() async {
@@ -152,6 +112,11 @@ class _StartParkingState extends State<StartParking> {
                               _selectedRegNr = value!;
                             });
                           },
+                          onSaved: (value) {
+                            setState(() {
+                              _selectedRegNr = value!;
+                            });
+                          },
                           items: [
                             for (final vehicle in vehicleList)
                               DropdownMenuItem(
@@ -167,21 +132,31 @@ class _StartParkingState extends State<StartParking> {
                           ],
                         ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            _selectedDate == null
-                                ? 'Inget valt datum'
-                                : DateFormat('yyyy-MM-dd kk:mm')
-                                    .format(_selectedDate!),
-                          ),
-                          IconButton(
-                              onPressed: _presentDatePicker,
-                              icon: const Icon(Icons.calendar_view_month))
-                        ],
-                      ),
+                      ValueListenableBuilder(
+                          valueListenable: _selectedDate,
+                          builder: (context, value, child) {
+                            return Text('');
+                          }),
+                      Datepicker(DateTime.now(), (value) {
+                        setState(() {
+                          _selectedDate.value = value;
+                        });
+                      })
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.end,
+                      //   crossAxisAlignment: CrossAxisAlignment.center,
+                      //   children: [
+                      //     Text(
+                      //       _selectedDate == null
+                      //           ? 'Inget valt datum'
+                      //           : DateFormat('yyyy-MM-dd kk:mm')
+                      //               .format(_selectedDate!),
+                      //     ),
+                      //     IconButton(
+                      //         onPressed: _presentDatePicker,
+                      //         icon: const Icon(Icons.calendar_view_month))
+                      //   ],
+                      // ),
                     ],
                   ),
                   SizedBox(
@@ -230,25 +205,26 @@ class _StartParkingState extends State<StartParking> {
                       const SizedBox(width: 8),
                       ElevatedButton(
                         onPressed: () async {
-                          if (formKey.currentState!.validate()) {
-                            final vehicleType = vehicleList
-                                .where((vehicle) =>
-                                    vehicle.regNr == _selectedRegNr)
-                                .first
-                                .vehicleType;
+                          final vehicleType = vehicleList
+                              .where(
+                                  (vehicle) => vehicle.regNr == _selectedRegNr)
+                              .first
+                              .vehicleType;
 
-                            final parkingSpace = listAvailableParkingSpaces
-                                .where((parkingSpace) =>
-                                    parkingSpace.id ==
-                                    int.parse(dropdownAvailableParkingSpaces!))
-                                .first;
+                          final parkingSpace = listAvailableParkingSpaces
+                              .where((parkingSpace) =>
+                                  parkingSpace.id ==
+                                  int.parse(dropdownAvailableParkingSpaces!))
+                              .first;
 
-                            final person = context.read<GetPerson>().person;
+                          final person = context.read<GetPerson>().person;
 
+                          if (_selectedDate.value != null) {
+                            formKey.currentState!.save();
                             final res = await ParkingRepository.instance
                                 .addParking(Parking(
                                     vehicle: Vehicle(
-                                        regNr: _selectedRegNr,
+                                        regNr: _selectedRegNr!,
                                         vehicleType: vehicleType,
                                         owner: person),
                                     parkingSpace: ParkingSpace(
@@ -257,16 +233,16 @@ class _StartParkingState extends State<StartParking> {
                                         pricePerHour:
                                             parkingSpace.pricePerHour),
                                     startTime: DateTime.now(),
-                                    endTime: _selectedDate!));
+                                    endTime: _selectedDate.value!));
 
                             if (res.statusCode == 200) {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    duration: const Duration(seconds: 3),
+                                  const SnackBar(
+                                    duration: Duration(seconds: 3),
                                     backgroundColor: Colors.lightGreen,
-                                    content: Text(
-                                        'Du har uppdaterat fordon med registreringsnummer $_selectedRegNr'),
+                                    content:
+                                        Text('Du har startat en ny parkering!'),
                                   ),
                                 );
                                 Navigator.of(context).pop();
@@ -291,7 +267,7 @@ class _StartParkingState extends State<StartParking> {
                                   duration: Duration(seconds: 3),
                                   backgroundColor: Colors.redAccent,
                                   content: Text(
-                                      'Något gick fel vänligen försök igen senare'),
+                                      'Du har inte valt korrekt datum och tid!'),
                                 ),
                               );
                             }

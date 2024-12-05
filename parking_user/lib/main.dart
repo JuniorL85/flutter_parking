@@ -48,6 +48,7 @@ class MyApp extends StatelessWidget {
       ),
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.system,
+      locale: const Locale('sv', ''),
       home: const Login(),
     );
   }

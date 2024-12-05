@@ -71,7 +71,7 @@ class _ManageAccountState extends State<ManageAccount> {
       ),
       body: <Widget>[
         const Home(),
-        ManageParkings(() {}),
+        ManageParkings(),
         ManageVehicle(),
         const ManageSettings(),
       ][currentPageIndex],
