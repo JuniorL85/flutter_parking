@@ -1,7 +1,6 @@
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
-import 'package:provider/provider.dart';
 
 class GetParking extends ChangeNotifier {
   Parking? _parking;
@@ -23,8 +22,8 @@ class GetParking extends ChangeNotifier {
   @override
   notifyListeners();
 
-  findActiveParking(BuildContext context) async {
-    var parkingList = await context.read<GetParking>().getAllParkings();
+  Future<List<Parking>> findActiveParking() async {
+    var parkingList = await getAllParkings();
 
     List<Parking> activeParkings = parkingList
         .where(

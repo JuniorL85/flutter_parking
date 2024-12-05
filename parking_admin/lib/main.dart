@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:parking_admin/providers/get_parking_provider.dart';
 import 'package:parking_admin/views/add_parkingplace.dart';
 import 'package:parking_admin/views/delete_parkingplace.dart';
+import 'package:parking_admin/views/monitoring.dart';
 import 'package:parking_admin/views/show_parkingplaces.dart';
 import 'package:parking_admin/views/update_parkingplace.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
       home: const HomePage(title: 'ParkHere - Administrera parkeringsplatser'),
@@ -78,6 +79,7 @@ class _MyHomePageState extends State<HomePage> {
     const UpdateParkingplace(),
     const DeleteParkingplace(),
     const ShowParkingplaces(),
+    const Monitoring()
   ];
 
   @override

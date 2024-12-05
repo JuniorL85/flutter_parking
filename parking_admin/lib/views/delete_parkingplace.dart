@@ -32,11 +32,12 @@ class _DeleteParkingplaceState extends State<DeleteParkingplace> {
         key: formKey,
         child: Column(
           children: [
+            const SizedBox(height: 50),
             const Text(
               'Ta bort parkeringsplats',
-              style: TextStyle(fontSize: 24, color: Colors.blueGrey),
+              style: TextStyle(fontSize: 24),
             ),
-            const SizedBox(height: 70),
+            const SizedBox(height: 50),
             SizedBox(
               width: 300,
               child: TextFormField(

@@ -61,11 +61,12 @@ class _ManageParkingsState extends State<ManageParkings> {
   }
 
   calculateActiveParking() {
-    return Text(calculateDuration(
+    var price = calculateDuration(
       parkingList[foundActiveParking!].startTime,
       parkingList[foundActiveParking!].endTime,
       parkingList[foundActiveParking!].parkingSpace!.pricePerHour,
-    ));
+    );
+    return Text('Ditt pris kommer att bli ${price.toStringAsFixed(2)} kr');
   }
 
   @override

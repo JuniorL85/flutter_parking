@@ -36,11 +36,12 @@ class _UpdateParkingplaceState extends State<UpdateParkingplace> {
         key: formKey,
         child: Column(
           children: [
+            const SizedBox(height: 50),
             const Text(
               'Uppdatera parkeringsplats',
-              style: TextStyle(fontSize: 24, color: Colors.blueGrey),
+              style: TextStyle(fontSize: 24),
             ),
-            const SizedBox(height: 70),
+            const SizedBox(height: 50),
             if (!isId)
               Column(
                 children: [

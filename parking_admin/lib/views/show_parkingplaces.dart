@@ -29,6 +29,7 @@ class _ShowParkingplacesState extends State<ShowParkingplaces> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Visa alla parkeringsplatser"),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
