@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:parking_admin/providers/get_parking_provider.dart';
 import 'package:parking_admin/views/add_parkingplace.dart';
 import 'package:parking_admin/views/delete_parkingplace.dart';
 import 'package:parking_admin/views/show_parkingplaces.dart';
 import 'package:parking_admin/views/update_parkingplace.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => GetParking(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -59,6 +66,10 @@ class _MyHomePageState extends State<HomePage> {
     NavigationRailDestination(
       icon: Icon(Icons.local_parking_sharp),
       label: Text('Visa alla'),
+    ),
+    NavigationRailDestination(
+      icon: Icon(Icons.monitor_outlined),
+      label: Text('Övervakning'),
     ),
   ];
 
