@@ -37,7 +37,7 @@ class _DeleteParkingplaceState extends State<DeleteParkingplace> {
               'Ta bort parkeringsplats',
               style: TextStyle(fontSize: 24),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 20),
             SizedBox(
               width: 300,
               child: TextFormField(
