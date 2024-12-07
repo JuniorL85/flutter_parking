@@ -7,6 +7,7 @@ import 'package:parking_user/providers/get_parking_provider.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
 import 'package:parking_user/providers/get_vehicle_provider.dart';
 import 'package:parking_user/widgets/datepicker_parking.dart';
+import 'package:parking_user/widgets/show_parking_history.dart';
 import 'package:parking_user/widgets/start_parking.dart';
 import 'package:provider/provider.dart';
 
@@ -341,7 +342,36 @@ class _ManageParkingsState extends State<ManageParkings> {
                     ),
                   ],
                 ),
-              )
+              ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
+              child: ListView(
+                shrinkWrap: true,
+                children: <Widget>[
+                  ListTile(
+                    leading: const Icon(Icons.history_sharp),
+                    title: Text(
+                      'Visa historik',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface),
+                    ),
+                    tileColor: Theme.of(context).colorScheme.inversePrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(
+                          color: Theme.of(context).colorScheme.onSecondary),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (ctx) => const ShowParkingHistory(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
