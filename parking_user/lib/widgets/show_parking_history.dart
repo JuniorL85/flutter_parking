@@ -60,16 +60,17 @@ class ShowParkingHistory extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.all(3.0),
                         child: ListTile(
-                            leading: Text(
-                                '${calculateDuration(parking.startTime, parking.endTime, parking.parkingSpace!.pricePerHour).toStringAsFixed(2)} kr'),
+                            leading: Text(parking.parkingSpace!.id.toString()),
                             title: Text(
-                              '${parking.parkingSpace!.id.toString()} - ${parking.parkingSpace!.address}',
+                              parking.parkingSpace!.address,
                               style: TextStyle(
                                   color:
                                       Theme.of(context).colorScheme.onSurface),
                             ),
                             subtitle: Text(
                                 '${DateFormat('yyyy-MM-dd kk:mm').format(parking.startTime)} - ${DateFormat('yyyy-MM-dd kk:mm').format(parking.endTime)}'),
+                            trailing: Text(
+                                '${calculateDuration(parking.startTime, parking.endTime, parking.parkingSpace!.pricePerHour).toStringAsFixed(2)} kr'),
                             tileColor:
                                 Theme.of(context).colorScheme.inversePrimary,
                             shape: RoundedRectangleBorder(

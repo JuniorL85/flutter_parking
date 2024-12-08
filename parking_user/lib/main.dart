@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:parking_user/providers/change_theme_provider.dart';
 import 'package:parking_user/providers/get_parking_provider.dart';
 import 'package:parking_user/providers/get_parking_spaces_provider.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
@@ -27,6 +28,9 @@ void main() {
           ChangeNotifierProvider(
             create: (context) => GetParking(),
           ),
+          ChangeNotifierProvider(
+            create: (context) => ChangeThemeProvider(),
+          ),
         ],
         child: const MyApp(),
       ),
@@ -47,7 +51,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       darkTheme: ThemeData.dark(),
-      themeMode: ThemeMode.system,
+      themeMode: context.watch<ChangeThemeProvider>().currentThemeMode,
       locale: const Locale('sv', ''),
       home: const Login(),
     );

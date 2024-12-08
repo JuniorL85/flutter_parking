@@ -22,4 +22,17 @@ class GetPerson extends ChangeNotifier {
   List<Person> get personList => _personList;
   @override
   notifyListeners();
+
+  ThemeMode? currentThemeMode;
+
+  changeThemeMode(int index) {
+    if (index == 0) {
+      currentThemeMode = ThemeMode.light;
+    } else if (index == 1) {
+      currentThemeMode = ThemeMode.dark;
+    } else {
+      currentThemeMode = ThemeMode.system;
+    }
+    notifyListeners();
+  }
 }
