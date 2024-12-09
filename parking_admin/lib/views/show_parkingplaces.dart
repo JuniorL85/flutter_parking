@@ -110,27 +110,30 @@ class _ShowParkingplacesState extends State<ShowParkingplaces> {
             future: getParkingSpaces,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: parkingSpaceList.length,
-                    itemBuilder: (context, index) {
-                      var parkingPlace = parkingSpaceList[index];
-                      return ListTile(
-                        title: SizedBox(
-                          height: 90,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Id: ${parkingPlace.id.toString()}'),
-                              Text('Adress: ${parkingPlace.address}'),
-                              Text(
-                                  'Pris: ${parkingPlace.pricePerHour.toString()}kr/h'),
-                              const Divider(thickness: 1, height: 10),
-                            ],
+                return Expanded(
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      itemCount: parkingSpaceList.length,
+                      itemBuilder: (context, index) {
+                        var parkingPlace = parkingSpaceList[index];
+                        return ListTile(
+                          title: SizedBox(
+                            height: 90,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Id: ${parkingPlace.id.toString()}'),
+                                Text('Adress: ${parkingPlace.address}'),
+                                Text(
+                                    'Pris: ${parkingPlace.pricePerHour.toString()}kr/h'),
+                                const Divider(thickness: 1, height: 10),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    });
+                        );
+                      }),
+                );
               }
 
               if (snapshot.hasError) {
