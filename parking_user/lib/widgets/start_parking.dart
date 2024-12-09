@@ -211,7 +211,7 @@ class _StartParkingState extends State<StartParking> {
                                         vehicle.regNr == _selectedRegNr)
                                     .first
                                     .vehicleType;
-                                print('vehicleType: $vehicleType');
+
                                 final parkingSpace = listAvailableParkingSpaces
                                     .where((parkingSpace) =>
                                         parkingSpace.id ==
