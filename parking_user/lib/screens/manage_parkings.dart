@@ -73,157 +73,251 @@ class _ManageParkingsState extends State<ManageParkings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        margin: const EdgeInsets.only(top: 50),
-        child: Column(
-          children: [
-            Text(
-              'Hantera parkering',
-              style: TextStyle(
-                  fontSize: 24,
-                  color: Theme.of(context).colorScheme.inversePrimary),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              !widget.isActiveParking
-                  ? 'Du har inga aktiva parkeringar, välj nedan vad du vill göra'
-                  : 'Du har en aktiv parkering, välj nedan vad du vill göra',
-              style: TextStyle(
-                  fontSize: 12,
-                  color: Theme.of(context).colorScheme.inversePrimary),
-            ),
-            const SizedBox(height: 50),
-            if (!widget.isActiveParking)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView(
-                  shrinkWrap: true,
-                  children: <Widget>[
-                    ListTile(
-                      title: Text(
-                        'Starta parkering',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface),
-                      ),
-                      trailing: ConstrainedBox(
-                        constraints: const BoxConstraints.tightFor(width: 120),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context)
-                                .push(
-                              MaterialPageRoute(
-                                builder: (ctx) => const StartParking(),
-                              ),
-                            )
-                                .then((onValue) {
-                              setState(() {
-                                findActiveParking();
+        body: Container(
+          margin: const EdgeInsets.only(top: 50),
+          child: Column(
+            children: [
+              Text(
+                'Hantera parkering',
+                style: TextStyle(
+                    fontSize: 24,
+                    color: Theme.of(context).colorScheme.inversePrimary),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                !widget.isActiveParking
+                    ? 'Du har inga aktiva parkeringar, välj nedan vad du vill göra'
+                    : 'Du har en aktiv parkering, välj nedan vad du vill göra',
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.inversePrimary),
+              ),
+              const SizedBox(height: 50),
+              if (!widget.isActiveParking)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: <Widget>[
+                      ListTile(
+                        title: Text(
+                          'Starta parkering',
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface),
+                        ),
+                        trailing: ConstrainedBox(
+                          constraints:
+                              const BoxConstraints.tightFor(width: 120),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .push(
+                                MaterialPageRoute(
+                                  builder: (ctx) => const StartParking(),
+                                ),
+                              )
+                                  .then((onValue) {
+                                setState(() {
+                                  findActiveParking();
+                                });
                               });
-                            });
-                          },
-                          child: const Text('Starta'),
+                            },
+                            child: const Text('Starta'),
+                          ),
+                        ),
+                        tileColor: Theme.of(context).colorScheme.inversePrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(
+                              color: Theme.of(context).colorScheme.onSecondary),
                         ),
                       ),
-                      tileColor: Theme.of(context).colorScheme.inversePrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.onSecondary),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            if (widget.isActiveParking)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView(
-                  shrinkWrap: true,
-                  children: <Widget>[
-                    Column(
-                      children: [
-                        Text(
-                            'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}'),
-                        Text(
-                            'Parkeringen startade: ${DateFormat('yyyy-MM-dd kk:mm').format(parkingList[foundActiveParking!].startTime)}'),
-                        Text(
-                            'Parkeringen avslutas: ${DateFormat('yyyy-MM-dd kk:mm').format(parkingList[foundActiveParking!].endTime)}'),
-                        calculateActiveParking()
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-                    ListTile(
-                      title: Text(
-                        'Uppdatera sluttid',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface),
+              if (widget.isActiveParking)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: <Widget>[
+                      Column(
+                        children: [
+                          Text(
+                              'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}'),
+                          Text(
+                              'Parkeringen startade: ${DateFormat('yyyy-MM-dd kk:mm').format(parkingList[foundActiveParking!].startTime)}'),
+                          Text(
+                              'Parkeringen avslutas: ${DateFormat('yyyy-MM-dd kk:mm').format(parkingList[foundActiveParking!].endTime)}'),
+                          calculateActiveParking()
+                        ],
                       ),
-                      trailing: ConstrainedBox(
-                        constraints: const BoxConstraints.tightFor(width: 120),
-                        child: ElevatedButton(
-                          onPressed: () => showDialog<String>(
-                            context: context,
-                            builder: (BuildContext context) => AlertDialog(
-                              title: const Text('Uppdatera sluttid'),
-                              content: SizedBox(
-                                height: 120,
-                                child: Column(
-                                  children: [
-                                    const Text(
-                                        'Välj datum och tid för att uppdatera din sluttid'),
-                                    ValueListenableBuilder(
-                                        valueListenable: _selectedDate,
-                                        builder: (context, value, child) {
-                                          return const Text('');
-                                        }),
-                                    Datepicker(
-                                        parkingList[foundActiveParking!]
-                                            .startTime, (value) {
-                                      setState(() {
-                                        _selectedDate.value = value;
-                                      });
-                                    }),
-                                  ],
+                      const SizedBox(height: 30),
+                      ListTile(
+                        title: Text(
+                          'Uppdatera sluttid',
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface),
+                        ),
+                        trailing: ConstrainedBox(
+                          constraints:
+                              const BoxConstraints.tightFor(width: 120),
+                          child: ElevatedButton(
+                            onPressed: () => showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                title: const Text('Uppdatera sluttid'),
+                                content: SizedBox(
+                                  height: 120,
+                                  child: Column(
+                                    children: [
+                                      const Text(
+                                          'Välj datum och tid för att uppdatera din sluttid'),
+                                      ValueListenableBuilder(
+                                          valueListenable: _selectedDate,
+                                          builder: (context, value, child) {
+                                            return const Text('');
+                                          }),
+                                      Datepicker(
+                                          parkingList[foundActiveParking!]
+                                              .startTime, (value) {
+                                        setState(() {
+                                          _selectedDate.value = value;
+                                        });
+                                      }),
+                                    ],
+                                  ),
                                 ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, 'Avbryt'),
+                                    child: const Text('Avbryt'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      if (_selectedDate.value != null) {
+                                        final res = await ParkingRepository.instance.updateParkings(Parking(
+                                            vehicle: Vehicle(
+                                                regNr:
+                                                    parkingList[foundActiveParking!]
+                                                        .vehicle!
+                                                        .regNr,
+                                                vehicleType:
+                                                    parkingList[foundActiveParking!]
+                                                        .vehicle!
+                                                        .vehicleType,
+                                                owner: person),
+                                            parkingSpace: ParkingSpace(
+                                                id: parkingList[foundActiveParking!]
+                                                    .parkingSpace!
+                                                    .id,
+                                                address:
+                                                    parkingList[foundActiveParking!]
+                                                        .parkingSpace!
+                                                        .address,
+                                                pricePerHour:
+                                                    parkingList[foundActiveParking!]
+                                                        .parkingSpace!
+                                                        .pricePerHour),
+                                            id: parkingList[foundActiveParking!]
+                                                .id,
+                                            startTime:
+                                                parkingList[foundActiveParking!]
+                                                    .startTime,
+                                            endTime: _selectedDate.value!));
+
+                                        if (res.statusCode == 200) {
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                duration: Duration(seconds: 3),
+                                                backgroundColor:
+                                                    Colors.lightGreen,
+                                                content: Text(
+                                                    'Du har uppdaterat sluttiden på din parkering'),
+                                              ),
+                                            );
+                                            setState(() {
+                                              Navigator.pop(context);
+                                              findActiveParking();
+                                            });
+                                          }
+                                        } else {
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                duration: Duration(seconds: 3),
+                                                backgroundColor:
+                                                    Colors.redAccent,
+                                                content: Text(
+                                                    'Något gick fel vänligen försök igen senare'),
+                                              ),
+                                            );
+                                            Navigator.pop(context);
+                                          }
+                                        }
+                                      } else {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              duration: Duration(seconds: 3),
+                                              backgroundColor: Colors.redAccent,
+                                              content: Text(
+                                                  'Du har inte valt korrekt datum och tid!'),
+                                            ),
+                                          );
+                                          Navigator.pop(context);
+                                        }
+                                      }
+                                    },
+                                    child: const Text('Uppdatera'),
+                                  ),
+                                ],
                               ),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(context, 'Avbryt'),
-                                  child: const Text('Avbryt'),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    if (_selectedDate.value != null) {
-                                      final res = await ParkingRepository.instance.updateParkings(Parking(
-                                          vehicle: Vehicle(
-                                              regNr:
-                                                  parkingList[foundActiveParking!]
-                                                      .vehicle!
-                                                      .regNr,
-                                              vehicleType:
-                                                  parkingList[foundActiveParking!]
-                                                      .vehicle!
-                                                      .vehicleType,
-                                              owner: person),
-                                          parkingSpace: ParkingSpace(
-                                              id: parkingList[foundActiveParking!]
-                                                  .parkingSpace!
-                                                  .id,
-                                              address:
-                                                  parkingList[foundActiveParking!]
-                                                      .parkingSpace!
-                                                      .address,
-                                              pricePerHour:
-                                                  parkingList[foundActiveParking!]
-                                                      .parkingSpace!
-                                                      .pricePerHour),
-                                          id: parkingList[foundActiveParking!]
-                                              .id,
-                                          startTime:
-                                              parkingList[foundActiveParking!]
-                                                  .startTime,
-                                          endTime: _selectedDate.value!));
+                            ),
+                            child: const Text('Uppdatera'),
+                          ),
+                        ),
+                        tileColor: Theme.of(context).colorScheme.inversePrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(
+                              color: Theme.of(context).colorScheme.onSecondary),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      ListTile(
+                        title: Text(
+                          'Avsluta parkering',
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface),
+                        ),
+                        trailing: ConstrainedBox(
+                          constraints:
+                              const BoxConstraints.tightFor(width: 120),
+                          child: ElevatedButton(
+                            onPressed: () => showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                title: const Text('Avsluta parkering'),
+                                content: const Text(
+                                    'Är du säker på att du vill avsluta din parkering? Det går inte att ångra efter att du tryckt på knappen "Avsluta".'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, 'Avbryt'),
+                                    child: const Text('Avbryt'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      final res = await ParkingRepository
+                                          .instance
+                                          .deleteParkings(
+                                              parkingList[foundActiveParking!]);
 
                                       if (res.statusCode == 200) {
                                         if (context.mounted) {
@@ -234,7 +328,7 @@ class _ManageParkingsState extends State<ManageParkings> {
                                               backgroundColor:
                                                   Colors.lightGreen,
                                               content: Text(
-                                                  'Du har uppdaterat sluttiden på din parkering'),
+                                                  'Du har avslutat din parkering'),
                                             ),
                                           );
                                           setState(() {
@@ -256,150 +350,40 @@ class _ManageParkingsState extends State<ManageParkings> {
                                           Navigator.pop(context);
                                         }
                                       }
-                                    } else {
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            duration: Duration(seconds: 3),
-                                            backgroundColor: Colors.redAccent,
-                                            content: Text(
-                                                'Du har inte valt korrekt datum och tid!'),
-                                          ),
-                                        );
-                                        Navigator.pop(context);
-                                      }
-                                    }
-                                  },
-                                  child: const Text('Uppdatera'),
-                                ),
-                              ],
+                                    },
+                                    child: const Text('Avsluta'),
+                                  ),
+                                ],
+                              ),
                             ),
+                            child: const Text('Avsluta'),
                           ),
-                          child: const Text('Uppdatera'),
+                        ),
+                        tileColor: Theme.of(context).colorScheme.inversePrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(
+                              color: Theme.of(context).colorScheme.onSecondary),
                         ),
                       ),
-                      tileColor: Theme.of(context).colorScheme.inversePrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.onSecondary),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    ListTile(
-                      title: Text(
-                        'Avsluta parkering',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface),
-                      ),
-                      trailing: ConstrainedBox(
-                        constraints: const BoxConstraints.tightFor(width: 120),
-                        child: ElevatedButton(
-                          onPressed: () => showDialog<String>(
-                            context: context,
-                            builder: (BuildContext context) => AlertDialog(
-                              title: const Text('Avsluta parkering'),
-                              content: const Text(
-                                  'Är du säker på att du vill avsluta din parkering? Det går inte att ångra efter att du tryckt på knappen "Avsluta".'),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(context, 'Avbryt'),
-                                  child: const Text('Avbryt'),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    final res = await ParkingRepository.instance
-                                        .deleteParkings(
-                                            parkingList[foundActiveParking!]);
-
-                                    if (res.statusCode == 200) {
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            duration: Duration(seconds: 3),
-                                            backgroundColor: Colors.lightGreen,
-                                            content: Text(
-                                                'Du har avslutat din parkering'),
-                                          ),
-                                        );
-                                        setState(() {
-                                          Navigator.pop(context);
-                                          findActiveParking();
-                                        });
-                                      }
-                                    } else {
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            duration: Duration(seconds: 3),
-                                            backgroundColor: Colors.redAccent,
-                                            content: Text(
-                                                'Något gick fel vänligen försök igen senare'),
-                                          ),
-                                        );
-                                        Navigator.pop(context);
-                                      }
-                                    }
-                                  },
-                                  child: const Text('Avsluta'),
-                                ),
-                              ],
-                            ),
-                          ),
-                          child: const Text('Avsluta'),
-                        ),
-                      ),
-                      tileColor: Theme.of(context).colorScheme.inversePrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.onSecondary),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
-              child: ListView(
-                shrinkWrap: true,
-                children: <Widget>[
-                  ListTile(
-                    title: Text(
-                      'Visa historik',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface),
-                    ),
-                    trailing: ConstrainedBox(
-                      constraints: const BoxConstraints.tightFor(width: 120),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (ctx) => const ShowParkingHistory(),
-                            ),
-                          );
-                        },
-                        child: const Text('Historik'),
-                      ),
-                    ),
-                    tileColor: Theme.of(context).colorScheme.inversePrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(
-                          color: Theme.of(context).colorScheme.onSecondary),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          ],
+                ),
+            ],
+          ),
         ),
-      ),
-    );
+        floatingActionButton: ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) => const ShowParkingHistory(),
+              ),
+            );
+          },
+          style: TextButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.inversePrimary),
+          child: const Text('Visa historik'),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat);
   }
 }

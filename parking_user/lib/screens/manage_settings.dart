@@ -137,84 +137,7 @@ class _ManageSettingsState extends State<ManageSettings> {
                       tileColor: Theme.of(context).colorScheme.inversePrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.onSecondary),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  ListTile(
-                    title: Text(
-                      'Radera konto',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface),
-                    ),
-                    trailing: ConstrainedBox(
-                      constraints: const BoxConstraints.tightFor(width: 120),
-                      child: ElevatedButton(
-                        onPressed: () => showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            title: const Text('Radera konto'),
-                            content: const Text(
-                                'Är du säker på att du vill radera ditt konto? Det går inte att ångra efter att du tryckt på knappen "Radera konto".'),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(context, 'Avbryt'),
-                                child: const Text('Avbryt'),
-                              ),
-                              TextButton(
-                                onPressed: () async {
-                                  final res = await PersonRepository.instance
-                                      .deletePerson(person);
-                                  if (res.statusCode == 200) {
-                                    if (context.mounted) {
-                                      Provider.of<GetPerson>(context,
-                                              listen: false)
-                                          .getAllPersons();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          duration: Duration(seconds: 3),
-                                          backgroundColor: Colors.lightGreen,
-                                          content: Text(
-                                              'Du har raderat ditt konto!'),
-                                        ),
-                                      );
-                                      setState(() {
-                                        Navigator.popUntil(
-                                            context, ModalRoute.withName('/'));
-                                      });
-                                    }
-                                  } else {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          duration: Duration(seconds: 3),
-                                          backgroundColor: Colors.redAccent,
-                                          content: Text(
-                                              'Något gick fel vänligen försök igen senare'),
-                                        ),
-                                      );
-                                      Navigator.pop(context);
-                                    }
-                                  }
-                                },
-                                child: const Text('Radera konto'),
-                              ),
-                            ],
-                          ),
-                        ),
-                        child: const Text('Radera'),
-                      ),
-                    ),
-                    tileColor: Theme.of(context).colorScheme.inversePrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(
-                          color: Theme.of(context).colorScheme.onSecondary),
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -295,8 +218,6 @@ class _ManageSettingsState extends State<ManageSettings> {
                     tileColor: Theme.of(context).colorScheme.inversePrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(
-                          color: Theme.of(context).colorScheme.onSecondary),
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -318,8 +239,6 @@ class _ManageSettingsState extends State<ManageSettings> {
                     tileColor: Theme.of(context).colorScheme.inversePrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(
-                          color: Theme.of(context).colorScheme.onSecondary),
                     ),
                   ),
                 ],
@@ -328,6 +247,61 @@ class _ManageSettingsState extends State<ManageSettings> {
           ],
         ),
       ),
+      floatingActionButton: ElevatedButton(
+        onPressed: () => showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Radera konto'),
+            content: const Text(
+                'Är du säker på att du vill radera ditt konto? Det går inte att ångra efter att du tryckt på knappen "Radera konto".'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'Avbryt'),
+                child: const Text('Avbryt'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final res =
+                      await PersonRepository.instance.deletePerson(person);
+                  if (res.statusCode == 200) {
+                    if (context.mounted) {
+                      Provider.of<GetPerson>(context, listen: false)
+                          .getAllPersons();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          duration: Duration(seconds: 3),
+                          backgroundColor: Colors.lightGreen,
+                          content: Text('Du har raderat ditt konto!'),
+                        ),
+                      );
+                      setState(() {
+                        Navigator.popUntil(context, ModalRoute.withName('/'));
+                      });
+                    }
+                  } else {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          duration: Duration(seconds: 3),
+                          backgroundColor: Colors.redAccent,
+                          content: Text(
+                              'Något gick fel vänligen försök igen senare'),
+                        ),
+                      );
+                      Navigator.pop(context);
+                    }
+                  }
+                },
+                child: const Text('Radera konto'),
+              ),
+            ],
+          ),
+        ),
+        style: TextButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.inversePrimary),
+        child: const Text('Radera konto'),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

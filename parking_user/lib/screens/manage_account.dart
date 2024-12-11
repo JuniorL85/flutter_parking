@@ -29,8 +29,24 @@ class _ManageAccountState extends State<ManageAccount> {
     final person = context.watch<GetPerson>().person;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Välkommen ${person.name}'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(
+          'Välkommen ${person.name}',
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.bottomLeft,
+                end: Alignment.topRight,
+                colors: <Color>[
+                  Theme.of(context).colorScheme.onInverseSurface,
+                  Theme.of(context).colorScheme.inversePrimary
+                ]),
+          ),
+        ),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -46,6 +62,8 @@ class _ManageAccountState extends State<ManageAccount> {
           setPageIndex(index);
         },
         indicatorColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
+        surfaceTintColor: Theme.of(context).colorScheme.onPrimaryFixed,
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
