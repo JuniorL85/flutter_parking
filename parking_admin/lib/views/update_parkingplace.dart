@@ -165,51 +165,73 @@ class _UpdateParkingplaceState extends State<UpdateParkingplace> {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () async {
-                      if (formKey.currentState!.validate()) {
-                        formKey.currentState!.save();
-
-                        final res = await ParkingSpaceRepository.instance
-                            .updateParkingSpace(
-                          ParkingSpace(
-                            id: chosenParkingSpace!.id,
-                            address: address!,
-                            pricePerHour: int.parse(pricePerHour!),
+                    onPressed: () => showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        title: const Text('Uppdatera parkeringsplats'),
+                        content: Text(
+                            'Är du säker på att du vill uppdatera parkeringsplatsen med id: ${chosenParkingSpace!.id}?\nDet går inte att ångra efter att du tryckt på knappen "Uppdatera".'),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context, 'Avbryt');
+                            },
+                            child: const Text('Avbryt'),
                           ),
-                        );
+                          TextButton(
+                            onPressed: () async {
+                              if (formKey.currentState!.validate()) {
+                                formKey.currentState!.save();
 
-                        if (res.statusCode == 200) {
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                duration: const Duration(seconds: 3),
-                                backgroundColor: Colors.lightGreen,
-                                content: Text(
-                                    'Du har uppdaterat parkeringsplats med id: ${chosenParkingSpace!.id}'),
-                              ),
-                            );
-                          }
-                          formKey.currentState?.reset();
-                          setState(() {
-                            isId = false;
-                            getParkingSpaceList();
-                          });
-                        } else {
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                duration: Duration(seconds: 3),
-                                backgroundColor: Colors.redAccent,
-                                content: Text(
-                                    'Något gick fel vänligen försök igen senare'),
-                              ),
-                            );
-                          }
-                        }
-                      }
-                    },
+                                final res = await ParkingSpaceRepository
+                                    .instance
+                                    .updateParkingSpace(
+                                  ParkingSpace(
+                                    id: chosenParkingSpace!.id,
+                                    address: address!,
+                                    pricePerHour: int.parse(pricePerHour!),
+                                  ),
+                                );
+
+                                if (res.statusCode == 200) {
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        duration: const Duration(seconds: 3),
+                                        backgroundColor: Colors.lightGreen,
+                                        content: Text(
+                                            'Du har uppdaterat parkeringsplats med id: ${chosenParkingSpace!.id}'),
+                                      ),
+                                    );
+                                  }
+                                  formKey.currentState?.reset();
+                                  setState(() {
+                                    isId = false;
+                                    getParkingSpaceList();
+                                  });
+                                } else {
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        duration: Duration(seconds: 3),
+                                        backgroundColor: Colors.redAccent,
+                                        content: Text(
+                                            'Något gick fel vänligen försök igen senare'),
+                                      ),
+                                    );
+                                  }
+                                }
+                              }
+                            },
+                            child: const Text('Uppdatera'),
+                          )
+                        ],
+                      ),
+                    ),
                     child: const Text('Uppdatera parkeringsplats'),
-                  )
+                  ),
                 ],
               )
           ],

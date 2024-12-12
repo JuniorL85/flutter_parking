@@ -79,66 +79,86 @@ class _AddParkingplaceState extends State<AddParkingplace> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () async {
-                if (formKey.currentState!.validate()) {
-                  if (validateNumber(pricePerHour!)) {
-                    final res =
-                        await ParkingSpaceRepository.instance.addParkingSpace(
-                      ParkingSpace(
-                        address: address!,
-                        pricePerHour: int.parse(pricePerHour!),
-                      ),
-                    );
-                    if (res.statusCode == 200) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            duration: Duration(seconds: 3),
-                            backgroundColor: Colors.lightGreen,
-                            content:
-                                Text('Du har lagt till en ny parkeringsplats!'),
-                          ),
-                        );
-                      }
-                      formKey.currentState?.reset();
-                    } else {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            duration: Duration(seconds: 3),
-                            backgroundColor: Colors.redAccent,
-                            content: Text(
-                                'Något gick fel vänligen försök igen senare'),
-                          ),
-                        );
-                      }
-                    }
-                  } else {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          duration: Duration(seconds: 3),
-                          backgroundColor: Colors.redAccent,
-                          content:
-                              Text('Du måste ange pris per timme i siffror!'),
-                        ),
-                      );
-                    }
-                  }
-                } else {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        duration: Duration(seconds: 3),
-                        backgroundColor: Colors.redAccent,
-                        content:
-                            Text('Något gick fel vänligen försök igen senare'),
-                      ),
-                    );
-                  }
-                  return;
-                }
-              },
+              onPressed: () => showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text('Lägg till parkeringsplats'),
+                  content: const Text(
+                      'Är du säker på att du vill lägga till en parkeringsplats?\nDet går inte att ångra efter att du tryckt på knappen "Lägg till".'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context, 'Avbryt');
+                      },
+                      child: const Text('Avbryt'),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        if (formKey.currentState!.validate()) {
+                          if (validateNumber(pricePerHour!)) {
+                            final res = await ParkingSpaceRepository.instance
+                                .addParkingSpace(
+                              ParkingSpace(
+                                address: address!,
+                                pricePerHour: int.parse(pricePerHour!),
+                              ),
+                            );
+                            if (res.statusCode == 200) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    duration: Duration(seconds: 3),
+                                    backgroundColor: Colors.lightGreen,
+                                    content: Text(
+                                        'Du har lagt till en ny parkeringsplats!'),
+                                  ),
+                                );
+                              }
+                              formKey.currentState?.reset();
+                            } else {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    duration: Duration(seconds: 3),
+                                    backgroundColor: Colors.redAccent,
+                                    content: Text(
+                                        'Något gick fel vänligen försök igen senare'),
+                                  ),
+                                );
+                              }
+                            }
+                          } else {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  duration: Duration(seconds: 3),
+                                  backgroundColor: Colors.redAccent,
+                                  content: Text(
+                                      'Du måste ange pris per timme i siffror!'),
+                                ),
+                              );
+                            }
+                          }
+                        } else {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                duration: Duration(seconds: 3),
+                                backgroundColor: Colors.redAccent,
+                                content: Text(
+                                    'Något gick fel vänligen försök igen senare'),
+                              ),
+                            );
+                          }
+                          return;
+                        }
+                        Navigator.pop(context, 'Avbryt');
+                      },
+                      child: const Text('Lägg till'),
+                    ),
+                  ],
+                ),
+              ),
               child: const Text('Lägg till'),
             ),
           ],

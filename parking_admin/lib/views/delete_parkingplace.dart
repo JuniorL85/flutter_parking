@@ -64,71 +64,89 @@ class _DeleteParkingplaceState extends State<DeleteParkingplace> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () async {
-                if (formKey.currentState!.validate()) {
-                  final index = parkingSpaceList
-                      .indexWhere((i) => i.id == int.parse(idToDelete!));
+              onPressed: () => showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text('Ta bort parkeringsplats'),
+                  content: Text(
+                      'Är du säker på att du vill radera parkeringsplats med id: $idToDelete?\nDet går inte att ångra efter att du tryckt på knappen "Ta bort".'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'Avbryt'),
+                      child: const Text('Avbryt'),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        if (formKey.currentState!.validate()) {
+                          final index = parkingSpaceList.indexWhere(
+                              (i) => i.id == int.parse(idToDelete!));
 
-                  if (index != -1) {
-                    final res = await ParkingSpaceRepository.instance
-                        .deleteParkingSpace(parkingSpaceList[index]);
+                          if (index != -1) {
+                            final res = await ParkingSpaceRepository.instance
+                                .deleteParkingSpace(parkingSpaceList[index]);
 
-                    if (res.statusCode == 200) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            duration: const Duration(seconds: 3),
-                            backgroundColor: Colors.lightGreen,
-                            content: Text(
-                                'Du har raderat parkeringsplats med id: $idToDelete'),
-                          ),
-                        );
-                      }
-                      formKey.currentState?.reset();
-                      setState(() {
-                        getParkingSpaceList();
-                      });
-                    } else {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            duration: Duration(seconds: 3),
-                            backgroundColor: Colors.redAccent,
-                            content: Text(
-                                'Något gick fel vänligen försök igen senare'),
-                          ),
-                        );
-                      }
-                    }
-                  } else {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          duration: Duration(seconds: 3),
-                          backgroundColor: Colors.redAccent,
-                          content: Text(
-                              'Finns ingen parkeringsplats med angivet id'),
-                        ),
-                      );
-                    }
-                    formKey.currentState?.reset();
-                  }
-                } else {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        duration: Duration(seconds: 3),
-                        backgroundColor: Colors.redAccent,
-                        content:
-                            Text('Något gick fel vänligen försök igen senare'),
-                      ),
-                    );
-                  }
-                  return;
-                }
-              },
+                            if (res.statusCode == 200) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    duration: const Duration(seconds: 3),
+                                    backgroundColor: Colors.lightGreen,
+                                    content: Text(
+                                        'Du har raderat parkeringsplats med id: $idToDelete'),
+                                  ),
+                                );
+                              }
+                              formKey.currentState?.reset();
+                              setState(() {
+                                getParkingSpaceList();
+                              });
+                            } else {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    duration: Duration(seconds: 3),
+                                    backgroundColor: Colors.redAccent,
+                                    content: Text(
+                                        'Något gick fel vänligen försök igen senare'),
+                                  ),
+                                );
+                              }
+                            }
+                          } else {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  duration: Duration(seconds: 3),
+                                  backgroundColor: Colors.redAccent,
+                                  content: Text(
+                                      'Finns ingen parkeringsplats med angivet id'),
+                                ),
+                              );
+                            }
+                            formKey.currentState?.reset();
+                          }
+                        } else {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                duration: Duration(seconds: 3),
+                                backgroundColor: Colors.redAccent,
+                                content: Text(
+                                    'Något gick fel vänligen försök igen senare'),
+                              ),
+                            );
+                          }
+                          return;
+                        }
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Ta bort'),
+                    )
+                  ],
+                ),
+              ),
               child: const Text('Ta bort'),
-            )
+            ),
           ],
         ),
       ),

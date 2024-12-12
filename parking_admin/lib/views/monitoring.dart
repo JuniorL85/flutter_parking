@@ -76,6 +76,20 @@ class _MonitoringState extends State<Monitoring> {
     }
   }
 
+  updateTheme() {
+    final content = BoxDecoration(
+      borderRadius: BorderRadius.circular(10),
+      gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.center,
+          colors: <Color>[
+            Theme.of(context).colorScheme.onInverseSurface,
+            Theme.of(context).colorScheme.inversePrimary
+          ]),
+    );
+    return content;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -99,71 +113,63 @@ class _MonitoringState extends State<Monitoring> {
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return Card(
-                    color: Theme.of(context).colorScheme.inversePrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(
-                          color: Theme.of(context).colorScheme.onSecondary),
-                    ),
-                    borderOnForeground: true,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        ListTile(
-                          leading: const Icon(Icons.summarize_outlined),
-                          title: const Text('Total summa aktiva parkeringar'),
-                          subtitle: Text('$totalSum kr'),
-                        ),
-                      ],
+                    color: Colors.transparent,
+                    child: Container(
+                      decoration: updateTheme(),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            leading: const Icon(Icons.summarize_outlined),
+                            title: const Text('Total summa aktiva parkeringar'),
+                            subtitle: Text('$totalSum kr'),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 } else if (index == 1) {
                   return Card(
-                    color: Theme.of(context).colorScheme.inversePrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(
-                          color: Theme.of(context).colorScheme.onSecondary),
-                    ),
-                    borderOnForeground: true,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        ListTile(
-                          leading: const Icon(Icons.local_parking_sharp),
-                          title: const Text('Populäraste parkeringsplatsen'),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: mostPopularParkings.map((parking) {
-                              return Text(
-                                'Id: ${parking.parkingSpace?.id}, '
-                                'Adress: ${parking.parkingSpace?.address}, '
-                                'Parkerad på: ${mapData[parking.parkingSpace?.id]}',
-                              );
-                            }).toList(),
+                    color: Colors.transparent,
+                    child: Container(
+                      decoration: updateTheme(),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            leading: const Icon(Icons.local_parking_sharp),
+                            title: const Text('Populäraste parkeringsplatsen'),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: mostPopularParkings.map((parking) {
+                                return Text(
+                                  'Id: ${parking.parkingSpace?.id}, '
+                                  'Adress: ${parking.parkingSpace?.address}, '
+                                  'Parkerad på: ${mapData[parking.parkingSpace?.id]}',
+                                );
+                              }).toList(),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 } else {
                   return Card(
-                    color: Theme.of(context).colorScheme.inversePrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(
-                          color: Theme.of(context).colorScheme.onSecondary),
-                    ),
-                    borderOnForeground: true,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        ListTile(
-                          leading: const Icon(Icons.notifications_active_sharp),
-                          title: const Text('Antal aktiva'),
-                          subtitle: Text('${activeParkingsList.length} st'),
-                        ),
-                      ],
+                    color: Colors.transparent,
+                    child: Container(
+                      decoration: updateTheme(),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            leading:
+                                const Icon(Icons.notifications_active_sharp),
+                            title: const Text('Antal aktiva'),
+                            subtitle: Text('${activeParkingsList.length} st'),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 }
