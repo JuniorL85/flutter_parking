@@ -31,10 +31,10 @@ class _ManageAccountState extends State<ManageAccount> {
       appBar: AppBar(
         title: Text(
           'Välkommen ${person.name}',
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface),
         ),
         flexibleSpace: Container(
           decoration: BoxDecoration(

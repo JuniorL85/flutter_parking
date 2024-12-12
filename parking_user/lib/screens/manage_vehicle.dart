@@ -82,13 +82,7 @@ class ManageVehicle extends StatelessWidget {
                       }
                     },
                     child: Card(
-                        // color: Theme.of(context).colorScheme.inversePrimary,
-                        // shape: RoundedRectangleBorder(
-                        //   borderRadius: BorderRadius.circular(10),
-                        //   side: BorderSide(
-                        //       color: Theme.of(context).colorScheme.onSecondary),
-                        // ),
-                        borderOnForeground: true,
+                        color: Colors.transparent,
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),

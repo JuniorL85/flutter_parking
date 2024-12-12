@@ -35,7 +35,7 @@ class ShowVehicles extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'Dina fordon',
@@ -43,13 +43,6 @@ class ShowVehicles extends StatelessWidget {
                       fontSize: 24,
                       color: Theme.of(context).colorScheme.inversePrimary),
                 ),
-                TextButton.icon(
-                  label: const Text('Tillbaka'),
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
               ],
             ),
           ),
@@ -62,32 +55,36 @@ class ShowVehicles extends StatelessWidget {
                         vehicle.owner!.socialSecurityNumber ==
                         person.socialSecurityNumber)
                     .toList();
-                return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: formattedSnapshot.length,
-                    itemBuilder: (context, index) {
-                      var vehicle = formattedSnapshot[index];
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                            leading: getIcon(vehicle.vehicleType),
-                            title: Text(
-                              vehicle.regNr,
-                              style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface),
-                            ),
-                            tileColor:
-                                Theme.of(context).colorScheme.inversePrimary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: BorderSide(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSecondary),
-                            )),
-                      );
-                    });
+                return Expanded(
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: formattedSnapshot.length,
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (context, index) {
+                        var vehicle = formattedSnapshot[index];
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ListTile(
+                              leading: getIcon(vehicle.vehicleType),
+                              title: Text(
+                                vehicle.regNr,
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
+                              ),
+                              tileColor:
+                                  Theme.of(context).colorScheme.inversePrimary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: BorderSide(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary),
+                              )),
+                        );
+                      }),
+                );
               }
 
               if (snapshot.hasError) {
@@ -98,6 +95,13 @@ class ShowVehicles extends StatelessWidget {
             },
           ),
         ],
+      ),
+      floatingActionButton: TextButton.icon(
+        label: const Text('Tillbaka'),
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
       ),
     );
   }

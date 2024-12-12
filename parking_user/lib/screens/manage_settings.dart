@@ -15,7 +15,7 @@ class ManageSettings extends StatefulWidget {
 }
 
 class _ManageSettingsState extends State<ManageSettings> {
-  ThemeSelected? _themeSelected = ThemeSelected.defaultTheme;
+  ThemeSelected? _themeSelected;
   final formKey = GlobalKey<FormState>();
   String? name;
 
