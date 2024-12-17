@@ -11,6 +11,7 @@ dependencies:
   uuid: ^4.5.1
   objectbox: ^4.0.3
   safe_int_id: ^1.1.1
+  flutter_bloc: ^8.1.6
   # path: ^1.8.0
 
 dev_dependencies:
