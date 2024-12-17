@@ -8,7 +8,6 @@ export 'src/models/parking.dart';
 export 'src/models/parking_space.dart';
 export 'src/models/person.dart';
 export 'src/models/vehicle.dart';
-export 'src/bloc/theme_bloc.dart';
 
 export 'objectbox.g.dart';
 
