@@ -11,6 +11,10 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
     on<LoadParkingSpaces>((event, emit) async {
       await onLoadParkingSpaces(emit);
     });
+
+    on<DeleteParkingSpace>((event, emit) async {
+      await onDeleteParkingSpace(emit, event.parkingSpace);
+    });
   }
 
   Future<void> onLoadParkingSpaces(Emitter<ParkingSpacesState> emit) async {
@@ -19,6 +23,23 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
       _parkingSpaceList =
           await ParkingSpaceRepository.instance.getAllParkingSpaces();
       emit(ParkingSpacesLoaded(parkingSpaces: _parkingSpaceList));
+    } catch (e) {
+      emit(ParkingSpacesError(message: e.toString()));
+    }
+  }
+
+  onDeleteParkingSpace(
+      Emitter<ParkingSpacesState> emit, ParkingSpace parkingSpace) async {
+    try {
+      await ParkingSpaceRepository.instance.deleteParkingSpace(ParkingSpace(
+        id: parkingSpace.id,
+        address: parkingSpace.address,
+        pricePerHour: parkingSpace.pricePerHour,
+      ));
+
+      final loadedParkingSpaces =
+          await ParkingSpaceRepository.instance.getAllParkingSpaces();
+      emit(ParkingSpacesLoaded(parkingSpaces: loadedParkingSpaces));
     } catch (e) {
       emit(ParkingSpacesError(message: e.toString()));
     }

@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_admin/bloc/parking_spaces_bloc.dart';
 
 class DeleteParkingplace extends StatefulWidget {
   const DeleteParkingplace({super.key});
@@ -13,6 +16,8 @@ class _DeleteParkingplaceState extends State<DeleteParkingplace> {
   final formKey = GlobalKey<FormState>();
   String? idToDelete;
   List<ParkingSpace> parkingSpaceList = [];
+  StreamSubscription? parkingSpacesSubscription;
+  StreamSubscription? _blocSubscription;
 
   @override
   void initState() {
@@ -20,9 +25,23 @@ class _DeleteParkingplaceState extends State<DeleteParkingplace> {
     getParkingSpaceList();
   }
 
+  @override
+  void dispose() {
+    parkingSpacesSubscription?.cancel();
+    _blocSubscription?.cancel();
+    super.dispose();
+  }
+
   getParkingSpaceList() async {
-    parkingSpaceList =
-        await ParkingSpaceRepository.instance.getAllParkingSpaces();
+    context.read<ParkingSpacesBloc>().add(LoadParkingSpaces());
+    parkingSpacesSubscription =
+        context.read<ParkingSpacesBloc>().stream.listen((state) {
+      if (state is ParkingSpacesLoaded) {
+        setState(() {
+          parkingSpaceList = state.parkingSpaces;
+        });
+      }
+    });
   }
 
   @override
@@ -82,35 +101,35 @@ class _DeleteParkingplaceState extends State<DeleteParkingplace> {
                               (i) => i.id == int.parse(idToDelete!));
 
                           if (index != -1) {
-                            final res = await ParkingSpaceRepository.instance
-                                .deleteParkingSpace(parkingSpaceList[index]);
+                            if (context.mounted) {
+                              final bloc = context.read<ParkingSpacesBloc>();
 
-                            if (res.statusCode == 200) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    duration: const Duration(seconds: 3),
-                                    backgroundColor: Colors.lightGreen,
-                                    content: Text(
-                                        'Du har raderat parkeringsplats med id: $idToDelete'),
-                                  ),
-                                );
-                              }
-                              formKey.currentState?.reset();
-                              setState(() {
-                                getParkingSpaceList();
+                              _blocSubscription = bloc.stream.listen((state) {
+                                if (state is ParkingSpacesLoaded) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      duration: const Duration(seconds: 3),
+                                      backgroundColor: Colors.lightGreen,
+                                      content: Text(
+                                          'Du har raderat parkeringsplats med id: $idToDelete'),
+                                    ),
+                                  );
+
+                                  formKey.currentState?.reset();
+                                } else if (state is ParkingSpacesError) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      duration: Duration(seconds: 3),
+                                      backgroundColor: Colors.redAccent,
+                                      content: Text(
+                                          'Något gick fel vänligen försök igen senare'),
+                                    ),
+                                  );
+                                }
                               });
-                            } else {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    duration: Duration(seconds: 3),
-                                    backgroundColor: Colors.redAccent,
-                                    content: Text(
-                                        'Något gick fel vänligen försök igen senare'),
-                                  ),
-                                );
-                              }
+                              context.read<ParkingSpacesBloc>().add(
+                                  DeleteParkingSpace(
+                                      parkingSpace: parkingSpaceList[index]));
                             }
                           } else {
                             if (mounted) {
