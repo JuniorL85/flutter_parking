@@ -1,4 +1,7 @@
 part of 'parking_bloc.dart';
 
-@immutable
 sealed class ParkingEvent {}
+
+class LoadParkings extends ParkingEvent {}
+
+class LoadActiveParkings extends ParkingEvent {}

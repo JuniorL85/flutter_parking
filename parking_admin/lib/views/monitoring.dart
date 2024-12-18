@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:parking_admin/providers/get_parking_provider.dart';
+import 'package:parking_admin/bloc/parking_bloc.dart';
 import 'package:parking_app_cli/utils/calculate.dart';
-import 'package:provider/provider.dart';
 
 class Monitoring extends StatefulWidget {
   const Monitoring({super.key});
@@ -13,81 +15,100 @@ class Monitoring extends StatefulWidget {
 }
 
 class _MonitoringState extends State<Monitoring> {
-  late Future<List<Parking>> activeList;
   List<Parking> activeParkingsList = [];
-  double activeParkingSum = 0;
-  late String totalSum = '';
   List<Parking> mostPopularParkings = [];
   Map<int, int> mapData = {};
-  late Future<List<Parking>> pList;
+  StreamSubscription? activeParkingsSubscription;
+  StreamSubscription? popularParkingsSubscription;
 
   @override
   void initState() {
-    activeList = context.read<GetParking>().findActiveParking();
-    pList = context.read<GetParking>().getAllParkings();
-    setActiveParkingsListAndTotalSum();
-    setMostPopularParkingSpaces();
     super.initState();
+    setActiveParkingsList();
+    setMostPopularParkingSpaces();
   }
 
-  setActiveParkingsListAndTotalSum() async {
-    activeParkingsList = await activeList;
-    for (var i = 0; i < activeParkingsList.length; i++) {
-      activeParkingSum += calculateDuration(
-          activeParkingsList[i].startTime,
-          activeParkingsList[i].endTime,
-          activeParkingsList[i].parkingSpace!.pricePerHour);
-    }
-    setState(() {
-      totalSum = activeParkingSum.toStringAsFixed(2);
+  @override
+  void dispose() {
+    activeParkingsSubscription?.cancel();
+    popularParkingsSubscription?.cancel();
+    super.dispose();
+  }
+
+  void setActiveParkingsList() {
+    context.read<ActiveParkingBloc>().add(LoadActiveParkings());
+    activeParkingsSubscription =
+        context.read<ActiveParkingBloc>().stream.listen((state) {
+      if (state is ActiveParkingsLoaded) {
+        setState(() {
+          activeParkingsList = state.activeParkings;
+        });
+      }
     });
   }
 
-  Future<void> setMostPopularParkingSpaces() async {
-    List<Parking> parkingList = await pList;
+  void setMostPopularParkingSpaces() {
+    context.read<ParkingBloc>().add(LoadParkings());
 
-    for (var parking in parkingList) {
-      final parkingSpaceId = parking.parkingSpace?.id;
-      if (parkingSpaceId != null) {
-        mapData[parkingSpaceId] = (mapData[parkingSpaceId] ?? 0) + 1;
-      }
-    }
+    popularParkingsSubscription =
+        context.read<ParkingBloc>().stream.listen((state) {
+      if (state is ParkingsLoaded) {
+        mapData.clear();
+        for (var parking in state.parkings) {
+          final parkingSpaceId = parking.parkingSpace?.id;
+          if (parkingSpaceId != null) {
+            mapData[parkingSpaceId] = (mapData[parkingSpaceId] ?? 0) + 1;
+          }
+        }
+        if (mapData.isNotEmpty) {
+          int maxCount =
+              mapData.values.fold(0, (prev, curr) => curr > prev ? curr : prev);
 
-    if (mapData.isNotEmpty) {
-      int maxCount =
-          mapData.values.fold(0, (prev, curr) => curr > prev ? curr : prev);
+          List<int> mostPopularIds = mapData.entries
+              .where((entry) => entry.value == maxCount)
+              .map((entry) => entry.key)
+              .toList();
 
-      List<int> mostPopularIds = mapData.entries
-          .where((entry) => entry.value == maxCount)
-          .map((entry) => entry.key)
-          .toList();
-
-      Map<int, Parking> uniqueMostPopularParkings = {};
-      for (var parking in parkingList) {
-        final parkingSpaceId = parking.parkingSpace?.id;
-        if (parkingSpaceId != null && mostPopularIds.contains(parkingSpaceId)) {
-          uniqueMostPopularParkings[parkingSpaceId] = parking;
+          Map<int, Parking> uniqueMostPopularParkings = {};
+          for (var parking in state.parkings) {
+            final parkingSpaceId = parking.parkingSpace?.id;
+            if (parkingSpaceId != null &&
+                mostPopularIds.contains(parkingSpaceId)) {
+              uniqueMostPopularParkings[parkingSpaceId] = parking;
+            }
+          }
+          setState(() {
+            mostPopularParkings = uniqueMostPopularParkings.values.toList();
+          });
         }
       }
+    });
+  }
 
-      setState(() {
-        mostPopularParkings = uniqueMostPopularParkings.values.toList();
-      });
+  String _calculateActiveSum() {
+    double sum = 0;
+    for (var parking in activeParkingsList) {
+      sum += calculateDuration(
+        parking.startTime,
+        parking.endTime,
+        parking.parkingSpace!.pricePerHour,
+      );
     }
+    return sum.toStringAsFixed(2);
   }
 
   updateTheme() {
-    final content = BoxDecoration(
+    return BoxDecoration(
       borderRadius: BorderRadius.circular(10),
       gradient: LinearGradient(
-          begin: Alignment.bottomCenter,
-          end: Alignment.center,
-          colors: <Color>[
-            Theme.of(context).colorScheme.onInverseSurface,
-            Theme.of(context).colorScheme.inversePrimary
-          ]),
+        begin: Alignment.bottomCenter,
+        end: Alignment.center,
+        colors: <Color>[
+          Theme.of(context).colorScheme.onInverseSurface,
+          Theme.of(context).colorScheme.inversePrimary
+        ],
+      ),
     );
-    return content;
   }
 
   @override
@@ -122,7 +143,7 @@ class _MonitoringState extends State<Monitoring> {
                           ListTile(
                             leading: const Icon(Icons.summarize_outlined),
                             title: const Text('Total summa aktiva parkeringar'),
-                            subtitle: Text('$totalSum kr'),
+                            subtitle: Text('${_calculateActiveSum()} kr'),
                           ),
                         ],
                       ),
@@ -246,49 +267,53 @@ class _MonitoringState extends State<Monitoring> {
               ],
             ),
           ),
-          FutureBuilder<List<Parking>>(
-            future: activeList,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
+          BlocBuilder<ActiveParkingBloc, ActiveParkingState>(
+            builder: (context, parkingState) {
+              if (parkingState is ActiveParkingInitial ||
+                  parkingState is ActiveParkingsLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (parkingState is ActiveParkingsLoaded) {
                 return Expanded(
                   child: ListView.builder(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      itemCount: activeParkingsList.length,
-                      itemBuilder: (context, index) {
-                        var activeParking = activeParkingsList[index];
-                        return ListTile(
-                          title: SizedBox(
-                            height: 210,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Id: ${activeParking.id}'),
-                                Text(
-                                    'Adress: ${activeParking.parkingSpace?.address}'),
-                                Text(
-                                    'Pris: ${activeParking.parkingSpace?.pricePerHour.toString()}kr/h'),
-                                Text(
-                                    'Från: ${DateFormat('yyyy-MM-dd kk:mm').format(activeParking.startTime)} - Till: ${DateFormat('yyyy-MM-dd kk:mm').format(activeParking.endTime)}'),
-                                Text('Fordon: ${activeParking.vehicle?.regNr}'),
-                                Text('Summa: ${calculateDuration(
-                                  activeParking.startTime,
-                                  activeParking.endTime,
-                                  activeParking.parkingSpace!.pricePerHour,
-                                ).toStringAsFixed(2)} kr'),
-                                const Divider(thickness: 1, height: 5),
-                              ],
-                            ),
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: activeParkingsList.length,
+                    itemBuilder: (context, index) {
+                      var activeParking = activeParkingsList[index];
+                      return ListTile(
+                        title: SizedBox(
+                          height: 210,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Id: ${activeParking.id}'),
+                              Text(
+                                  'Adress: ${activeParking.parkingSpace?.address}'),
+                              Text(
+                                  'Pris: ${activeParking.parkingSpace?.pricePerHour.toString()}kr/h'),
+                              Text(
+                                  'Från: ${DateFormat('yyyy-MM-dd kk:mm').format(activeParking.startTime)} - Till: ${DateFormat('yyyy-MM-dd kk:mm').format(activeParking.endTime)}'),
+                              Text('Fordon: ${activeParking.vehicle?.regNr}'),
+                              Text('Summa: ${calculateDuration(
+                                activeParking.startTime,
+                                activeParking.endTime,
+                                activeParking.parkingSpace!.pricePerHour,
+                              ).toStringAsFixed(2)} kr'),
+                              const Divider(thickness: 1, height: 5),
+                            ],
                           ),
-                        );
-                      }),
+                        ),
+                      );
+                    },
+                  ),
                 );
+              } else if (parkingState is ActiveParkingsError) {
+                return Text('Error: ${parkingState.message}');
+              } else {
+                return const Text('Ingen data tillgänglig');
               }
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              }
-
-              return const CircularProgressIndicator();
             },
           ),
         ],

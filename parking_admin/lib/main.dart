@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_admin/bloc/parking_bloc.dart';
 import 'package:parking_admin/bloc/theme_bloc.dart';
-import 'package:parking_admin/providers/get_parking_provider.dart';
 import 'package:parking_admin/views/home.dart';
-import 'package:provider/provider.dart';
 
 void main() {
   runApp(
     MultiBlocProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (context) => GetParking(),
+        BlocProvider<ParkingBloc>(
+          create: (context) => ParkingBloc()..add(LoadParkings()),
+        ),
+        BlocProvider<ActiveParkingBloc>(
+          create: (context) => ActiveParkingBloc()..add(LoadActiveParkings()),
         ),
         BlocProvider<ThemeBloc>(
           create: (context) => ThemeBloc()..add(InitialThemeEvent()),

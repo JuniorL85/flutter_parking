@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
 
 part 'parking_spaces_event.dart';
 part 'parking_spaces_state.dart';
