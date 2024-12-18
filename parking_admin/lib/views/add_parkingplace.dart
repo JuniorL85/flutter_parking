@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_admin/bloc/parking_spaces_bloc.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
 
 class AddParkingplace extends StatefulWidget {
@@ -13,6 +17,13 @@ class _AddParkingplaceState extends State<AddParkingplace> {
   final formKey = GlobalKey<FormState>();
   String? address;
   String? pricePerHour;
+  StreamSubscription? _blocSubscription;
+
+  @override
+  void dispose() {
+    _blocSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,36 +107,38 @@ class _AddParkingplaceState extends State<AddParkingplace> {
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
                           if (validateNumber(pricePerHour!)) {
-                            final res = await ParkingSpaceRepository.instance
-                                .addParkingSpace(
-                              ParkingSpace(
-                                address: address!,
-                                pricePerHour: int.parse(pricePerHour!),
-                              ),
-                            );
-                            if (res.statusCode == 200) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    duration: Duration(seconds: 3),
-                                    backgroundColor: Colors.lightGreen,
-                                    content: Text(
-                                        'Du har lagt till en ny parkeringsplats!'),
-                                  ),
-                                );
-                              }
-                              formKey.currentState?.reset();
-                            } else {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    duration: Duration(seconds: 3),
-                                    backgroundColor: Colors.redAccent,
-                                    content: Text(
-                                        'Något gick fel vänligen försök igen senare'),
-                                  ),
-                                );
-                              }
+                            if (context.mounted) {
+                              final bloc = context.read<ParkingSpacesBloc>();
+
+                              _blocSubscription = bloc.stream.listen((state) {
+                                if (state is ParkingSpacesLoaded) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      duration: Duration(seconds: 3),
+                                      backgroundColor: Colors.lightGreen,
+                                      content: Text(
+                                          'Du har lagt till en ny parkeringsplats!'),
+                                    ),
+                                  );
+
+                                  formKey.currentState?.reset();
+                                } else if (state is ParkingSpacesError) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      duration: Duration(seconds: 3),
+                                      backgroundColor: Colors.redAccent,
+                                      content: Text(
+                                          'Något gick fel vänligen försök igen senare'),
+                                    ),
+                                  );
+                                }
+                              });
+                              context.read<ParkingSpacesBloc>().add(
+                                  CreateParkingSpace(
+                                      parkingSpace: ParkingSpace(
+                                          address: address!,
+                                          pricePerHour:
+                                              int.parse(pricePerHour!))));
                             }
                           } else {
                             if (mounted) {
@@ -150,7 +163,6 @@ class _AddParkingplaceState extends State<AddParkingplace> {
                               ),
                             );
                           }
-                          return;
                         }
                         Navigator.pop(context, 'Avbryt');
                       },
