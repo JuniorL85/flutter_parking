@@ -19,6 +19,10 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
     on<CreateParkingSpace>((event, emit) async {
       await onCreateParkingSpace(emit, event.parkingSpace);
     });
+
+    on<UpdateParkingSpace>((event, emit) async {
+      await onUpdateParkingSpace(emit, event.parkingSpace);
+    });
   }
 
   Future<void> onLoadParkingSpaces(Emitter<ParkingSpacesState> emit) async {
@@ -36,6 +40,23 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
       Emitter<ParkingSpacesState> emit, ParkingSpace parkingSpace) async {
     try {
       await ParkingSpaceRepository.instance.addParkingSpace(ParkingSpace(
+        address: parkingSpace.address,
+        pricePerHour: parkingSpace.pricePerHour,
+      ));
+
+      final loadedParkingSpaces =
+          await ParkingSpaceRepository.instance.getAllParkingSpaces();
+      emit(ParkingSpacesLoaded(parkingSpaces: loadedParkingSpaces));
+    } catch (e) {
+      emit(ParkingSpacesError(message: e.toString()));
+    }
+  }
+
+  onUpdateParkingSpace(
+      Emitter<ParkingSpacesState> emit, ParkingSpace parkingSpace) async {
+    try {
+      await ParkingSpaceRepository.instance.updateParkingSpace(ParkingSpace(
+        id: parkingSpace.id,
         address: parkingSpace.address,
         pricePerHour: parkingSpace.pricePerHour,
       ));

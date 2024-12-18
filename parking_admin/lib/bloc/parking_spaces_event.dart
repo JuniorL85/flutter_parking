@@ -10,6 +10,12 @@ class CreateParkingSpace extends ParkingSpacesEvent {
   CreateParkingSpace({required this.parkingSpace});
 }
 
+class UpdateParkingSpace extends ParkingSpacesEvent {
+  final ParkingSpace parkingSpace;
+
+  UpdateParkingSpace({required this.parkingSpace});
+}
+
 class DeleteParkingSpace extends ParkingSpacesEvent {
   final ParkingSpace parkingSpace;
 
