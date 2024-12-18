@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_admin/bloc/parking_bloc.dart';
+import 'package:parking_admin/bloc/parking_spaces_bloc.dart';
 import 'package:parking_admin/bloc/theme_bloc.dart';
 import 'package:parking_admin/views/home.dart';
 
@@ -13,6 +14,9 @@ void main() {
         ),
         BlocProvider<ActiveParkingBloc>(
           create: (context) => ActiveParkingBloc()..add(LoadActiveParkings()),
+        ),
+        BlocProvider<ParkingSpacesBloc>(
+          create: (context) => ParkingSpacesBloc()..add(LoadParkingSpaces()),
         ),
         BlocProvider<ThemeBloc>(
           create: (context) => ThemeBloc()..add(InitialThemeEvent()),

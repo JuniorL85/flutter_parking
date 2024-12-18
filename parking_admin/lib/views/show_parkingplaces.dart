@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:cli_shared/cli_shared.dart';
-import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_admin/bloc/parking_spaces_bloc.dart';
 
 class ShowParkingplaces extends StatefulWidget {
   const ShowParkingplaces({super.key});
@@ -10,18 +13,31 @@ class ShowParkingplaces extends StatefulWidget {
 }
 
 class _ShowParkingplacesState extends State<ShowParkingplaces> {
-  late Future<List<ParkingSpace>> getParkingSpaces;
   List<ParkingSpace> parkingSpaceList = [];
+  StreamSubscription? parkingSpacesSubscription;
 
   @override
   void initState() {
-    getParkingSpaces = ParkingSpaceRepository.instance.getAllParkingSpaces();
-    setList();
     super.initState();
+    setList();
+  }
+
+  @override
+  void dispose() {
+    parkingSpacesSubscription?.cancel();
+    super.dispose();
   }
 
   setList() async {
-    parkingSpaceList = await getParkingSpaces;
+    context.read<ParkingSpacesBloc>().add(LoadParkingSpaces());
+    parkingSpacesSubscription =
+        context.read<ParkingSpacesBloc>().stream.listen((state) {
+      if (state is ParkingSpacesLoaded) {
+        setState(() {
+          parkingSpaceList = state.parkingSpaces;
+        });
+      }
+    });
   }
 
   @override
@@ -106,10 +122,14 @@ class _ShowParkingplacesState extends State<ShowParkingplaces> {
             ),
           ),
           const Divider(thickness: 1, height: 10),
-          FutureBuilder<List<ParkingSpace>>(
-            future: getParkingSpaces,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
+          BlocBuilder<ParkingSpacesBloc, ParkingSpacesState>(
+            builder: (context, state) {
+              if (state is ParkingSpacesInitial ||
+                  state is ParkingSpacesLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is ParkingSpacesLoaded) {
                 return Expanded(
                   child: ListView.builder(
                       shrinkWrap: true,
@@ -134,13 +154,11 @@ class _ShowParkingplacesState extends State<ShowParkingplaces> {
                         );
                       }),
                 );
+              } else if (state is ParkingSpacesError) {
+                return Text('Error: ${state.message}');
+              } else {
+                return const Text('Ingen data tillgänglig');
               }
-
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              }
-
-              return const CircularProgressIndicator();
             },
           ),
         ],
