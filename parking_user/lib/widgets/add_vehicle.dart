@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_user/bloc/vehicle_bloc.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
-import 'package:parking_user/screens/manage_account.dart';
 import 'package:provider/provider.dart';
 
 List<String> list = <String>['Bil', 'Motorcykel', 'Annan'];
@@ -18,15 +20,36 @@ class _AddVehicleState extends State<AddVehicle> {
   final formKey = GlobalKey<FormState>();
   String dropdownValue = list.first;
   String? regNr;
+  List<Vehicle> vehicleList = [];
+  StreamSubscription? _blocSubscription;
+  StreamSubscription? vehicleSubscription;
+  late Person person;
 
-  setHomePageState() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (ctx) => ManageAccount(
-          onSetNewState: (index) => index = 0,
-        ),
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    getVehicleList();
+  }
+
+  @override
+  void dispose() {
+    vehicleSubscription?.cancel();
+    _blocSubscription?.cancel();
+    super.dispose();
+  }
+
+  getVehicleList() async {
+    if (mounted) {
+      person = super.context.read<GetPerson>().person;
+      context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
+      vehicleSubscription = context.read<VehicleBloc>().stream.listen((state) {
+        if (state is VehiclesLoaded) {
+          setState(() {
+            vehicleList = state.vehicles;
+          });
+        }
+      });
+    }
   }
 
   @override
@@ -106,47 +129,59 @@ class _AddVehicleState extends State<AddVehicle> {
                     ElevatedButton(
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
-                          final person = context.read<GetPerson>().person;
-                          final res =
-                              await VehicleRepository.instance.addVehicle(
-                            Vehicle(
-                              regNr: regNr!,
-                              vehicleType: dropdownValue,
-                              owner: Person(
-                                id: person.id,
-                                name: person.name,
-                                socialSecurityNumber:
-                                    person.socialSecurityNumber,
-                              ),
-                            ),
-                          );
-                          if (res.statusCode == 200) {
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  duration: Duration(seconds: 3),
-                                  backgroundColor: Colors.lightGreen,
-                                  content:
-                                      Text('Du har lagt till ett nytt fordon!'),
-                                ),
-                              );
+                          final index = vehicleList.indexWhere((v) =>
+                              v.regNr.toUpperCase() == regNr!.toUpperCase());
+
+                          if (index == -1) {
+                            if (context.mounted) {
+                              final bloc = context.read<VehicleBloc>();
+
+                              _blocSubscription = bloc.stream.listen((state) {
+                                if (state is VehiclesLoaded) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      duration: Duration(seconds: 3),
+                                      backgroundColor: Colors.lightGreen,
+                                      content: Text(
+                                          'Du har lagt till ett nytt fordon!'),
+                                    ),
+                                  );
+
+                                  formKey.currentState?.reset();
+                                  Navigator.of(context).pop();
+                                } else if (state is VehiclesError) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      duration: const Duration(seconds: 3),
+                                      backgroundColor: Colors.redAccent,
+                                      content: Text(state.message),
+                                    ),
+                                  );
+                                }
+                              });
+                              context.read<VehicleBloc>().add(CreateVehicle(
+                                  vehicle: Vehicle(
+                                      regNr: regNr!,
+                                      vehicleType: dropdownValue,
+                                      owner: Person(
+                                        id: person.id,
+                                        name: person.name,
+                                        socialSecurityNumber:
+                                            person.socialSecurityNumber,
+                                      ))));
                             }
-                            formKey.currentState?.reset();
-                            Navigator.of(context).pop();
                           } else {
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  duration: Duration(seconds: 3),
-                                  backgroundColor: Colors.redAccent,
-                                  content: Text(
-                                      'Något gick fel vänligen försök igen senare'),
-                                ),
-                              );
-                            }
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                duration: Duration(seconds: 3),
+                                backgroundColor: Colors.redAccent,
+                                content: Text(
+                                    'Det angivna registreringsnumret finns redan i listan'),
+                              ),
+                            );
+                            Navigator.of(context).pop();
                           }
                         }
-                        // setHomePageState
                       },
                       child: const Text('Lägg till'),
                     )
