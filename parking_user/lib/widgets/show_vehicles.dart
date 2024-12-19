@@ -1,11 +1,48 @@
+import 'dart:async';
+
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_user/bloc/vehicle_bloc.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
-import 'package:provider/provider.dart';
 
-class ShowVehicles extends StatelessWidget {
+class ShowVehicles extends StatefulWidget {
   const ShowVehicles({super.key});
+
+  @override
+  State<ShowVehicles> createState() => _ShowVehiclesState();
+}
+
+class _ShowVehiclesState extends State<ShowVehicles> {
+  List<Vehicle> vehicleList = [];
+  StreamSubscription? vehicleSubscription;
+  late Person person;
+
+  @override
+  void initState() {
+    super.initState();
+    getVehicleList();
+  }
+
+  @override
+  void dispose() {
+    vehicleSubscription?.cancel();
+    super.dispose();
+  }
+
+  getVehicleList() async {
+    if (mounted) {
+      person = context.read<GetPerson>().person;
+      context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
+      vehicleSubscription = context.read<VehicleBloc>().stream.listen((state) {
+        if (state is VehiclesLoaded) {
+          setState(() {
+            vehicleList = state.vehicles;
+          });
+        }
+      });
+    }
+  }
 
   getIcon(String type) {
     switch (type) {
@@ -23,10 +60,12 @@ class ShowVehicles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future<List<Vehicle>> getVehicles =
-        VehicleRepository.instance.getAllVehicles();
+    // // Future<List<Vehicle>> getVehicles =
+    // //     VehicleRepository.instance.getAllVehicles();
 
-    final person = context.read<GetPerson>().person;
+    // final person = context.read<GetPerson>().person;
+    // final vehicleList =
+    //     context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
 
     return Scaffold(
       body: Column(
@@ -46,22 +85,20 @@ class ShowVehicles extends StatelessWidget {
               ],
             ),
           ),
-          FutureBuilder<List<Vehicle>>(
-            future: getVehicles,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                var formattedSnapshot = snapshot.data!
-                    .where((vehicle) =>
-                        vehicle.owner!.socialSecurityNumber ==
-                        person.socialSecurityNumber)
-                    .toList();
+          BlocBuilder<VehicleBloc, VehicleState>(
+            builder: (context, state) {
+              if (state is VehiclesInitial || state is VehiclesLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is VehiclesLoaded) {
                 return Expanded(
                   child: ListView.builder(
                       shrinkWrap: true,
-                      itemCount: formattedSnapshot.length,
+                      itemCount: vehicleList.length,
                       scrollDirection: Axis.vertical,
                       itemBuilder: (context, index) {
-                        var vehicle = formattedSnapshot[index];
+                        var vehicle = vehicleList[index];
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: ListTile(
@@ -85,13 +122,11 @@ class ShowVehicles extends StatelessWidget {
                         );
                       }),
                 );
+              } else if (state is VehiclesError) {
+                return Text('Error: ${state.message}');
+              } else {
+                return const Text('Ingen data tillgänglig');
               }
-
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              }
-
-              return const CircularProgressIndicator();
             },
           ),
         ],

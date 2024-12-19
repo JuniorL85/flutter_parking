@@ -62,14 +62,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
           vehicleType: vehicle.vehicleType,
           owner: vehicle.owner));
 
-      _vehicleList = await VehicleRepository.instance.getAllVehicles();
-      final vehicleListByPerson = _vehicleList
-          .where((v) =>
-              v.owner!.socialSecurityNumber ==
-              vehicle.owner!.socialSecurityNumber)
-          .toList();
-
-      emit(VehiclesLoaded(vehicles: vehicleListByPerson));
+      add(LoadVehiclesByPerson(person: vehicle.owner!));
     } catch (e) {
       emit(VehiclesError(message: e.toString()));
     }
@@ -83,8 +76,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
           vehicleType: vehicle.vehicleType,
           owner: vehicle.owner));
 
-      final loadedVehicles = await VehicleRepository.instance.getAllVehicles();
-      emit(VehiclesLoaded(vehicles: loadedVehicles));
+      add(LoadVehiclesByPerson(person: vehicle.owner!));
     } catch (e) {
       emit(VehiclesError(message: e.toString()));
     }
@@ -98,13 +90,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
           vehicleType: vehicle.vehicleType,
           owner: vehicle.owner));
 
-      _vehicleList = await VehicleRepository.instance.getAllVehicles();
-      final vehicleListByPerson = _vehicleList
-          .where((v) =>
-              v.owner!.socialSecurityNumber ==
-              vehicle.owner!.socialSecurityNumber)
-          .toList();
-      emit(VehiclesLoaded(vehicles: vehicleListByPerson));
+      add(LoadVehiclesByPerson(person: vehicle.owner!));
     } catch (e) {
       emit(VehiclesError(message: e.toString()));
     }
