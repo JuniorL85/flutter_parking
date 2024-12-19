@@ -16,10 +16,10 @@ class CreateVehicle extends VehicleEvent {
   CreateVehicle({required this.vehicle});
 }
 
-class UpdateVehicle extends VehicleEvent {
+class UpdateVehicles extends VehicleEvent {
   final Vehicle vehicle;
 
-  UpdateVehicle({required this.vehicle});
+  UpdateVehicles({required this.vehicle});
 }
 
 class DeleteVehicles extends VehicleEvent {

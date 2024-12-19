@@ -24,7 +24,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
       await onCreateVehicle(emit, event.vehicle);
     });
 
-    on<UpdateVehicle>((event, emit) async {
+    on<UpdateVehicles>((event, emit) async {
       await onUpdateVehicle(emit, event.vehicle);
     });
   }
