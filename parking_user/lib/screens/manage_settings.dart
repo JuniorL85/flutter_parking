@@ -1,7 +1,8 @@
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
-import 'package:parking_user/providers/change_theme_provider.dart';
+import 'package:parking_user/bloc/theme_bloc.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -15,7 +16,6 @@ class ManageSettings extends StatefulWidget {
 }
 
 class _ManageSettingsState extends State<ManageSettings> {
-  ThemeSelected? _themeSelected;
   final formKey = GlobalKey<FormState>();
   String? name;
 
@@ -153,58 +153,45 @@ class _ManageSettingsState extends State<ManageSettings> {
                         onPressed: () => showDialog<String>(
                           context: context,
                           builder: (BuildContext context) {
-                            return StatefulBuilder(
-                              builder:
-                                  (BuildContext context, StateSetter setState) {
+                            return BlocBuilder<ThemeBloc, AppTheme>(
+                              builder: (context, appTheme) {
                                 return AlertDialog(
                                   title: const Text('Tema'),
                                   content: const Text(
                                       'Ändra till det temat du föredrar'),
                                   actions: <Widget>[
-                                    RadioListTile<ThemeSelected>(
-                                      value: ThemeSelected.lightTheme,
-                                      groupValue: _themeSelected,
-                                      onChanged: (ThemeSelected? value) {
-                                        final themeProvider =
-                                            Provider.of<ChangeThemeProvider>(
-                                                context,
-                                                listen: false);
-                                        setState(() {
-                                          _themeSelected = value;
-                                          themeProvider.changeThemeMode(0);
-                                        });
+                                    RadioListTile<AppTheme>(
+                                      value: AppTheme.light,
+                                      groupValue: appTheme,
+                                      onChanged: (value) {
+                                        if (value != null) {
+                                          context.read<ThemeBloc>().add(
+                                              SwitchThemeEvent(theme: value));
+                                        }
                                       },
                                       title: const Text('Ljus'),
                                     ),
-                                    RadioListTile<ThemeSelected>(
-                                      value: ThemeSelected.darkTheme,
-                                      groupValue: _themeSelected,
-                                      onChanged: (ThemeSelected? value) {
-                                        final themeProvider =
-                                            Provider.of<ChangeThemeProvider>(
-                                                context,
-                                                listen: false);
-                                        setState(() {
-                                          _themeSelected = value;
-                                          themeProvider.changeThemeMode(1);
-                                        });
+                                    RadioListTile<AppTheme>(
+                                      value: AppTheme.dark,
+                                      groupValue: appTheme,
+                                      onChanged: (value) {
+                                        if (value != null) {
+                                          context.read<ThemeBloc>().add(
+                                              SwitchThemeEvent(theme: value));
+                                        }
                                       },
                                       title: const Text('Mörk'),
                                     ),
-                                    RadioListTile<ThemeSelected>(
-                                      value: ThemeSelected.defaultTheme,
-                                      groupValue: _themeSelected,
-                                      onChanged: (ThemeSelected? value) {
-                                        final themeProvider =
-                                            Provider.of<ChangeThemeProvider>(
-                                                context,
-                                                listen: false);
-                                        setState(() {
-                                          _themeSelected = value;
-                                          themeProvider.changeThemeMode(2);
-                                        });
+                                    RadioListTile<AppTheme>(
+                                      value: AppTheme.system,
+                                      groupValue: appTheme,
+                                      onChanged: (value) {
+                                        if (value != null) {
+                                          context.read<ThemeBloc>().add(
+                                              SwitchThemeEvent(theme: value));
+                                        }
                                       },
-                                      title: const Text('System default'),
+                                      title: const Text('System'),
                                     ),
                                   ],
                                 );

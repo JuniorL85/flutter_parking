@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:parking_user/providers/change_theme_provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_user/bloc/theme_bloc.dart';
 import 'package:parking_user/providers/get_parking_provider.dart';
 import 'package:parking_user/providers/get_parking_spaces_provider.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
@@ -14,7 +15,7 @@ void main() {
     DeviceOrientation.portraitUp,
   ]).then((fn) {
     runApp(
-      MultiProvider(
+      MultiBlocProvider(
         providers: [
           ChangeNotifierProvider(
             create: (context) => GetPerson(),
@@ -28,8 +29,8 @@ void main() {
           ChangeNotifierProvider(
             create: (context) => GetParking(),
           ),
-          ChangeNotifierProvider(
-            create: (context) => ChangeThemeProvider(),
+          BlocProvider<ThemeBloc>(
+            create: (context) => ThemeBloc()..add(InitialThemeEvent()),
           ),
         ],
         child: const MyApp(),
@@ -43,17 +44,32 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ParkHere',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData.dark(),
-      themeMode: context.watch<ChangeThemeProvider>().currentThemeMode,
-      locale: const Locale('sv', ''),
-      home: const Login(),
-    );
+    return BlocBuilder<ThemeBloc, AppTheme>(builder: (context, state) {
+      ThemeData currentTheme;
+      if (state == AppTheme.light) {
+        currentTheme = ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+          useMaterial3: true,
+        );
+      } else if (state == AppTheme.dark) {
+        currentTheme = ThemeData.dark();
+      } else {
+        final Brightness brightness = MediaQuery.of(context).platformBrightness;
+        currentTheme = brightness == Brightness.dark
+            ? ThemeData.dark()
+            : ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+                useMaterial3: true,
+              );
+      }
+
+      return MaterialApp(
+        title: 'ParkHere',
+        debugShowCheckedModeBanner: false,
+        theme: currentTheme,
+        home: const Login(),
+        locale: const Locale('sv', ''),
+      );
+    });
   }
 }
