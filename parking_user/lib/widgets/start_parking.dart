@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
-import 'package:parking_user/providers/get_parking_spaces_provider.dart';
+import 'package:parking_user/bloc/parking_spaces_bloc.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
 import 'package:parking_user/providers/get_vehicle_provider.dart';
 import 'package:parking_user/screens/manage_account.dart';
@@ -24,12 +27,19 @@ class _StartParkingState extends State<StartParking> {
   late List<Vehicle> vehicleList = [];
   String? _selectedRegNr;
   bool isVehicleListEmpty = false;
+  StreamSubscription? parkingSpacesSubscription;
 
   @override
   void initState() {
     super.initState();
     listParkingSpaces();
     getVehicleList();
+  }
+
+  @override
+  void dispose() {
+    parkingSpacesSubscription?.cancel();
+    super.dispose();
   }
 
   setHomePageState() {
@@ -43,10 +53,17 @@ class _StartParkingState extends State<StartParking> {
   }
 
   listParkingSpaces() async {
-    listAvailableParkingSpaces =
-        await super.context.read<GetParkingSpaces>().getAllParkingSpaces();
-    dropdownAvailableParkingSpaces =
-        listAvailableParkingSpaces.first.id.toString();
+    context.read<ParkingSpacesBloc>().add(LoadParkingSpaces());
+    parkingSpacesSubscription =
+        context.read<ParkingSpacesBloc>().stream.listen((state) {
+      if (state is ParkingSpacesLoaded) {
+        setState(() {
+          listAvailableParkingSpaces = state.parkingSpaces;
+          dropdownAvailableParkingSpaces =
+              listAvailableParkingSpaces.first.id.toString();
+        });
+      }
+    });
   }
 
   getVehicleList() async {

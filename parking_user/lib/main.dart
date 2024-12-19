@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_user/bloc/parking_spaces_bloc.dart';
 import 'package:parking_user/bloc/theme_bloc.dart';
 import 'package:parking_user/providers/get_parking_provider.dart';
-import 'package:parking_user/providers/get_parking_spaces_provider.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
 import 'package:parking_user/providers/get_vehicle_provider.dart';
 import 'package:parking_user/screens/login.dart';
@@ -23,8 +23,8 @@ void main() {
           ChangeNotifierProvider(
             create: (context) => GetVehicle(),
           ),
-          ChangeNotifierProvider(
-            create: (context) => GetParkingSpaces(),
+          BlocProvider<ParkingSpacesBloc>(
+            create: (context) => ParkingSpacesBloc()..add(LoadParkingSpaces()),
           ),
           ChangeNotifierProvider(
             create: (context) => GetParking(),
