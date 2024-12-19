@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
       ThemeData currentTheme;
       if (state == AppTheme.light) {
         currentTheme = ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
           useMaterial3: true,
         );
       } else if (state == AppTheme.dark) {
