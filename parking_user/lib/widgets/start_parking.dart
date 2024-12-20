@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
 import 'package:parking_user/bloc/parking_spaces_bloc.dart';
+import 'package:parking_user/bloc/vehicle_bloc.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
-import 'package:parking_user/providers/get_vehicle_provider.dart';
 import 'package:parking_user/screens/manage_account.dart';
 import 'package:parking_user/widgets/datepicker_parking.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +28,7 @@ class _StartParkingState extends State<StartParking> {
   String? _selectedRegNr;
   bool isVehicleListEmpty = false;
   StreamSubscription? parkingSpacesSubscription;
+  StreamSubscription? vehicleSubscription;
 
   @override
   void initState() {
@@ -39,6 +40,7 @@ class _StartParkingState extends State<StartParking> {
   @override
   void dispose() {
     parkingSpacesSubscription?.cancel();
+    vehicleSubscription?.cancel();
     super.dispose();
   }
 
@@ -69,22 +71,40 @@ class _StartParkingState extends State<StartParking> {
   getVehicleList() async {
     if (mounted) {
       Person person = super.context.read<GetPerson>().person;
-      List<Vehicle> list =
-          await super.context.read<GetVehicle>().getAllVehicles();
-      vehicleList = list
-          .where((vehicle) =>
-              vehicle.owner!.socialSecurityNumber ==
-              person.socialSecurityNumber)
-          .toList();
-      if (vehicleList.isNotEmpty) {
-        setState(() {
-          _selectedRegNr = vehicleList.first.regNr;
-        });
-      } else {
-        setState(() {
-          isVehicleListEmpty = true;
-        });
-      }
+      context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
+      vehicleSubscription = context.read<VehicleBloc>().stream.listen((state) {
+        if (state is VehiclesLoaded) {
+          setState(() {
+            vehicleList = state.vehicles;
+
+            if (vehicleList.isNotEmpty) {
+              setState(() {
+                _selectedRegNr = vehicleList.first.regNr;
+              });
+            } else {
+              setState(() {
+                isVehicleListEmpty = true;
+              });
+            }
+          });
+        }
+      });
+      // List<Vehicle> list =
+      //     await super.context.read<GetVehicle>().getAllVehicles();
+      // vehicleList = list
+      //     .where((vehicle) =>
+      //         vehicle.owner!.socialSecurityNumber ==
+      //         person.socialSecurityNumber)
+      //     .toList();
+      // if (vehicleList.isNotEmpty) {
+      //   setState(() {
+      //     _selectedRegNr = vehicleList.first.regNr;
+      //   });
+      // } else {
+      //   setState(() {
+      //     isVehicleListEmpty = true;
+      //   });
+      // }
     }
   }
 

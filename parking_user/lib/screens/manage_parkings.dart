@@ -1,11 +1,14 @@
+import 'dart:async';
+
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
 import 'package:parking_app_cli/utils/calculate.dart';
+import 'package:parking_user/bloc/vehicle_bloc.dart';
 import 'package:parking_user/providers/get_parking_provider.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
-import 'package:parking_user/providers/get_vehicle_provider.dart';
 import 'package:parking_user/widgets/datepicker_parking.dart';
 import 'package:parking_user/widgets/show_parking_history.dart';
 import 'package:parking_user/widgets/start_parking.dart';
@@ -24,28 +27,41 @@ class ManageParkings extends StatefulWidget {
 class _ManageParkingsState extends State<ManageParkings> {
   List<Parking> parkingList = [];
   int? foundActiveParking;
-  Person? person;
+  late Person person;
   List<Vehicle> vehicleList = [];
   final ValueNotifier<DateTime?> _selectedDate = ValueNotifier(null);
+  StreamSubscription? vehicleSubscription;
 
   @override
   void initState() {
     super.initState();
-    findActiveParking();
+    WidgetsBinding.instance.addPostFrameCallback((_) => findActiveParking());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    vehicleSubscription?.cancel();
+    super.dispose();
   }
 
   findActiveParking() async {
     parkingList = await super.context.read<GetParking>().getAllParkings();
 
-    if (mounted) {
-      person = super.context.read<GetPerson>().person;
-      List<Vehicle> list =
-          await super.context.read<GetVehicle>().getAllVehicles();
-      vehicleList = list
-          .where((vehicle) =>
-              vehicle.owner!.socialSecurityNumber ==
-              person!.socialSecurityNumber)
-          .toList();
+    if (!mounted) return;
+
+    person = super.context.read<GetPerson>().person;
+    context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
+    vehicleSubscription = context.read<VehicleBloc>().stream.listen((state) {
+      if (state is VehiclesLoaded) {
+        setState(() {
+          vehicleList = state.vehicles;
+        });
+      }
 
       foundActiveParking = parkingList.indexWhere(
         (activeParking) => (vehicleList.any((v) =>
@@ -55,10 +71,8 @@ class _ManageParkingsState extends State<ManageParkings> {
                 DateTime.now().microsecondsSinceEpoch),
       );
 
-      setState(() {
-        widget.isActiveParking = foundActiveParking == -1 ? false : true;
-      });
-    }
+      widget.isActiveParking = foundActiveParking == -1 ? false : true;
+    });
   }
 
   calculateActiveParking() {

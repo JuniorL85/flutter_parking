@@ -6,7 +6,6 @@ import 'package:parking_user/bloc/theme_bloc.dart';
 import 'package:parking_user/bloc/vehicle_bloc.dart';
 import 'package:parking_user/providers/get_parking_provider.dart';
 import 'package:parking_user/providers/get_person_provider.dart';
-import 'package:parking_user/providers/get_vehicle_provider.dart';
 import 'package:parking_user/screens/login.dart';
 import 'package:provider/provider.dart';
 
@@ -20,9 +19,6 @@ void main() {
         providers: [
           ChangeNotifierProvider(
             create: (context) => GetPerson(),
-          ),
-          ChangeNotifierProvider(
-            create: (context) => GetVehicle(),
           ),
           BlocProvider<VehicleBloc>(
             create: (context) => VehicleBloc()..add(LoadVehicles()),
