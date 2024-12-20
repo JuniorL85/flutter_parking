@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_user/bloc/parking_spaces_bloc.dart';
+import 'package:parking_user/bloc/person_bloc.dart';
 import 'package:parking_user/bloc/theme_bloc.dart';
 import 'package:parking_user/bloc/vehicle_bloc.dart';
 import 'package:parking_user/providers/get_parking_provider.dart';
-import 'package:parking_user/providers/get_person_provider.dart';
 import 'package:parking_user/screens/login.dart';
 import 'package:provider/provider.dart';
 
@@ -17,8 +17,8 @@ void main() {
     runApp(
       MultiBlocProvider(
         providers: [
-          ChangeNotifierProvider(
-            create: (context) => GetPerson(),
+          BlocProvider<PersonBloc>(
+            create: (context) => PersonBloc()..add(LoadPersons()),
           ),
           BlocProvider<VehicleBloc>(
             create: (context) => VehicleBloc()..add(LoadVehicles()),

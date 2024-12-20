@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
 import 'package:parking_user/bloc/parking_spaces_bloc.dart';
+import 'package:parking_user/bloc/person_bloc.dart';
 import 'package:parking_user/bloc/vehicle_bloc.dart';
-import 'package:parking_user/providers/get_person_provider.dart';
 import 'package:parking_user/screens/manage_account.dart';
 import 'package:parking_user/widgets/datepicker_parking.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +27,7 @@ class _StartParkingState extends State<StartParking> {
   late List<Vehicle> vehicleList = [];
   String? _selectedRegNr;
   bool isVehicleListEmpty = false;
+  late Person person;
   StreamSubscription? parkingSpacesSubscription;
   StreamSubscription? vehicleSubscription;
 
@@ -34,7 +35,7 @@ class _StartParkingState extends State<StartParking> {
   void initState() {
     super.initState();
     listParkingSpaces();
-    getVehicleList();
+    getVehicleListAndPerson();
   }
 
   @override
@@ -68,14 +69,18 @@ class _StartParkingState extends State<StartParking> {
     });
   }
 
-  getVehicleList() async {
+  getVehicleListAndPerson() async {
     if (mounted) {
-      Person person = super.context.read<GetPerson>().person;
-      context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
-      vehicleSubscription = context.read<VehicleBloc>().stream.listen((state) {
-        if (state is VehiclesLoaded) {
+      final personState = context.read<PersonBloc>().state;
+      if (personState is PersonLoaded) {
+        person = personState.person;
+
+        final vehicleState = context.read<VehicleBloc>().state;
+        if (vehicleState is! VehiclesLoaded) {
+          context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
+        } else {
           setState(() {
-            vehicleList = state.vehicles;
+            vehicleList = vehicleState.vehicles;
 
             if (vehicleList.isNotEmpty) {
               setState(() {
@@ -88,23 +93,26 @@ class _StartParkingState extends State<StartParking> {
             }
           });
         }
-      });
-      // List<Vehicle> list =
-      //     await super.context.read<GetVehicle>().getAllVehicles();
-      // vehicleList = list
-      //     .where((vehicle) =>
-      //         vehicle.owner!.socialSecurityNumber ==
-      //         person.socialSecurityNumber)
-      //     .toList();
-      // if (vehicleList.isNotEmpty) {
-      //   setState(() {
-      //     _selectedRegNr = vehicleList.first.regNr;
-      //   });
-      // } else {
-      //   setState(() {
-      //     isVehicleListEmpty = true;
-      //   });
-      // }
+
+        vehicleSubscription =
+            context.read<VehicleBloc>().stream.listen((state) {
+          if (state is VehiclesLoaded) {
+            setState(() {
+              vehicleList = state.vehicles;
+
+              if (vehicleList.isNotEmpty) {
+                setState(() {
+                  _selectedRegNr = vehicleList.first.regNr;
+                });
+              } else {
+                setState(() {
+                  isVehicleListEmpty = true;
+                });
+              }
+            });
+          }
+        });
+      }
     }
   }
 
@@ -255,8 +263,6 @@ class _StartParkingState extends State<StartParking> {
                                         int.parse(
                                             dropdownAvailableParkingSpaces!))
                                     .first;
-
-                                final person = context.read<GetPerson>().person;
 
                                 if (_selectedDate.value != null &&
                                     vehicleType != '') {

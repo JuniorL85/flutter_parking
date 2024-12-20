@@ -1,10 +1,10 @@
+import 'dart:async';
+
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:parking_user/bloc/person_bloc.dart';
 import 'package:parking_user/bloc/theme_bloc.dart';
-import 'package:parking_user/providers/get_person_provider.dart';
-import 'package:provider/provider.dart';
 
 enum ThemeSelected { lightTheme, darkTheme, defaultTheme }
 
@@ -18,11 +18,45 @@ class ManageSettings extends StatefulWidget {
 class _ManageSettingsState extends State<ManageSettings> {
   final formKey = GlobalKey<FormState>();
   String? name;
+  late Person person;
+  StreamSubscription? personSubscription;
+  StreamSubscription? _updatePersonSubscription;
+  StreamSubscription? _deletePersonSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    getPerson();
+  }
+
+  @override
+  void dispose() {
+    personSubscription?.cancel();
+    _updatePersonSubscription?.cancel();
+    _deletePersonSubscription?.cancel();
+    super.dispose();
+  }
+
+  getPerson() {
+    if (mounted) {
+      final personState = context.read<PersonBloc>().state;
+      if (personState is PersonLoaded) {
+        person = personState.person;
+      } else {
+        person = Person(name: '', socialSecurityNumber: '');
+      }
+      personSubscription = context.read<PersonBloc>().stream.listen((state) {
+        if (state is PersonLoaded) {
+          setState(() {
+            person = state.person;
+          });
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final person = context.read<GetPerson>().person;
-
     return Scaffold(
       body: Container(
         margin: const EdgeInsets.only(top: 50),
@@ -80,49 +114,53 @@ class _ManageSettingsState extends State<ManageSettings> {
                                   child: const Text('Avbryt'),
                                 ),
                                 TextButton(
-                                  onPressed: () async {
+                                  onPressed: () {
                                     if (formKey.currentState!.validate()) {
                                       formKey.currentState!.save();
-                                      final res = await PersonRepository
-                                          .instance
-                                          .updatePersons(Person(
+
+                                      if (mounted) {
+                                        final bloc = context.read<PersonBloc>();
+
+                                        _updatePersonSubscription =
+                                            bloc.stream.listen((state) {
+                                          if (state is PersonLoaded) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                duration: Duration(seconds: 3),
+                                                backgroundColor:
+                                                    Colors.lightGreen,
+                                                content: Text(
+                                                    'Du har uppdaterat ditt konto'),
+                                              ),
+                                            );
+                                            setState(() {
+                                              Navigator.pop(
+                                                  context, 'Uppdatera');
+                                            });
+                                          } else if (state is PersonsError) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                duration:
+                                                    const Duration(seconds: 3),
+                                                backgroundColor:
+                                                    Colors.redAccent,
+                                                content: Text(state.message),
+                                              ),
+                                            );
+                                            Navigator.pop(context);
+                                          }
+                                        });
+                                        context
+                                            .read<PersonBloc>()
+                                            .add(UpdatePersons(
+                                                person: Person(
                                               id: person.id,
                                               name: name!,
                                               socialSecurityNumber:
-                                                  person.socialSecurityNumber));
-                                      if (res.statusCode == 200) {
-                                        if (context.mounted) {
-                                          context
-                                              .read<GetPerson>()
-                                              .getPerson(person.id);
-
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              duration: Duration(seconds: 3),
-                                              backgroundColor:
-                                                  Colors.lightGreen,
-                                              content: Text(
-                                                  'Du har uppdaterat ditt konto'),
-                                            ),
-                                          );
-                                          setState(() {
-                                            Navigator.pop(context);
-                                          });
-                                        }
-                                      } else {
-                                        if (context.mounted) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              duration: Duration(seconds: 3),
-                                              backgroundColor: Colors.redAccent,
-                                              content: Text(
-                                                  'Något gick fel vänligen försök igen senare'),
-                                            ),
-                                          );
-                                          Navigator.pop(context);
-                                        }
+                                                  person.socialSecurityNumber,
+                                            )));
                                       }
                                     }
                                   },
@@ -248,35 +286,35 @@ class _ManageSettingsState extends State<ManageSettings> {
               ),
               TextButton(
                 onPressed: () async {
-                  final res =
-                      await PersonRepository.instance.deletePerson(person);
-                  if (res.statusCode == 200) {
-                    if (context.mounted) {
-                      Provider.of<GetPerson>(context, listen: false)
-                          .getAllPersons();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          duration: Duration(seconds: 3),
-                          backgroundColor: Colors.lightGreen,
-                          content: Text('Du har raderat ditt konto!'),
-                        ),
-                      );
-                      setState(() {
-                        Navigator.popUntil(context, ModalRoute.withName('/'));
-                      });
-                    }
-                  } else {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          duration: Duration(seconds: 3),
-                          backgroundColor: Colors.redAccent,
-                          content: Text(
-                              'Något gick fel vänligen försök igen senare'),
-                        ),
-                      );
-                      Navigator.pop(context);
-                    }
+                  if (mounted) {
+                    final bloc = context.read<PersonBloc>();
+
+                    _deletePersonSubscription = bloc.stream.listen((state) {
+                      if (state is PersonsLoaded) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            duration: Duration(seconds: 3),
+                            backgroundColor: Colors.lightGreen,
+                            content: Text('Du har raderat ditt konto!'),
+                          ),
+                        );
+                        setState(() {
+                          Navigator.popUntil(context, ModalRoute.withName('/'));
+                        });
+                      } else if (state is PersonsError) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            duration: const Duration(seconds: 3),
+                            backgroundColor: Colors.redAccent,
+                            content: Text(state.message),
+                          ),
+                        );
+                        Navigator.pop(context);
+                      }
+                    });
+                    context
+                        .read<PersonBloc>()
+                        .add(DeletePersons(person: person));
                   }
                 },
                 child: const Text('Radera konto'),

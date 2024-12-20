@@ -1,10 +1,13 @@
+import 'dart:async';
+
+import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:parking_user/providers/get_person_provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_user/bloc/person_bloc.dart';
 import 'package:parking_user/screens/manage_parkings.dart';
 import 'package:parking_user/screens/manage_settings.dart';
 import 'package:parking_user/screens/manage_vehicle.dart';
 import 'package:parking_user/widgets/home.dart';
-import 'package:provider/provider.dart';
 
 class ManageAccount extends StatefulWidget {
   const ManageAccount({super.key, this.onSetNewState});
@@ -17,6 +20,20 @@ class ManageAccount extends StatefulWidget {
 
 class _ManageAccountState extends State<ManageAccount> {
   int currentPageIndex = 0;
+  late Person person;
+  StreamSubscription? personSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    getPerson();
+  }
+
+  @override
+  void dispose() {
+    personSubscription?.cancel();
+    super.dispose();
+  }
 
   setPageIndex(int index) {
     setState(() {
@@ -24,9 +41,26 @@ class _ManageAccountState extends State<ManageAccount> {
     });
   }
 
+  getPerson() {
+    if (mounted) {
+      final personState = context.read<PersonBloc>().state;
+      if (personState is PersonLoaded) {
+        person = personState.person;
+      } else {
+        person = Person(name: '', socialSecurityNumber: '');
+      }
+      personSubscription = context.read<PersonBloc>().stream.listen((state) {
+        if (state is PersonLoaded) {
+          setState(() {
+            person = state.person;
+          });
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final person = context.watch<GetPerson>().person;
     return Scaffold(
       appBar: AppBar(
         title: Text(

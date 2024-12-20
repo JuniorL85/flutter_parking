@@ -1,9 +1,10 @@
+import 'dart:async';
+
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
-import 'package:parking_user/providers/get_person_provider.dart';
-import 'package:parking_user/screens/login.dart';
-import 'package:provider/provider.dart';
+import 'package:parking_user/bloc/person_bloc.dart';
 
 class CreateAccount extends StatefulWidget {
   const CreateAccount({super.key});
@@ -16,10 +17,38 @@ class _CreateAccountState extends State<CreateAccount> {
   final formKey = GlobalKey<FormState>();
   String? name;
   String? socialSecurityNumber;
+  List<Person> personList = [];
+  StreamSubscription? personSubscription;
+  StreamSubscription? _blocSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    getPersonList();
+  }
+
+  @override
+  void dispose() {
+    personSubscription?.cancel();
+    _blocSubscription?.cancel();
+    super.dispose();
+  }
+
+  getPersonList() async {
+    if (mounted) {
+      context.read<PersonBloc>().add(LoadPersons());
+      personSubscription = context.read<PersonBloc>().stream.listen((state) {
+        if (state is PersonsLoaded) {
+          setState(() {
+            personList = state.persons;
+          });
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    context.read<GetPerson>().getAllPersons();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Skapa konto'),
@@ -76,50 +105,40 @@ class _CreateAccountState extends State<CreateAccount> {
                     ElevatedButton(
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
-                          final personList =
-                              context.read<GetPerson>().personList;
                           final index = personList.indexWhere((i) =>
                               i.socialSecurityNumber == socialSecurityNumber!);
 
                           if (index == -1) {
-                            final res =
-                                await PersonRepository.instance.addPerson(
-                              Person(
-                                name: name!,
-                                socialSecurityNumber: socialSecurityNumber!,
-                              ),
-                            );
+                            if (context.mounted) {
+                              final bloc = context.read<PersonBloc>();
 
-                            if (res.statusCode == 200) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    duration: Duration(seconds: 3),
-                                    backgroundColor: Colors.lightGreen,
-                                    content: Text('Du har skapat ett konto'),
-                                  ),
-                                );
+                              _blocSubscription = bloc.stream.listen((state) {
+                                if (state is PersonsLoaded) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      duration: Duration(seconds: 3),
+                                      backgroundColor: Colors.lightGreen,
+                                      content: Text('Du har skapat ett konto'),
+                                    ),
+                                  );
 
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (ctx) => const Login(),
-                                  ),
-                                );
-                                Provider.of<GetPerson>(context, listen: false)
-                                    .getAllPersons();
-                              }
-                              formKey.currentState?.reset();
-                            } else {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    duration: Duration(seconds: 3),
-                                    backgroundColor: Colors.redAccent,
-                                    content: Text(
-                                        'Något gick fel vänligen försök igen senare'),
-                                  ),
-                                );
-                              }
+                                  formKey.currentState?.reset();
+                                  Navigator.of(context).pop();
+                                } else if (state is PersonsError) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      duration: const Duration(seconds: 3),
+                                      backgroundColor: Colors.redAccent,
+                                      content: Text(state.message),
+                                    ),
+                                  );
+                                }
+                              });
+                              context.read<PersonBloc>().add(CreatePerson(
+                                      person: Person(
+                                    name: name!,
+                                    socialSecurityNumber: socialSecurityNumber!,
+                                  )));
                             }
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(

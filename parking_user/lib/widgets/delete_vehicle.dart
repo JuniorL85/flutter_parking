@@ -3,9 +3,8 @@ import 'dart:async';
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_user/bloc/person_bloc.dart';
 import 'package:parking_user/bloc/vehicle_bloc.dart';
-import 'package:parking_user/providers/get_person_provider.dart';
-import 'package:provider/provider.dart';
 
 class DeleteVehicle extends StatefulWidget {
   const DeleteVehicle({super.key});
@@ -26,7 +25,7 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
   @override
   void initState() {
     super.initState();
-    getVehicleList();
+    getVehicleListAndPerson();
   }
 
   @override
@@ -36,14 +35,18 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
     super.dispose();
   }
 
-  getVehicleList() async {
+  getVehicleListAndPerson() async {
     if (mounted) {
-      person = super.context.read<GetPerson>().person;
-      context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
-      vehicleSubscription = context.read<VehicleBloc>().stream.listen((state) {
-        if (state is VehiclesLoaded) {
+      final personState = context.read<PersonBloc>().state;
+      if (personState is PersonLoaded) {
+        person = personState.person;
+
+        final vehicleState = context.read<VehicleBloc>().state;
+        if (vehicleState is! VehiclesLoaded) {
+          context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
+        } else {
           setState(() {
-            vehicleList = state.vehicles;
+            vehicleList = vehicleState.vehicles;
 
             if (vehicleList.isNotEmpty) {
               _selectedRegNr = vehicleList.first.regNr;
@@ -52,7 +55,22 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
             }
           });
         }
-      });
+
+        vehicleSubscription =
+            context.read<VehicleBloc>().stream.listen((state) {
+          if (state is VehiclesLoaded) {
+            setState(() {
+              vehicleList = state.vehicles;
+
+              if (vehicleList.isNotEmpty) {
+                _selectedRegNr = vehicleList.first.regNr;
+              } else {
+                _selectedRegNr = null;
+              }
+            });
+          }
+        });
+      }
     }
   }
 
@@ -188,7 +206,6 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
                             }
                           }
                         }
-                        // setHomePageState
                       },
                       child: const Text('Radera fordon'),
                     )

@@ -3,9 +3,8 @@ import 'dart:async';
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_user/bloc/person_bloc.dart';
 import 'package:parking_user/bloc/vehicle_bloc.dart';
-import 'package:parking_user/providers/get_person_provider.dart';
-import 'package:provider/provider.dart';
 
 List<String> list = <String>['Bil', 'Motorcykel', 'Annan'];
 
@@ -29,7 +28,7 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
   @override
   void initState() {
     super.initState();
-    getVehicleList();
+    getVehicleListAndPerson();
   }
 
   @override
@@ -39,23 +38,35 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
     super.dispose();
   }
 
-  getVehicleList() async {
+  getVehicleListAndPerson() async {
     if (mounted) {
-      person = super.context.read<GetPerson>().person;
-      context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
-      vehicleSubscription = context.read<VehicleBloc>().stream.listen((state) {
-        if (state is VehiclesLoaded) {
+      final personState = context.read<PersonBloc>().state;
+      if (personState is PersonLoaded) {
+        person = personState.person;
+
+        final vehicleState = context.read<VehicleBloc>().state;
+        if (vehicleState is! VehiclesLoaded) {
+          context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
+        } else {
           setState(() {
-            vehicleList = state.vehicles;
+            vehicleList = vehicleState.vehicles;
           });
         }
-      });
+
+        vehicleSubscription =
+            context.read<VehicleBloc>().stream.listen((state) {
+          if (state is VehiclesLoaded) {
+            setState(() {
+              vehicleList = state.vehicles;
+            });
+          }
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final person = context.read<GetPerson>().person;
     return Scaffold(
       body: Center(
         child: Padding(
@@ -174,7 +185,7 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                                   if (state is VehiclesLoaded) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        duration: Duration(seconds: 3),
+                                        duration: const Duration(seconds: 3),
                                         backgroundColor: Colors.lightGreen,
                                         content: Text(
                                             'Du har uppdaterat fordon med registreringsnummer $_selectedRegNr'),
@@ -205,46 +216,6 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                                               person.socialSecurityNumber,
                                         ))));
                               }
-                              // final res = await VehicleRepository.instance
-                              //     .updateVehicles(
-                              //   Vehicle(
-                              //     id: vehicleList[index].id,
-                              //     regNr: _selectedRegNr,
-                              //     vehicleType: dropdownValue,
-                              //     owner: Person(
-                              //       id: person.id,
-                              //       name: person.name,
-                              //       socialSecurityNumber:
-                              //           person.socialSecurityNumber,
-                              //     ),
-                              //   ),
-                              // );
-                              // if (res.statusCode == 200) {
-                              //   if (context.mounted) {
-                              //     ScaffoldMessenger.of(context).showSnackBar(
-                              //       SnackBar(
-                              //         duration: const Duration(seconds: 3),
-                              //         backgroundColor: Colors.lightGreen,
-                              //         content: Text(
-                              //             'Du har uppdaterat fordon med registreringsnummer $_selectedRegNr'),
-                              //       ),
-                              //     );
-                              //     formKey.currentState?.reset();
-                              //     isRegNrPicked = false;
-                              //     Navigator.of(context).pop();
-                              //   }
-                              // } else {
-                              //   if (context.mounted) {
-                              //     ScaffoldMessenger.of(context).showSnackBar(
-                              //       const SnackBar(
-                              //         duration: Duration(seconds: 3),
-                              //         backgroundColor: Colors.redAccent,
-                              //         content: Text(
-                              //             'Något gick fel vänligen försök igen senare'),
-                              //       ),
-                              //     );
-                              //   }
-                              // }
                             } else {
                               if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(

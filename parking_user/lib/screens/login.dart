@@ -1,9 +1,12 @@
+import 'dart:async';
+
+import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
-import 'package:parking_user/providers/get_person_provider.dart';
+import 'package:parking_user/bloc/person_bloc.dart';
 import 'package:parking_user/screens/create_account.dart';
 import 'package:parking_user/screens/manage_account.dart';
-import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -15,10 +18,36 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final formKey = GlobalKey<FormState>();
   String? socialSecurityNumber;
+  List<Person> personList = [];
+  StreamSubscription? personSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    getPersonList();
+  }
+
+  @override
+  void dispose() {
+    personSubscription?.cancel();
+    super.dispose();
+  }
+
+  getPersonList() async {
+    if (mounted) {
+      context.read<PersonBloc>().add(LoadPersons());
+      personSubscription = context.read<PersonBloc>().stream.listen((state) {
+        if (state is PersonsLoaded) {
+          setState(() {
+            personList = state.persons;
+          });
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    context.watch<GetPerson>().getAllPersons();
     return Scaffold(
       appBar: AppBar(
         title: const Text('ParkHere'),
@@ -38,8 +67,6 @@ class _LoginState extends State<Login> {
         child: Padding(
           padding: const EdgeInsets.all(15),
           child: Card(
-              // shape:
-              //     RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               color: Colors.transparent,
               child: Container(
                 decoration: BoxDecoration(
@@ -91,16 +118,13 @@ class _LoginState extends State<Login> {
                       ElevatedButton(
                         onPressed: () async {
                           if (formKey.currentState!.validate()) {
-                            final personList =
-                                context.read<GetPerson>().personList;
                             final index = personList.indexWhere((i) =>
                                 i.socialSecurityNumber ==
                                 socialSecurityNumber!);
 
                             if (index != -1) {
-                              context
-                                  .read<GetPerson>()
-                                  .getPerson(personList[index].id);
+                              context.read<PersonBloc>().add(
+                                  LoadPersonsById(person: personList[index]));
 
                               if (context.mounted) {
                                 Navigator.of(context).push(

@@ -1,20 +1,59 @@
+import 'dart:async';
+
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:parking_app_cli/utils/calculate.dart';
+import 'package:parking_user/bloc/person_bloc.dart';
 import 'package:parking_user/providers/get_parking_provider.dart';
-import 'package:parking_user/providers/get_person_provider.dart';
 import 'package:provider/provider.dart';
 
-class ShowParkingHistory extends StatelessWidget {
+class ShowParkingHistory extends StatefulWidget {
   const ShowParkingHistory({super.key});
+
+  @override
+  State<ShowParkingHistory> createState() => _ShowParkingHistoryState();
+}
+
+class _ShowParkingHistoryState extends State<ShowParkingHistory> {
+  late Person person;
+  StreamSubscription? personSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    getPerson();
+  }
+
+  @override
+  void dispose() {
+    personSubscription?.cancel();
+    super.dispose();
+  }
+
+  getPerson() {
+    if (mounted) {
+      final personState = context.read<PersonBloc>().state;
+      if (personState is PersonLoaded) {
+        person = personState.person;
+      } else {
+        person = Person(name: '', socialSecurityNumber: '');
+      }
+      personSubscription = context.read<PersonBloc>().stream.listen((state) {
+        if (state is PersonLoaded) {
+          setState(() {
+            person = state.person;
+          });
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     Future<List<Parking>> getParkings =
         context.read<GetParking>().getAllParkings();
-
-    final person = context.read<GetPerson>().person;
 
     return Scaffold(
       body: Column(
