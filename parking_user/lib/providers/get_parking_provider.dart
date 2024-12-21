@@ -6,11 +6,6 @@ class GetParking extends ChangeNotifier {
   Parking? _parking;
   List<Parking> _parkingList = [];
 
-  Future<void> getParking(int id) async {
-    _parking = await ParkingRepository.instance.getParkingById(id);
-    notifyListeners();
-  }
-
   Parking get parking => _parking!;
 
   Future<List<Parking>> getAllParkings() async {

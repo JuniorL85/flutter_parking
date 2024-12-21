@@ -4,15 +4,13 @@ import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:parking_app_cli/parking_app_cli.dart';
 import 'package:parking_app_cli/utils/calculate.dart';
+import 'package:parking_user/bloc/parking_bloc.dart';
 import 'package:parking_user/bloc/person_bloc.dart';
 import 'package:parking_user/bloc/vehicle_bloc.dart';
-import 'package:parking_user/providers/get_parking_provider.dart';
 import 'package:parking_user/widgets/datepicker_parking.dart';
 import 'package:parking_user/widgets/show_parking_history.dart';
 import 'package:parking_user/widgets/start_parking.dart';
-import 'package:provider/provider.dart';
 
 //ignore: must_be_immutable
 class ManageParkings extends StatefulWidget {
@@ -32,6 +30,9 @@ class _ManageParkingsState extends State<ManageParkings> {
   final ValueNotifier<DateTime?> _selectedDate = ValueNotifier(null);
   StreamSubscription? vehicleSubscription;
   StreamSubscription? personSubscription;
+  StreamSubscription? parkingSubscription;
+  StreamSubscription? _updateParkingSubscription;
+  StreamSubscription? _deleteParkingSubscription;
 
   @override
   void initState() {
@@ -40,20 +41,16 @@ class _ManageParkingsState extends State<ManageParkings> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
   void dispose() {
     vehicleSubscription?.cancel();
     personSubscription?.cancel();
+    parkingSubscription?.cancel();
+    _updateParkingSubscription?.cancel();
+    _deleteParkingSubscription?.cancel();
     super.dispose();
   }
 
   findActiveParking() async {
-    parkingList = await super.context.read<GetParking>().getAllParkings();
-
     if (!mounted) return;
 
     final personState = context.read<PersonBloc>().state;
@@ -61,35 +58,47 @@ class _ManageParkingsState extends State<ManageParkings> {
       person = personState.person;
 
       final vehicleState = context.read<VehicleBloc>().state;
-      if (vehicleState is! VehiclesLoaded) {
-        context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
+      if (vehicleState is VehiclesLoaded) {
+        vehicleList = vehicleState.vehicles;
       } else {
-        setState(() {
-          vehicleList = vehicleState.vehicles;
-        });
+        context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
+        await Future.delayed(const Duration(milliseconds: 100));
+        vehicleList = context.read<VehicleBloc>().state is VehiclesLoaded
+            ? (context.read<VehicleBloc>().state as VehiclesLoaded).vehicles
+            : [];
       }
 
-      vehicleSubscription = context.read<VehicleBloc>().stream.listen((state) {
-        if (state is VehiclesLoaded) {
-          setState(() {
-            vehicleList = state.vehicles;
-          });
-        }
+      final parkingState = context.read<ParkingBloc>().state;
+      if (parkingState is ParkingsLoaded) {
+        parkingList = parkingState.parkings;
+      } else {
+        context.read<ParkingBloc>().add(LoadActiveParkings());
+        await Future.delayed(const Duration(milliseconds: 100));
+        parkingList = context.read<ParkingBloc>().state is ParkingsLoaded
+            ? (context.read<ParkingBloc>().state as ParkingsLoaded).parkings
+            : [];
+      }
+
+      final filteredParkings = parkingList.where((activeParking) {
+        final matchingVehicle = vehicleList.any((v) =>
+            v.regNr.toUpperCase() ==
+            activeParking.vehicle!.regNr.toUpperCase());
+        return matchingVehicle;
+      }).toList();
+
+      setState(() {
+        parkingList = filteredParkings;
+        foundActiveParking = parkingList.isEmpty ? -1 : 0;
+        widget.isActiveParking = foundActiveParking != -1;
       });
-
-      foundActiveParking = parkingList.indexWhere(
-        (activeParking) => (vehicleList.any((v) =>
-                v.regNr.toUpperCase() ==
-                activeParking.vehicle!.regNr.toUpperCase()) &&
-            activeParking.endTime.microsecondsSinceEpoch >
-                DateTime.now().microsecondsSinceEpoch),
-      );
-
-      widget.isActiveParking = foundActiveParking == -1 ? false : true;
     }
   }
 
   calculateActiveParking() {
+    if (foundActiveParking == -1 || parkingList.isEmpty) {
+      return const Text('Ingen aktiv parkering hittades.');
+    }
+
     var price = calculateDuration(
       parkingList[foundActiveParking!].startTime,
       parkingList[foundActiveParking!].endTime,
@@ -144,7 +153,9 @@ class _ManageParkingsState extends State<ManageParkings> {
                                   builder: (ctx) => const StartParking(),
                                 ),
                               )
-                                  .then((onValue) {
+                                  .then((onValue) async {
+                                await Future.delayed(
+                                    const Duration(milliseconds: 100));
                                 setState(() {
                                   findActiveParking();
                                 });
@@ -163,7 +174,7 @@ class _ManageParkingsState extends State<ManageParkings> {
                     ],
                   ),
                 ),
-              if (widget.isActiveParking)
+              if (widget.isActiveParking && foundActiveParking != -1)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ListView(
@@ -225,67 +236,73 @@ class _ManageParkingsState extends State<ManageParkings> {
                                   TextButton(
                                     onPressed: () async {
                                       if (_selectedDate.value != null) {
-                                        final res = await ParkingRepository.instance.updateParkings(Parking(
-                                            vehicle: Vehicle(
-                                                regNr:
-                                                    parkingList[foundActiveParking!]
-                                                        .vehicle!
-                                                        .regNr,
-                                                vehicleType:
-                                                    parkingList[foundActiveParking!]
-                                                        .vehicle!
-                                                        .vehicleType,
-                                                owner: person),
-                                            parkingSpace: ParkingSpace(
-                                                id: parkingList[foundActiveParking!]
-                                                    .parkingSpace!
-                                                    .id,
-                                                address:
-                                                    parkingList[foundActiveParking!]
-                                                        .parkingSpace!
-                                                        .address,
-                                                pricePerHour:
-                                                    parkingList[foundActiveParking!]
-                                                        .parkingSpace!
-                                                        .pricePerHour),
-                                            id: parkingList[foundActiveParking!]
-                                                .id,
-                                            startTime:
-                                                parkingList[foundActiveParking!]
-                                                    .startTime,
-                                            endTime: _selectedDate.value!));
+                                        if (context.mounted) {
+                                          final bloc =
+                                              context.read<ParkingBloc>();
 
-                                        if (res.statusCode == 200) {
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                duration: Duration(seconds: 3),
-                                                backgroundColor:
-                                                    Colors.lightGreen,
-                                                content: Text(
-                                                    'Du har uppdaterat sluttiden på din parkering'),
-                                              ),
-                                            );
-                                            setState(() {
+                                          _updateParkingSubscription =
+                                              bloc.stream.listen((state) {
+                                            if (state is ParkingsLoaded) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  duration:
+                                                      Duration(seconds: 3),
+                                                  backgroundColor:
+                                                      Colors.lightGreen,
+                                                  content: Text(
+                                                      'Du har uppdaterat sluttiden på din parkering'),
+                                                ),
+                                              );
+
+                                              setState(() {
+                                                Navigator.pop(context);
+                                                findActiveParking();
+                                              });
+                                            } else if (state is ParkingsError) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  duration: const Duration(
+                                                      seconds: 3),
+                                                  backgroundColor:
+                                                      Colors.redAccent,
+                                                  content: Text(state.message),
+                                                ),
+                                              );
                                               Navigator.pop(context);
-                                              findActiveParking();
-                                            });
-                                          }
-                                        } else {
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                duration: Duration(seconds: 3),
-                                                backgroundColor:
-                                                    Colors.redAccent,
-                                                content: Text(
-                                                    'Något gick fel vänligen försök igen senare'),
-                                              ),
-                                            );
-                                            Navigator.pop(context);
-                                          }
+                                            }
+                                          });
+                                          context.read<ParkingBloc>().add(UpdateParking(
+                                              parking: Parking(
+                                                  vehicle: Vehicle(
+                                                      regNr:
+                                                          parkingList[foundActiveParking!]
+                                                              .vehicle!
+                                                              .regNr,
+                                                      vehicleType:
+                                                          parkingList[foundActiveParking!]
+                                                              .vehicle!
+                                                              .vehicleType,
+                                                      owner: person),
+                                                  parkingSpace: ParkingSpace(
+                                                      id: parkingList[foundActiveParking!]
+                                                          .parkingSpace!
+                                                          .id,
+                                                      address:
+                                                          parkingList[foundActiveParking!]
+                                                              .parkingSpace!
+                                                              .address,
+                                                      pricePerHour:
+                                                          parkingList[foundActiveParking!]
+                                                              .parkingSpace!
+                                                              .pricePerHour),
+                                                  id: parkingList[foundActiveParking!]
+                                                      .id,
+                                                  startTime:
+                                                      parkingList[foundActiveParking!]
+                                                          .startTime,
+                                                  endTime: _selectedDate.value!)));
                                         }
                                       } else {
                                         if (context.mounted) {
@@ -342,41 +359,46 @@ class _ManageParkingsState extends State<ManageParkings> {
                                   ),
                                   TextButton(
                                     onPressed: () async {
-                                      final res = await ParkingRepository
-                                          .instance
-                                          .deleteParkings(
-                                              parkingList[foundActiveParking!]);
+                                      if (context.mounted) {
+                                        final bloc =
+                                            context.read<ParkingBloc>();
 
-                                      if (res.statusCode == 200) {
-                                        if (context.mounted) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              duration: Duration(seconds: 3),
-                                              backgroundColor:
-                                                  Colors.lightGreen,
-                                              content: Text(
-                                                  'Du har avslutat din parkering'),
-                                            ),
-                                          );
-                                          setState(() {
+                                        _deleteParkingSubscription =
+                                            bloc.stream.listen((state) {
+                                          if (state is ParkingsLoaded) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                duration: Duration(seconds: 3),
+                                                backgroundColor:
+                                                    Colors.lightGreen,
+                                                content: Text(
+                                                    'Du har avslutat din parkering!'),
+                                              ),
+                                            );
+
+                                            setState(() {
+                                              Navigator.pop(context);
+                                              findActiveParking();
+                                            });
+                                          } else if (state is ParkingsError) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                duration:
+                                                    const Duration(seconds: 3),
+                                                backgroundColor:
+                                                    Colors.redAccent,
+                                                content: Text(state.message),
+                                              ),
+                                            );
                                             Navigator.pop(context);
-                                            findActiveParking();
-                                          });
-                                        }
-                                      } else {
-                                        if (context.mounted) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              duration: Duration(seconds: 3),
-                                              backgroundColor: Colors.redAccent,
-                                              content: Text(
-                                                  'Något gick fel vänligen försök igen senare'),
-                                            ),
-                                          );
-                                          Navigator.pop(context);
-                                        }
+                                          }
+                                        });
+                                        context.read<ParkingBloc>().add(
+                                            DeleteParking(
+                                                parking: parkingList[
+                                                    foundActiveParking!]));
                                       }
                                     },
                                     child: const Text('Avsluta'),

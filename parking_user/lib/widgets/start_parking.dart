@@ -3,13 +3,12 @@ import 'dart:async';
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:parking_user/bloc/parking_bloc.dart';
 import 'package:parking_user/bloc/parking_spaces_bloc.dart';
 import 'package:parking_user/bloc/person_bloc.dart';
 import 'package:parking_user/bloc/vehicle_bloc.dart';
 import 'package:parking_user/screens/manage_account.dart';
 import 'package:parking_user/widgets/datepicker_parking.dart';
-import 'package:provider/provider.dart';
 
 List<ParkingSpace> listAvailableParkingSpaces = [];
 
@@ -30,6 +29,7 @@ class _StartParkingState extends State<StartParking> {
   late Person person;
   StreamSubscription? parkingSpacesSubscription;
   StreamSubscription? vehicleSubscription;
+  StreamSubscription? _blocSubscription;
 
   @override
   void initState() {
@@ -42,6 +42,7 @@ class _StartParkingState extends State<StartParking> {
   void dispose() {
     parkingSpacesSubscription?.cancel();
     vehicleSubscription?.cancel();
+    _blocSubscription?.cancel();
     super.dispose();
   }
 
@@ -267,46 +268,52 @@ class _StartParkingState extends State<StartParking> {
                                 if (_selectedDate.value != null &&
                                     vehicleType != '') {
                                   formKey.currentState!.save();
-                                  final res = await ParkingRepository.instance
-                                      .addParking(Parking(
-                                          vehicle: Vehicle(
-                                              regNr: _selectedRegNr!,
-                                              vehicleType: vehicleType,
-                                              owner: person),
-                                          parkingSpace: ParkingSpace(
-                                              id: parkingSpace.id,
-                                              address: parkingSpace.address,
-                                              pricePerHour:
-                                                  parkingSpace.pricePerHour),
-                                          startTime: DateTime.now(),
-                                          endTime: _selectedDate.value!));
+                                  if (context.mounted) {
+                                    final bloc = context.read<ParkingBloc>();
 
-                                  if (res.statusCode == 200) {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          duration: Duration(seconds: 3),
-                                          backgroundColor: Colors.lightGreen,
-                                          content: Text(
-                                              'Du har startat en ny parkering!'),
-                                        ),
-                                      );
-                                      Navigator.of(context).pop();
-                                      formKey.currentState!.reset();
-                                    }
-                                  } else {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          duration: Duration(seconds: 3),
-                                          backgroundColor: Colors.redAccent,
-                                          content: Text(
-                                              'Något gick fel vänligen försök igen senare'),
-                                        ),
-                                      );
-                                    }
+                                    _blocSubscription =
+                                        bloc.stream.listen((state) {
+                                      if (state is ParkingsLoaded) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            duration: Duration(seconds: 3),
+                                            backgroundColor: Colors.lightGreen,
+                                            content: Text(
+                                                'Du har startat en ny parkering!'),
+                                          ),
+                                        );
+
+                                        formKey.currentState?.reset();
+                                        Navigator.of(context).pop();
+                                      } else if (state is ParkingsError) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            duration:
+                                                const Duration(seconds: 3),
+                                            backgroundColor: Colors.redAccent,
+                                            content: Text(state.message),
+                                          ),
+                                        );
+                                      }
+                                    });
+                                    context.read<ParkingBloc>().add(
+                                        CreateParking(
+                                            parking: Parking(
+                                                vehicle: Vehicle(
+                                                    regNr: _selectedRegNr!,
+                                                    vehicleType: vehicleType,
+                                                    owner: person),
+                                                parkingSpace: ParkingSpace(
+                                                    id: parkingSpace.id,
+                                                    address:
+                                                        parkingSpace.address,
+                                                    pricePerHour: parkingSpace
+                                                        .pricePerHour),
+                                                startTime: DateTime.now(),
+                                                endTime:
+                                                    _selectedDate.value!)));
                                   }
                                 } else {
                                   if (context.mounted) {
