@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:parking_app_cli/utils/calculate.dart';
+import 'package:parking_user/bloc/parking_bloc.dart';
 import 'package:parking_user/bloc/person_bloc.dart';
-import 'package:parking_user/providers/get_parking_provider.dart';
-import 'package:provider/provider.dart';
 
 class ShowParkingHistory extends StatefulWidget {
   const ShowParkingHistory({super.key});
@@ -18,43 +17,67 @@ class ShowParkingHistory extends StatefulWidget {
 
 class _ShowParkingHistoryState extends State<ShowParkingHistory> {
   late Person person;
+  List<Parking> parkingList = [];
   StreamSubscription? personSubscription;
+  StreamSubscription? parkingSubscription;
 
   @override
   void initState() {
     super.initState();
-    getPerson();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    context.read<ParkingBloc>().add(LoadNonActiveParkings());
+    getPersonAndNonActiveParkings();
   }
 
   @override
   void dispose() {
     personSubscription?.cancel();
+    parkingSubscription?.cancel();
     super.dispose();
   }
 
-  getPerson() {
+  getPersonAndNonActiveParkings() async {
     if (mounted) {
       final personState = context.read<PersonBloc>().state;
       if (personState is PersonLoaded) {
         person = personState.person;
+        final parkingState = context.read<ParkingBloc>().state;
+        if (parkingState is! ParkingsLoaded) {
+          context.read<ParkingBloc>().add(LoadNonActiveParkings());
+        } else {
+          setState(() {
+            parkingList = parkingState.parkings
+                .where((parking) =>
+                    parking.vehicle?.owner?.socialSecurityNumber ==
+                    person.socialSecurityNumber)
+                .toList();
+          });
+        }
+
+        parkingSubscription =
+            context.read<ParkingBloc>().stream.listen((state) {
+          if (state is ParkingsLoaded) {
+            setState(() {
+              parkingList = state.parkings
+                  .where((parking) =>
+                      parking.vehicle?.owner?.socialSecurityNumber ==
+                      person.socialSecurityNumber)
+                  .toList();
+            });
+          }
+        });
       } else {
         person = Person(name: '', socialSecurityNumber: '');
       }
-      personSubscription = context.read<PersonBloc>().stream.listen((state) {
-        if (state is PersonLoaded) {
-          setState(() {
-            person = state.person;
-          });
-        }
-      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    Future<List<Parking>> getParkings =
-        context.read<GetParking>().getAllParkings();
-
     return Scaffold(
       body: Column(
         children: [
@@ -73,59 +96,57 @@ class _ShowParkingHistoryState extends State<ShowParkingHistory> {
               ],
             ),
           ),
-          FutureBuilder<List<Parking>>(
-            future: getParkings,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                var formattedSnapshot = snapshot.data!
-                    .where((parking) =>
-                        parking.vehicle?.owner?.socialSecurityNumber ==
-                            person.socialSecurityNumber &&
-                        parking.endTime.microsecondsSinceEpoch <
-                            DateTime.now().microsecondsSinceEpoch)
-                    .toList();
-                return Expanded(
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: formattedSnapshot.length,
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (context, index) {
-                        var parking = formattedSnapshot[index];
-                        return Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: ListTile(
-                              leading:
-                                  Text(parking.parkingSpace!.id.toString()),
-                              title: Text(
-                                parking.parkingSpace!.address,
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
-                              ),
-                              subtitle: Text(
-                                  '${DateFormat('yyyy-MM-dd kk:mm').format(parking.startTime)} - ${DateFormat('yyyy-MM-dd kk:mm').format(parking.endTime)}'),
-                              trailing: Text(
-                                  '${calculateDuration(parking.startTime, parking.endTime, parking.parkingSpace!.pricePerHour).toStringAsFixed(2)} kr'),
-                              tileColor:
-                                  Theme.of(context).colorScheme.inversePrimary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                side: BorderSide(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary),
-                              )),
-                        );
-                      }),
+          BlocBuilder<ParkingBloc, ParkingState>(
+            builder: (context, state) {
+              if (state is ParkingInitial || state is ParkingsLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
                 );
+              } else if (state is ParkingsLoaded) {
+                return Expanded(
+                  child: SizedBox(
+                    height: 300,
+                    child: ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: parkingList.length,
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (context, index) {
+                          var parking = parkingList[index];
+                          return Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: ListTile(
+                                leading:
+                                    Text(parking.parkingSpace!.id.toString()),
+                                title: Text(
+                                  parking.parkingSpace!.address,
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface),
+                                ),
+                                subtitle: Text(
+                                    '${DateFormat('yyyy-MM-dd kk:mm').format(parking.startTime)} - ${DateFormat('yyyy-MM-dd kk:mm').format(parking.endTime)}'),
+                                trailing: Text(
+                                    '${calculateDuration(parking.startTime, parking.endTime, parking.parkingSpace!.pricePerHour).toStringAsFixed(2)} kr'),
+                                tileColor: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  side: BorderSide(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondary),
+                                )),
+                          );
+                        }),
+                  ),
+                );
+              } else if (state is ParkingsError) {
+                return Text('Error: ${state.message}');
+              } else {
+                return const Text('Ingen data tillgänglig');
               }
-
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              }
-
-              return const CircularProgressIndicator();
             },
           ),
         ],

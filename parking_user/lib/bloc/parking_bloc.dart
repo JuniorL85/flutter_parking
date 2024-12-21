@@ -67,14 +67,11 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
     try {
       _parkingList = await ParkingRepository.instance.getAllParkings();
 
-      List<Parking> activeParkings = _parkingList
-          .where(
-            (activeParking) => (activeParking.endTime.microsecondsSinceEpoch <
-                DateTime.now().microsecondsSinceEpoch),
-          )
+      List<Parking> nonActiveParkings = _parkingList
+          .where((parking) => parking.endTime.isBefore(DateTime.now()))
           .toList();
 
-      emit(ParkingsLoaded(parkings: activeParkings));
+      emit(ParkingsLoaded(parkings: nonActiveParkings));
     } catch (e) {
       emit(ParkingsError(message: e.toString()));
     }
