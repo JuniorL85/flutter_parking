@@ -104,43 +104,39 @@ class _ShowParkingHistoryState extends State<ShowParkingHistory> {
                 );
               } else if (state is ParkingsLoaded) {
                 return Expanded(
-                  child: SizedBox(
-                    height: 300,
-                    child: ListView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: parkingList.length,
-                        scrollDirection: Axis.vertical,
-                        itemBuilder: (context, index) {
-                          var parking = parkingList[index];
-                          return Padding(
-                            padding: const EdgeInsets.all(3.0),
-                            child: ListTile(
-                                leading:
-                                    Text(parking.parkingSpace!.id.toString()),
-                                title: Text(
-                                  parking.parkingSpace!.address,
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface),
-                                ),
-                                subtitle: Text(
-                                    '${DateFormat('yyyy-MM-dd kk:mm').format(parking.startTime)} - ${DateFormat('yyyy-MM-dd kk:mm').format(parking.endTime)}'),
-                                trailing: Text(
-                                    '${calculateDuration(parking.startTime, parking.endTime, parking.parkingSpace!.pricePerHour).toStringAsFixed(2)} kr'),
-                                tileColor: Theme.of(context)
-                                    .colorScheme
-                                    .inversePrimary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  side: BorderSide(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary),
-                                )),
-                          );
-                        }),
-                  ),
+                  child: ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: parkingList.length,
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (context, index) {
+                        var parking = parkingList[index];
+                        return Padding(
+                          padding: const EdgeInsets.all(3.0),
+                          child: ListTile(
+                              leading:
+                                  Text(parking.parkingSpace!.id.toString()),
+                              title: Text(
+                                parking.parkingSpace!.address,
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
+                              ),
+                              subtitle: Text(
+                                  '${DateFormat('yyyy-MM-dd kk:mm').format(parking.startTime)} - ${DateFormat('yyyy-MM-dd kk:mm').format(parking.endTime)}'),
+                              trailing: Text(
+                                  '${calculateDuration(parking.startTime, parking.endTime, parking.parkingSpace!.pricePerHour).toStringAsFixed(2)} kr'),
+                              tileColor:
+                                  Theme.of(context).colorScheme.inversePrimary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: BorderSide(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary),
+                              )),
+                        );
+                      }),
                 );
               } else if (state is ParkingsError) {
                 return Text('Error: ${state.message}');

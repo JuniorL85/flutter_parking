@@ -69,13 +69,14 @@ class _ManageParkingsState extends State<ManageParkings> {
       }
 
       final parkingState = context.read<ParkingBloc>().state;
-      if (parkingState is ParkingsLoaded) {
+      if (parkingState is ActiveParkingsLoaded) {
         parkingList = parkingState.parkings;
       } else {
         context.read<ParkingBloc>().add(LoadActiveParkings());
         await Future.delayed(const Duration(milliseconds: 100));
-        parkingList = context.read<ParkingBloc>().state is ParkingsLoaded
-            ? (context.read<ParkingBloc>().state as ParkingsLoaded).parkings
+        parkingList = context.read<ParkingBloc>().state is ActiveParkingsLoaded
+            ? (context.read<ParkingBloc>().state as ActiveParkingsLoaded)
+                .parkings
             : [];
       }
 
@@ -242,7 +243,7 @@ class _ManageParkingsState extends State<ManageParkings> {
 
                                           _updateParkingSubscription =
                                               bloc.stream.listen((state) {
-                                            if (state is ParkingsLoaded) {
+                                            if (state is ActiveParkingsLoaded) {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(
@@ -365,7 +366,7 @@ class _ManageParkingsState extends State<ManageParkings> {
 
                                         _deleteParkingSubscription =
                                             bloc.stream.listen((state) {
-                                          if (state is ParkingsLoaded) {
+                                          if (state is ActiveParkingsLoaded) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(

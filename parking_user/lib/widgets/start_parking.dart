@@ -273,7 +273,7 @@ class _StartParkingState extends State<StartParking> {
 
                                     _blocSubscription =
                                         bloc.stream.listen((state) {
-                                      if (state is ParkingsLoaded) {
+                                      if (state is ActiveParkingsLoaded) {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(

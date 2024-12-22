@@ -23,3 +23,9 @@ class ParkingsError extends ParkingState {
 
   List<Object?> get props => [message];
 }
+
+class ActiveParkingsLoaded extends ParkingState {
+  final List<Parking> parkings;
+
+  ActiveParkingsLoaded({required this.parkings});
+}

@@ -56,7 +56,7 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
           )
           .toList();
 
-      emit(ParkingsLoaded(parkings: activeParkings));
+      emit(ActiveParkingsLoaded(parkings: activeParkings));
     } catch (e) {
       emit(ParkingsError(message: e.toString()));
     }
