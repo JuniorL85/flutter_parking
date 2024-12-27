@@ -43,6 +43,8 @@ dependencies:
   flutter_bloc: ^8.1.6
   bloc: ^8.1.4
   shared_preferences: ^2.3.4
+  bloc_test: ^9.1.7
+  mocktail: ^1.0.4
 
 dev_dependencies:
   flutter_test:
