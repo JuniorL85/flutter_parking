@@ -1,13 +1,16 @@
 import 'package:bloc/bloc.dart';
 import 'package:cli_shared/cli_shared.dart';
+import 'package:equatable/equatable.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
 
 part 'parking_spaces_event.dart';
 part 'parking_spaces_state.dart';
 
 class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
+  final ParkingSpaceRepository parkingSpaceRepository;
   List<ParkingSpace> _parkingSpaceList = [];
-  ParkingSpacesBloc() : super(ParkingSpacesInitial()) {
+  ParkingSpacesBloc({required this.parkingSpaceRepository})
+      : super(ParkingSpacesInitial()) {
     on<LoadParkingSpaces>((event, emit) async {
       await onLoadParkingSpaces(emit);
     });
@@ -39,13 +42,13 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
   onCreateParkingSpace(
       Emitter<ParkingSpacesState> emit, ParkingSpace parkingSpace) async {
     try {
-      await ParkingSpaceRepository.instance.addParkingSpace(ParkingSpace(
+      await parkingSpaceRepository.addParkingSpace(ParkingSpace(
         address: parkingSpace.address,
         pricePerHour: parkingSpace.pricePerHour,
       ));
 
       final loadedParkingSpaces =
-          await ParkingSpaceRepository.instance.getAllParkingSpaces();
+          await parkingSpaceRepository.getAllParkingSpaces();
       emit(ParkingSpacesLoaded(parkingSpaces: loadedParkingSpaces));
     } catch (e) {
       emit(ParkingSpacesError(message: e.toString()));

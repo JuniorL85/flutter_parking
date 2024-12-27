@@ -4,6 +4,7 @@ import 'package:parking_admin/bloc/parking_bloc.dart';
 import 'package:parking_admin/bloc/parking_spaces_bloc.dart';
 import 'package:parking_admin/bloc/theme_bloc.dart';
 import 'package:parking_admin/views/home.dart';
+import 'package:parking_app_cli/parking_app_cli.dart';
 
 void main() {
   runApp(
@@ -16,7 +17,9 @@ void main() {
           create: (context) => ActiveParkingBloc()..add(LoadActiveParkings()),
         ),
         BlocProvider<ParkingSpacesBloc>(
-          create: (context) => ParkingSpacesBloc()..add(LoadParkingSpaces()),
+          create: (context) => ParkingSpacesBloc(
+              parkingSpaceRepository: ParkingSpaceRepository.instance)
+            ..add(LoadParkingSpaces()),
         ),
         BlocProvider<ThemeBloc>(
           create: (context) => ThemeBloc()..add(InitialThemeEvent()),
