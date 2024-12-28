@@ -31,8 +31,7 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
   Future<void> onLoadParkingSpaces(Emitter<ParkingSpacesState> emit) async {
     emit(ParkingSpacesLoading());
     try {
-      _parkingSpaceList =
-          await ParkingSpaceRepository.instance.getAllParkingSpaces();
+      _parkingSpaceList = await parkingSpaceRepository.getAllParkingSpaces();
       emit(ParkingSpacesLoaded(parkingSpaces: _parkingSpaceList));
     } catch (e) {
       emit(ParkingSpacesError(message: e.toString()));
@@ -58,14 +57,14 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
   onUpdateParkingSpace(
       Emitter<ParkingSpacesState> emit, ParkingSpace parkingSpace) async {
     try {
-      await ParkingSpaceRepository.instance.updateParkingSpace(ParkingSpace(
+      await parkingSpaceRepository.updateParkingSpace(ParkingSpace(
         id: parkingSpace.id,
         address: parkingSpace.address,
         pricePerHour: parkingSpace.pricePerHour,
       ));
 
       final loadedParkingSpaces =
-          await ParkingSpaceRepository.instance.getAllParkingSpaces();
+          await parkingSpaceRepository.getAllParkingSpaces();
       emit(ParkingSpacesLoaded(parkingSpaces: loadedParkingSpaces));
     } catch (e) {
       emit(ParkingSpacesError(message: e.toString()));
@@ -75,14 +74,14 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
   onDeleteParkingSpace(
       Emitter<ParkingSpacesState> emit, ParkingSpace parkingSpace) async {
     try {
-      await ParkingSpaceRepository.instance.deleteParkingSpace(ParkingSpace(
+      await parkingSpaceRepository.deleteParkingSpace(ParkingSpace(
         id: parkingSpace.id,
         address: parkingSpace.address,
         pricePerHour: parkingSpace.pricePerHour,
       ));
 
       final loadedParkingSpaces =
-          await ParkingSpaceRepository.instance.getAllParkingSpaces();
+          await parkingSpaceRepository.getAllParkingSpaces();
       emit(ParkingSpacesLoaded(parkingSpaces: loadedParkingSpaces));
     } catch (e) {
       emit(ParkingSpacesError(message: e.toString()));
