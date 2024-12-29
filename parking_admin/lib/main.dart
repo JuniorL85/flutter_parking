@@ -14,7 +14,9 @@ void main() {
           create: (context) => ParkingBloc()..add(LoadParkings()),
         ),
         BlocProvider<ActiveParkingBloc>(
-          create: (context) => ActiveParkingBloc()..add(LoadActiveParkings()),
+          create: (context) => ActiveParkingBloc(
+              activeParkingRepository: ParkingRepository.instance)
+            ..add(LoadActiveParkings()),
         ),
         BlocProvider<ParkingSpacesBloc>(
           create: (context) => ParkingSpacesBloc(

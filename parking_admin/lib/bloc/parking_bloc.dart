@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:cli_shared/cli_shared.dart';
+import 'package:equatable/equatable.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
 
 part 'parking_event.dart';
@@ -26,9 +27,11 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
 }
 
 class ActiveParkingBloc extends Bloc<ParkingEvent, ActiveParkingState> {
+  final ParkingRepository activeParkingRepository;
   List<Parking> _parkingList = [];
 
-  ActiveParkingBloc() : super(ActiveParkingInitial()) {
+  ActiveParkingBloc({required this.activeParkingRepository})
+      : super(ActiveParkingInitial()) {
     on<LoadActiveParkings>((event, emit) async {
       await onLoadActiveParkings(emit);
     });
@@ -37,7 +40,7 @@ class ActiveParkingBloc extends Bloc<ParkingEvent, ActiveParkingState> {
   Future<void> onLoadActiveParkings(Emitter<ActiveParkingState> emit) async {
     emit(ActiveParkingsLoading());
     try {
-      _parkingList = await ParkingRepository.instance.getAllParkings();
+      _parkingList = await activeParkingRepository.getAllParkings();
 
       List<Parking> activeParkings = _parkingList
           .where(
