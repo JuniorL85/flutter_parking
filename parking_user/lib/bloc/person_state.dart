@@ -1,25 +1,33 @@
 part of 'person_bloc.dart';
 
-sealed class PersonState {}
+abstract class PersonState extends Equatable {}
 
 class PersonsInitial extends PersonState {
-  List<Object?> get persons => [];
+  @override
+  List<Object?> get props => [];
 }
 
 class PersonsLoading extends PersonState {
-  List<Object?> get persons => [];
+  @override
+  List<Object?> get props => [];
 }
 
 class PersonsLoaded extends PersonState {
   final List<Person> persons;
 
   PersonsLoaded({required this.persons});
+
+  @override
+  List<Object?> get props => [persons];
 }
 
 class PersonLoaded extends PersonState {
-  Person person;
+  final Person person;
 
   PersonLoaded({required this.person});
+
+  @override
+  List<Object?> get props => [person];
 }
 
 class PersonsError extends PersonState {
@@ -27,5 +35,6 @@ class PersonsError extends PersonState {
 
   PersonsError({required this.message});
 
+  @override
   List<Object?> get props => [message];
 }

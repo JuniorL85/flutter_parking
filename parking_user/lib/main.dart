@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_app_cli/parking_app_cli.dart';
 import 'package:parking_user/bloc/parking_bloc.dart';
 import 'package:parking_user/bloc/parking_spaces_bloc.dart';
 import 'package:parking_user/bloc/person_bloc.dart';
@@ -17,7 +18,9 @@ void main() {
       MultiBlocProvider(
         providers: [
           BlocProvider<PersonBloc>(
-            create: (context) => PersonBloc()..add(LoadPersons()),
+            create: (context) =>
+                PersonBloc(personRepository: PersonRepository.instance)
+                  ..add(LoadPersons()),
           ),
           BlocProvider<VehicleBloc>(
             create: (context) => VehicleBloc()..add(LoadVehicles()),
@@ -26,7 +29,9 @@ void main() {
             create: (context) => ParkingBloc()..add(LoadActiveParkings()),
           ),
           BlocProvider<ParkingSpacesBloc>(
-            create: (context) => ParkingSpacesBloc()..add(LoadParkingSpaces()),
+            create: (context) => ParkingSpacesBloc(
+                parkingSpaceRepository: ParkingSpaceRepository.instance)
+              ..add(LoadParkingSpaces()),
           ),
           BlocProvider<ThemeBloc>(
             create: (context) => ThemeBloc()..add(InitialThemeEvent()),
@@ -57,7 +62,7 @@ class MyApp extends StatelessWidget {
         currentTheme = brightness == Brightness.dark
             ? ThemeData.dark()
             : ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
                 useMaterial3: true,
               );
       }

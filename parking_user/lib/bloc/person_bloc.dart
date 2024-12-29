@@ -1,13 +1,15 @@
 import 'package:bloc/bloc.dart';
 import 'package:cli_shared/cli_shared.dart';
+import 'package:equatable/equatable.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
 
 part 'person_event.dart';
 part 'person_state.dart';
 
 class PersonBloc extends Bloc<PersonEvent, PersonState> {
+  final PersonRepository personRepository;
   List<Person> _personList = [];
-  PersonBloc() : super(PersonsInitial()) {
+  PersonBloc({required this.personRepository}) : super(PersonsInitial()) {
     on<LoadPersons>((event, emit) async {
       await onLoadPersons(emit);
     });
@@ -32,7 +34,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   Future<void> onLoadPersons(Emitter<PersonState> emit) async {
     emit(PersonsLoading());
     try {
-      _personList = await PersonRepository.instance.getAllPersons();
+      _personList = await personRepository.getAllPersons();
       emit(PersonsLoaded(persons: _personList));
     } catch (e) {
       emit(PersonsError(message: e.toString()));
@@ -43,8 +45,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
       Emitter<PersonState> emit, Person person) async {
     emit(PersonsLoading());
     try {
-      final personById =
-          await PersonRepository.instance.getPersonById(person.id);
+      final personById = await personRepository.getPersonById(person.id);
       emit(PersonLoaded(person: personById));
     } catch (e) {
       emit(PersonsError(message: e.toString()));
@@ -53,11 +54,11 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
 
   onCreatePerson(Emitter<PersonState> emit, Person person) async {
     try {
-      await PersonRepository.instance.addPerson(Person(
+      await personRepository.addPerson(Person(
           name: person.name,
           socialSecurityNumber: person.socialSecurityNumber));
 
-      _personList = await PersonRepository.instance.getAllPersons();
+      _personList = await personRepository.getAllPersons();
       emit(PersonsLoaded(persons: _personList));
     } catch (e) {
       emit(PersonsError(message: e.toString()));
@@ -66,7 +67,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
 
   onUpdatePerson(Emitter<PersonState> emit, Person person) async {
     try {
-      await PersonRepository.instance.updatePersons(Person(
+      await personRepository.updatePersons(Person(
           id: person.id,
           name: person.name,
           socialSecurityNumber: person.socialSecurityNumber));
@@ -79,12 +80,12 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
 
   onDeletePerson(Emitter<PersonState> emit, Person person) async {
     try {
-      await PersonRepository.instance.deletePerson(Person(
+      await personRepository.deletePerson(Person(
           id: person.id,
           name: person.name,
           socialSecurityNumber: person.socialSecurityNumber));
 
-      _personList = await PersonRepository.instance.getAllPersons();
+      _personList = await personRepository.getAllPersons();
       emit(PersonsLoaded(persons: _personList));
     } catch (e) {
       emit(PersonsError(message: e.toString()));
