@@ -206,31 +206,5 @@ void main() {
         ],
       );
     });
-
-    // group("delete parkingSpace", () {
-    //   ParkingSpace newParkingSpace = ParkingSpace(
-    //       address: 'Testadress 44, 555 66 Testar', pricePerHour: 12);
-
-    //   blocTest<ParkingSpacesBloc, ParkingSpacesState>(
-    //     "delete parkingspace test",
-    //     setUp: () {
-    //       when(() => parkingSpaceRepository.deleteParkingSpace(any()))
-    //           .thenAnswer((_) async => newParkingSpace);
-    //       when(() => parkingSpaceRepository.getAllParkingSpaces())
-    //           .thenAnswer((_) async => [newParkingSpace]);
-    //     },
-    //     build: () =>
-    //         ParkingSpacesBloc(parkingSpaceRepository: parkingSpaceRepository),
-    //     seed: () => ParkingSpacesLoaded(parkingSpaces: const []),
-    //     act: (bloc) =>
-    //         bloc.add(CreateParkingSpace(parkingSpace: newParkingSpace)),
-    //     expect: () => [
-    //       ParkingSpacesLoaded(parkingSpaces: [newParkingSpace])
-    //     ],
-    //     verify: (_) {
-    //       verify(() => parkingSpaceRepository.addParkingSpace(any())).called(1);
-    //     },
-    //   );
-    // });
   });
 }
