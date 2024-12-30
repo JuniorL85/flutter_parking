@@ -23,7 +23,9 @@ void main() {
                   ..add(LoadPersons()),
           ),
           BlocProvider<VehicleBloc>(
-            create: (context) => VehicleBloc()..add(LoadVehicles()),
+            create: (context) =>
+                VehicleBloc(vehicleRepository: VehicleRepository.instance)
+                  ..add(LoadVehicles()),
           ),
           BlocProvider<ParkingBloc>(
             create: (context) => ParkingBloc()..add(LoadActiveParkings()),

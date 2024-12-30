@@ -1,13 +1,15 @@
 import 'package:bloc/bloc.dart';
 import 'package:cli_shared/cli_shared.dart';
+import 'package:equatable/equatable.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
 
 part 'vehicle_event.dart';
 part 'vehicle_state.dart';
 
 class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
+  final VehicleRepository vehicleRepository;
   List<Vehicle> _vehicleList = [];
-  VehicleBloc() : super(VehiclesInitial()) {
+  VehicleBloc({required this.vehicleRepository}) : super(VehiclesInitial()) {
     on<LoadVehicles>((event, emit) async {
       await onLoadVehicles(emit);
     });
@@ -32,7 +34,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
   Future<void> onLoadVehicles(Emitter<VehicleState> emit) async {
     emit(VehiclesLoading());
     try {
-      _vehicleList = await VehicleRepository.instance.getAllVehicles();
+      _vehicleList = await vehicleRepository.getAllVehicles();
       emit(VehiclesLoaded(vehicles: _vehicleList));
     } catch (e) {
       emit(VehiclesError(message: e.toString()));
@@ -43,7 +45,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
       Emitter<VehicleState> emit, Person person) async {
     emit(VehiclesLoading());
     try {
-      _vehicleList = await VehicleRepository.instance.getAllVehicles();
+      _vehicleList = await vehicleRepository.getAllVehicles();
       final vehicleListByPerson = _vehicleList
           .where((vehicle) =>
               vehicle.owner!.socialSecurityNumber ==
@@ -57,7 +59,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
 
   onCreateVehicle(Emitter<VehicleState> emit, Vehicle vehicle) async {
     try {
-      await VehicleRepository.instance.addVehicle(Vehicle(
+      await vehicleRepository.addVehicle(Vehicle(
           regNr: vehicle.regNr,
           vehicleType: vehicle.vehicleType,
           owner: vehicle.owner));
@@ -70,7 +72,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
 
   onUpdateVehicle(Emitter<VehicleState> emit, Vehicle vehicle) async {
     try {
-      await VehicleRepository.instance.updateVehicles(Vehicle(
+      await vehicleRepository.updateVehicles(Vehicle(
           id: vehicle.id,
           regNr: vehicle.regNr,
           vehicleType: vehicle.vehicleType,
@@ -84,7 +86,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
 
   onDeleteVehicle(Emitter<VehicleState> emit, Vehicle vehicle) async {
     try {
-      await VehicleRepository.instance.deleteVehicle(Vehicle(
+      await vehicleRepository.deleteVehicle(Vehicle(
           id: vehicle.id,
           regNr: vehicle.regNr,
           vehicleType: vehicle.vehicleType,
