@@ -1,19 +1,24 @@
 part of 'parking_bloc.dart';
 
-sealed class ParkingState {}
+sealed class ParkingState extends Equatable {}
 
 class ParkingInitial extends ParkingState {
-  List<Object?> get parkings => [];
+  @override
+  List<Object?> get props => [];
 }
 
 class ParkingsLoading extends ParkingState {
-  List<Object?> get parkings => [];
+  @override
+  List<Object?> get props => [];
 }
 
 class ParkingsLoaded extends ParkingState {
   final List<Parking> parkings;
 
   ParkingsLoaded({required this.parkings});
+
+  @override
+  List<Object?> get props => [parkings];
 }
 
 class ParkingsError extends ParkingState {
@@ -28,4 +33,7 @@ class ActiveParkingsLoaded extends ParkingState {
   final List<Parking> parkings;
 
   ActiveParkingsLoaded({required this.parkings});
+
+  @override
+  List<Object?> get props => [parkings];
 }

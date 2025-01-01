@@ -1,14 +1,16 @@
 import 'package:bloc/bloc.dart';
 import 'package:cli_shared/cli_shared.dart';
+import 'package:equatable/equatable.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
 
 part 'parking_event.dart';
 part 'parking_state.dart';
 
 class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
+  final ParkingRepository parkingRepository;
   List<Parking> _parkingList = [];
 
-  ParkingBloc() : super(ParkingInitial()) {
+  ParkingBloc({required this.parkingRepository}) : super(ParkingInitial()) {
     // on<LoadParkings>((event, emit) async {
     //   await onLoadParkings(emit);
     // });
@@ -37,7 +39,7 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
   // Future<void> onLoadParkings(Emitter<ParkingState> emit) async {
   //   emit(ParkingsLoading());
   //   try {
-  //     _parkingList = await ParkingRepository.instance.getAllParkings();
+  //     _parkingList = await parkingRepository.getAllParkings();
   //     emit(ParkingsLoaded(parkings: _parkingList));
   //   } catch (e) {
   //     emit(ParkingsError(message: e.toString()));
@@ -47,7 +49,7 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
   Future<void> onLoadActiveParkings(Emitter<ParkingState> emit) async {
     emit(ParkingsLoading());
     try {
-      _parkingList = await ParkingRepository.instance.getAllParkings();
+      _parkingList = await parkingRepository.getAllParkings();
 
       List<Parking> activeParkings = _parkingList
           .where(
@@ -65,7 +67,7 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
   Future<void> onLoadNonActiveParkings(Emitter<ParkingState> emit) async {
     emit(ParkingsLoading());
     try {
-      _parkingList = await ParkingRepository.instance.getAllParkings();
+      _parkingList = await parkingRepository.getAllParkings();
 
       List<Parking> nonActiveParkings = _parkingList
           .where((parking) => parking.endTime.isBefore(DateTime.now()))
@@ -79,7 +81,7 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
 
   onCreateParking(Emitter<ParkingState> emit, Parking parking) async {
     try {
-      await ParkingRepository.instance.addParking(parking);
+      await parkingRepository.addParking(parking);
 
       add(LoadActiveParkings());
     } catch (e) {
@@ -89,7 +91,7 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
 
   onUpdateParking(Emitter<ParkingState> emit, Parking parking) async {
     try {
-      await ParkingRepository.instance.updateParkings(parking);
+      await parkingRepository.updateParkings(parking);
 
       add(LoadActiveParkings());
     } catch (e) {
@@ -99,7 +101,7 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
 
   onDeleteParking(Emitter<ParkingState> emit, Parking parking) async {
     try {
-      await ParkingRepository.instance.deleteParkings(parking);
+      await parkingRepository.deleteParkings(parking);
 
       add(LoadActiveParkings());
     } catch (e) {
