@@ -76,25 +76,10 @@ class _StartParkingState extends State<StartParking> {
       if (personState is PersonLoaded) {
         person = personState.person;
 
-        final vehicleState = context.read<VehicleBloc>().state;
-        if (vehicleState is! VehiclesLoaded) {
-          context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
-        } else {
-          setState(() {
-            vehicleList = vehicleState.vehicles;
+        // Dispatch LoadVehiclesByPerson event unconditionally
+        context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
 
-            if (vehicleList.isNotEmpty) {
-              setState(() {
-                _selectedRegNr = vehicleList.first.regNr;
-              });
-            } else {
-              setState(() {
-                isVehicleListEmpty = true;
-              });
-            }
-          });
-        }
-
+        // Update the vehicle list whenever VehiclesLoaded state is emitted
         vehicleSubscription =
             context.read<VehicleBloc>().stream.listen((state) {
           if (state is VehiclesLoaded) {
@@ -113,6 +98,43 @@ class _StartParkingState extends State<StartParking> {
             });
           }
         });
+        // final vehicleState = context.read<VehicleBloc>().state;
+        // if (vehicleState is! VehiclesLoaded) {
+        //   context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
+        // } else {
+        //   setState(() {
+        //     vehicleList = vehicleState.vehicles;
+
+        //     if (vehicleList.isNotEmpty) {
+        //       setState(() {
+        //         _selectedRegNr = vehicleList.first.regNr;
+        //       });
+        //     } else {
+        //       setState(() {
+        //         isVehicleListEmpty = true;
+        //       });
+        //     }
+        //   });
+        // }
+
+        // vehicleSubscription =
+        //     context.read<VehicleBloc>().stream.listen((state) {
+        //   if (state is VehiclesLoaded) {
+        //     setState(() {
+        //       vehicleList = state.vehicles;
+
+        //       if (vehicleList.isNotEmpty) {
+        //         setState(() {
+        //           _selectedRegNr = vehicleList.first.regNr;
+        //         });
+        //       } else {
+        //         setState(() {
+        //           isVehicleListEmpty = true;
+        //         });
+        //       }
+        //     });
+        //   }
+        // });
       }
     }
   }

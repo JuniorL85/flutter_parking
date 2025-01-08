@@ -33,6 +33,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
 
   Future<void> onLoadVehicles(Emitter<VehicleState> emit) async {
     emit(VehiclesLoading());
+    _vehicleList = [];
     try {
       _vehicleList = await vehicleRepository.getAllVehicles();
       emit(VehiclesLoaded(vehicles: _vehicleList));
@@ -44,6 +45,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
   Future<void> onLoadVehiclesByPerson(
       Emitter<VehicleState> emit, Person person) async {
     emit(VehiclesLoading());
+    _vehicleList = [];
     try {
       _vehicleList = await vehicleRepository.getAllVehicles();
       final vehicleListByPerson = _vehicleList

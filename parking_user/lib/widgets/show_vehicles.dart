@@ -41,15 +41,10 @@ class _ShowVehiclesState extends State<ShowVehicles> {
       if (personState is PersonLoaded) {
         person = personState.person;
 
-        final vehicleState = context.read<VehicleBloc>().state;
-        if (vehicleState is! VehiclesLoaded) {
-          context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
-        } else {
-          setState(() {
-            vehicleList = vehicleState.vehicles;
-          });
-        }
+        // Dispatch LoadVehiclesByPerson event unconditionally
+        context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
 
+        // Update the vehicle list whenever VehiclesLoaded state is emitted
         vehicleSubscription =
             context.read<VehicleBloc>().stream.listen((state) {
           if (state is VehiclesLoaded) {
@@ -58,6 +53,24 @@ class _ShowVehiclesState extends State<ShowVehicles> {
             });
           }
         });
+
+        // final vehicleState = context.read<VehicleBloc>().state;
+        // if (vehicleState is! VehiclesLoaded) {
+        //   context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
+        // } else {
+        //   setState(() {
+        //     vehicleList = vehicleState.vehicles;
+        //   });
+        // }
+
+        // vehicleSubscription =
+        //     context.read<VehicleBloc>().stream.listen((state) {
+        //   if (state is VehiclesLoaded) {
+        //     setState(() {
+        //       vehicleList = state.vehicles;
+        //     });
+        //   }
+        // });
       }
     }
   }

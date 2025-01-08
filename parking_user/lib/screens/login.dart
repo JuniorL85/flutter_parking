@@ -4,6 +4,7 @@ import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:parking_user/bloc/auth_cubit.dart';
 import 'package:parking_user/bloc/person_bloc.dart';
 import 'package:parking_user/screens/create_account.dart';
 import 'package:parking_user/screens/manage_account.dart';
@@ -20,6 +21,8 @@ class _LoginState extends State<Login> {
   String? socialSecurityNumber;
   List<Person> personList = [];
   StreamSubscription? personSubscription;
+  StreamSubscription? loginSubscription;
+  AuthStatus authStatus = AuthStatus.unauthenticated;
 
   @override
   void initState() {
@@ -30,6 +33,7 @@ class _LoginState extends State<Login> {
   @override
   void dispose() {
     personSubscription?.cancel();
+    loginSubscription?.cancel();
     super.dispose();
   }
 
@@ -118,6 +122,10 @@ class _LoginState extends State<Login> {
                       ElevatedButton(
                         onPressed: () async {
                           if (formKey.currentState!.validate()) {
+                            context
+                                .read<AuthCubit>()
+                                .login(socialSecurityNumber!);
+
                             final index = personList.indexWhere((i) =>
                                 i.socialSecurityNumber ==
                                 socialSecurityNumber!);
@@ -125,7 +133,6 @@ class _LoginState extends State<Login> {
                             if (index != -1) {
                               context.read<PersonBloc>().add(
                                   LoadPersonsById(person: personList[index]));
-
                               if (context.mounted) {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(

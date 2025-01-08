@@ -1,16 +1,25 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:parking_user/bloc/auth_cubit.dart';
 import 'package:parking_user/bloc/parking_bloc.dart';
 import 'package:parking_user/bloc/parking_spaces_bloc.dart';
 import 'package:parking_user/bloc/person_bloc.dart';
 import 'package:parking_user/bloc/theme_bloc.dart';
 import 'package:parking_user/bloc/vehicle_bloc.dart';
 import 'package:parking_user/screens/login.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  HydratedBloc.storage = await HydratedStorage.build(
+    storageDirectory: kIsWeb
+        ? HydratedStorage.webStorageDirectory
+        : await getApplicationDocumentsDirectory(),
+  );
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]).then((fn) {
@@ -37,6 +46,9 @@ void main() {
                 parkingSpaceRepository: ParkingSpaceRepository.instance)
               ..add(LoadParkingSpaces()),
           ),
+          BlocProvider(
+              create: (context) =>
+                  AuthCubit(personRepository: PersonRepository.instance)),
           BlocProvider<ThemeBloc>(
             create: (context) => ThemeBloc()..add(InitialThemeEvent()),
           ),
