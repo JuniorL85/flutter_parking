@@ -21,8 +21,6 @@ class _LoginState extends State<Login> {
   String? socialSecurityNumber;
   List<Person> personList = [];
   StreamSubscription? personSubscription;
-  StreamSubscription? loginSubscription;
-  AuthStatus authStatus = AuthStatus.unauthenticated;
 
   @override
   void initState() {
@@ -33,7 +31,6 @@ class _LoginState extends State<Login> {
   @override
   void dispose() {
     personSubscription?.cancel();
-    loginSubscription?.cancel();
     super.dispose();
   }
 
