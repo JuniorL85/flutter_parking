@@ -83,16 +83,12 @@ class MyApp extends StatelessWidget {
               );
       }
 
-      final RouteObserver<ModalRoute> routeObserver =
-          RouteObserver<ModalRoute>();
-
       return MaterialApp(
         title: 'ParkHere',
         debugShowCheckedModeBanner: false,
         theme: currentTheme,
         home: const Login(),
         locale: const Locale('sv', ''),
-        navigatorObservers: [routeObserver],
       );
     });
   }
