@@ -271,44 +271,54 @@ class _MonitoringState extends State<Monitoring> {
             builder: (context, parkingState) {
               if (parkingState is ActiveParkingInitial ||
                   parkingState is ActiveParkingsLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (parkingState is ActiveParkingsLoaded) {
-                return Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    itemCount: activeParkingsList.length,
-                    itemBuilder: (context, index) {
-                      var activeParking = activeParkingsList[index];
-                      return ListTile(
-                        title: SizedBox(
-                          height: 210,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Id: ${activeParking.id}'),
-                              Text(
-                                  'Adress: ${activeParking.parkingSpace?.address}'),
-                              Text(
-                                  'Pris: ${activeParking.parkingSpace?.pricePerHour.toString()}kr/h'),
-                              Text(
-                                  'Från: ${DateFormat('yyyy-MM-dd kk:mm').format(activeParking.startTime)} - Till: ${DateFormat('yyyy-MM-dd kk:mm').format(activeParking.endTime)}'),
-                              Text('Fordon: ${activeParking.vehicle?.regNr}'),
-                              Text('Summa: ${calculateDuration(
-                                activeParking.startTime,
-                                activeParking.endTime,
-                                activeParking.parkingSpace!.pricePerHour,
-                              ).toStringAsFixed(2)} kr'),
-                              const Divider(thickness: 1, height: 5),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+                return const Expanded(
+                  child: Center(
+                    child: CircularProgressIndicator(),
                   ),
                 );
+              } else if (parkingState is ActiveParkingsLoaded) {
+                Widget content = activeParkingsList.isEmpty
+                    ? const Expanded(
+                        child: Center(
+                        child: Text(
+                            'Finns inga aktiva parkeringar att visa just nu.'),
+                      ))
+                    : Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          itemCount: activeParkingsList.length,
+                          itemBuilder: (context, index) {
+                            var activeParking = activeParkingsList[index];
+                            return ListTile(
+                              title: SizedBox(
+                                height: 210,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Id: ${activeParking.id}'),
+                                    Text(
+                                        'Adress: ${activeParking.parkingSpace?.address}'),
+                                    Text(
+                                        'Pris: ${activeParking.parkingSpace?.pricePerHour.toString()}kr/h'),
+                                    Text(
+                                        'Från: ${DateFormat('yyyy-MM-dd kk:mm').format(activeParking.startTime)} - Till: ${DateFormat('yyyy-MM-dd kk:mm').format(activeParking.endTime)}'),
+                                    Text(
+                                        'Fordon: ${activeParking.vehicle?.regNr}'),
+                                    Text('Summa: ${calculateDuration(
+                                      activeParking.startTime,
+                                      activeParking.endTime,
+                                      activeParking.parkingSpace!.pricePerHour,
+                                    ).toStringAsFixed(2)} kr'),
+                                    const Divider(thickness: 1, height: 5),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                return content;
               } else if (parkingState is ActiveParkingsError) {
                 return Text('Error: ${parkingState.message}');
               } else {

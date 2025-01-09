@@ -122,6 +122,7 @@ class _AddParkingplaceState extends State<AddParkingplace> {
                                   );
 
                                   formKey.currentState?.reset();
+                                  Navigator.pop(context);
                                 } else if (state is ParkingSpacesError) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
@@ -164,9 +165,21 @@ class _AddParkingplaceState extends State<AddParkingplace> {
                             );
                           }
                         }
-                        Navigator.pop(context, 'Avbryt');
                       },
-                      child: const Text('Lägg till'),
+                      child: BlocBuilder<ParkingSpacesBloc, ParkingSpacesState>(
+                        builder: (context, state) {
+                          if (state is ParkingSpacesLoading) {
+                            return const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            );
+                          }
+                          return const Text('Lägg till');
+                        },
+                      ),
                     ),
                   ],
                 ),

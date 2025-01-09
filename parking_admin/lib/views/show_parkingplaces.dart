@@ -126,34 +126,44 @@ class _ShowParkingplacesState extends State<ShowParkingplaces> {
             builder: (context, state) {
               if (state is ParkingSpacesInitial ||
                   state is ParkingSpacesLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
+                return const Expanded(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 );
               } else if (state is ParkingSpacesLoaded) {
-                return Expanded(
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      itemCount: parkingSpaceList.length,
-                      itemBuilder: (context, index) {
-                        var parkingPlace = parkingSpaceList[index];
-                        return ListTile(
-                          title: SizedBox(
-                            height: 90,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Id: ${parkingPlace.id.toString()}'),
-                                Text('Adress: ${parkingPlace.address}'),
-                                Text(
-                                    'Pris: ${parkingPlace.pricePerHour.toString()}kr/h'),
-                                const Divider(thickness: 1, height: 10),
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-                );
+                Widget content = parkingSpaceList.isEmpty
+                    ? const Expanded(
+                        child: Center(
+                        child: Text(
+                            'Finns inga aktiva parkeringsplatser att visa just nu.'),
+                      ))
+                    : Expanded(
+                        child: ListView.builder(
+                            shrinkWrap: true,
+                            scrollDirection: Axis.vertical,
+                            itemCount: parkingSpaceList.length,
+                            itemBuilder: (context, index) {
+                              var parkingPlace = parkingSpaceList[index];
+                              return ListTile(
+                                title: SizedBox(
+                                  height: 90,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Id: ${parkingPlace.id.toString()}'),
+                                      Text('Adress: ${parkingPlace.address}'),
+                                      Text(
+                                          'Pris: ${parkingPlace.pricePerHour.toString()}kr/h'),
+                                      const Divider(thickness: 1, height: 10),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                      );
+                return content;
               } else if (state is ParkingSpacesError) {
                 return Text('Error: ${state.message}');
               } else {

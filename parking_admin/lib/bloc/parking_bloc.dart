@@ -48,7 +48,7 @@ class ActiveParkingBloc extends Bloc<ParkingEvent, ActiveParkingState> {
                 DateTime.now().microsecondsSinceEpoch),
           )
           .toList();
-
+      await Future.delayed(const Duration(seconds: 2));
       emit(ActiveParkingsLoaded(activeParkings: activeParkings));
     } catch (e) {
       emit(ActiveParkingsError(message: e.toString()));

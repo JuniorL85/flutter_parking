@@ -220,6 +220,7 @@ class _UpdateParkingplaceState extends State<UpdateParkingplace> {
                                       formKey.currentState?.reset();
                                       setState(() {
                                         isId = false;
+                                        Navigator.pop(context);
                                       });
                                     } else if (state is ParkingSpacesError) {
                                       ScaffoldMessenger.of(context)
@@ -242,11 +243,23 @@ class _UpdateParkingplaceState extends State<UpdateParkingplace> {
                                         pricePerHour: int.parse(pricePerHour!),
                                       )));
                                 }
-
-                                Navigator.pop(context);
                               }
                             },
-                            child: const Text('Uppdatera'),
+                            child: BlocBuilder<ParkingSpacesBloc,
+                                ParkingSpacesState>(
+                              builder: (context, state) {
+                                if (state is ParkingSpacesLoading) {
+                                  return const SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  );
+                                }
+                                return const Text('Uppdatera');
+                              },
+                            ),
                           )
                         ],
                       ),

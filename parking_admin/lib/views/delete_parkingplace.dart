@@ -116,6 +116,7 @@ class _DeleteParkingplaceState extends State<DeleteParkingplace> {
                                   );
 
                                   formKey.currentState?.reset();
+                                  Navigator.pop(context);
                                 } else if (state is ParkingSpacesError) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
@@ -143,6 +144,7 @@ class _DeleteParkingplaceState extends State<DeleteParkingplace> {
                               );
                             }
                             formKey.currentState?.reset();
+                            Navigator.pop(context);
                           }
                         } else {
                           if (mounted) {
@@ -154,12 +156,25 @@ class _DeleteParkingplaceState extends State<DeleteParkingplace> {
                                     'Något gick fel vänligen försök igen senare'),
                               ),
                             );
+                            Navigator.pop(context);
                           }
                           return;
                         }
-                        Navigator.pop(context);
                       },
-                      child: const Text('Ta bort'),
+                      child: BlocBuilder<ParkingSpacesBloc, ParkingSpacesState>(
+                        builder: (context, state) {
+                          if (state is ParkingSpacesLoading) {
+                            return const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            );
+                          }
+                          return const Text('Ta bort');
+                        },
+                      ),
                     )
                   ],
                 ),
