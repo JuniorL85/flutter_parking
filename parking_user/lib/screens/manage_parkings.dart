@@ -27,6 +27,7 @@ class _ManageParkingsState extends State<ManageParkings> {
   int? foundActiveParking;
   late Person person;
   List<Vehicle> vehicleList = [];
+  bool isLoading = true;
   final ValueNotifier<DateTime?> _selectedDate = ValueNotifier(null);
   StreamSubscription? vehicleSubscription;
   StreamSubscription? personSubscription;
@@ -57,27 +58,47 @@ class _ManageParkingsState extends State<ManageParkings> {
     if (personState is PersonLoaded) {
       person = personState.person;
 
-      final vehicleState = context.read<VehicleBloc>().state;
+      context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
+      final vehicleState =
+          await context.read<VehicleBloc>().stream.firstWhere((state) {
+        if (state is VehiclesLoading) {
+          setState(() {
+            isLoading = true;
+          });
+        }
+        return state is VehiclesLoaded || state is VehiclesError;
+      });
+
       if (vehicleState is VehiclesLoaded) {
         vehicleList = vehicleState.vehicles;
-      } else {
-        context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
-        await Future.delayed(const Duration(milliseconds: 100));
-        vehicleList = context.read<VehicleBloc>().state is VehiclesLoaded
-            ? (context.read<VehicleBloc>().state as VehiclesLoaded).vehicles
-            : [];
+        setState(() {
+          isLoading = false;
+        });
+      } else if (vehicleState is VehiclesError) {
+        debugPrint('Fel vid laddning av fordon: ${vehicleState.message}');
+        return;
       }
 
-      final parkingState = context.read<ParkingBloc>().state;
+      context.read<ParkingBloc>().add(LoadActiveParkings());
+      final parkingState =
+          await context.read<ParkingBloc>().stream.firstWhere((state) {
+        if (state is ParkingsLoading) {
+          setState(() {
+            isLoading = true;
+          });
+        }
+        return state is ActiveParkingsLoaded || state is ParkingsError;
+      });
+
       if (parkingState is ActiveParkingsLoaded) {
         parkingList = parkingState.parkings;
-      } else {
-        context.read<ParkingBloc>().add(LoadActiveParkings());
-        await Future.delayed(const Duration(milliseconds: 100));
-        parkingList = context.read<ParkingBloc>().state is ActiveParkingsLoaded
-            ? (context.read<ParkingBloc>().state as ActiveParkingsLoaded)
-                .parkings
-            : [];
+        setState(() {
+          isLoading = false;
+        });
+      } else if (parkingState is ParkingsError) {
+        debugPrint(
+            'Fel vid laddning av aktiva parkeringar: ${parkingState.message}');
+        return;
       }
 
       final filteredParkings = parkingList.where((activeParking) {
@@ -110,331 +131,396 @@ class _ManageParkingsState extends State<ManageParkings> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Container(
-          margin: const EdgeInsets.only(top: 50),
-          child: Column(
-            children: [
-              Text(
-                'Hantera parkering',
-                style: TextStyle(
-                    fontSize: 24,
-                    color: Theme.of(context).colorScheme.inversePrimary),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                !widget.isActiveParking
-                    ? 'Du har inga aktiva parkeringar, välj nedan vad du vill göra'
-                    : 'Du har en aktiv parkering, välj nedan vad du vill göra',
-                style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).colorScheme.inversePrimary),
-              ),
-              const SizedBox(height: 50),
-              if (!widget.isActiveParking)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: <Widget>[
-                      ListTile(
-                        title: Text(
-                          'Starta parkering',
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
-                        ),
-                        trailing: ConstrainedBox(
-                          constraints:
-                              const BoxConstraints.tightFor(width: 120),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .push(
-                                MaterialPageRoute(
-                                  builder: (ctx) => const StartParking(),
-                                ),
-                              )
-                                  .then((onValue) async {
-                                await Future.delayed(
-                                    const Duration(milliseconds: 100));
-                                setState(() {
-                                  findActiveParking();
-                                });
-                              });
-                            },
-                            child: const Text('Starta'),
-                          ),
-                        ),
-                        tileColor: Theme.of(context).colorScheme.inversePrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(
-                              color: Theme.of(context).colorScheme.onSecondary),
-                        ),
-                      ),
-                    ],
+    Widget content = isLoading
+        ? const Center(
+            child: CircularProgressIndicator(),
+          )
+        : Scaffold(
+            body: Container(
+              margin: const EdgeInsets.only(top: 50),
+              child: Column(
+                children: [
+                  Text(
+                    'Hantera parkering',
+                    style: TextStyle(
+                        fontSize: 24,
+                        color: Theme.of(context).colorScheme.inversePrimary),
                   ),
-                ),
-              if (widget.isActiveParking && foundActiveParking != -1)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: <Widget>[
-                      Column(
-                        children: [
-                          Text(
-                              'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}'),
-                          Text(
-                              'Parkeringen startade: ${DateFormat('yyyy-MM-dd kk:mm').format(parkingList[foundActiveParking!].startTime)}'),
-                          Text(
-                              'Parkeringen avslutas: ${DateFormat('yyyy-MM-dd kk:mm').format(parkingList[foundActiveParking!].endTime)}'),
-                          calculateActiveParking()
+                  const SizedBox(height: 20),
+                  Text(
+                    !widget.isActiveParking
+                        ? 'Du har inga aktiva parkeringar, välj nedan vad du vill göra'
+                        : 'Du har en aktiv parkering, välj nedan vad du vill göra',
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.inversePrimary),
+                  ),
+                  const SizedBox(height: 50),
+                  if (!widget.isActiveParking)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: <Widget>[
+                          ListTile(
+                            title: Text(
+                              'Starta parkering',
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
+                            ),
+                            trailing: ConstrainedBox(
+                              constraints:
+                                  const BoxConstraints.tightFor(width: 120),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .push(
+                                    MaterialPageRoute(
+                                      builder: (ctx) => const StartParking(),
+                                    ),
+                                  )
+                                      .then((onValue) async {
+                                    await Future.delayed(
+                                        const Duration(milliseconds: 100));
+                                    setState(() {
+                                      findActiveParking();
+                                    });
+                                  });
+                                },
+                                child: const Text('Starta'),
+                              ),
+                            ),
+                            tileColor:
+                                Theme.of(context).colorScheme.inversePrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: BorderSide(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondary),
+                            ),
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 30),
-                      ListTile(
-                        title: Text(
-                          'Uppdatera sluttid',
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
-                        ),
-                        trailing: ConstrainedBox(
-                          constraints:
-                              const BoxConstraints.tightFor(width: 120),
-                          child: ElevatedButton(
-                            onPressed: () => showDialog<String>(
-                              context: context,
-                              builder: (BuildContext context) => AlertDialog(
-                                title: const Text('Uppdatera sluttid'),
-                                content: SizedBox(
-                                  height: 120,
-                                  child: Column(
-                                    children: [
-                                      const Text(
-                                          'Välj datum och tid för att uppdatera din sluttid'),
-                                      ValueListenableBuilder(
-                                          valueListenable: _selectedDate,
-                                          builder: (context, value, child) {
-                                            return const Text('');
+                    ),
+                  if (widget.isActiveParking && foundActiveParking != -1)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: <Widget>[
+                          Column(
+                            children: [
+                              Text(
+                                  'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}'),
+                              Text(
+                                  'Parkeringen startade: ${DateFormat('yyyy-MM-dd kk:mm').format(parkingList[foundActiveParking!].startTime)}'),
+                              Text(
+                                  'Parkeringen avslutas: ${DateFormat('yyyy-MM-dd kk:mm').format(parkingList[foundActiveParking!].endTime)}'),
+                              calculateActiveParking()
+                            ],
+                          ),
+                          const SizedBox(height: 30),
+                          ListTile(
+                            title: Text(
+                              'Uppdatera sluttid',
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
+                            ),
+                            trailing: ConstrainedBox(
+                              constraints:
+                                  const BoxConstraints.tightFor(width: 120),
+                              child: ElevatedButton(
+                                onPressed: () => showDialog<String>(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      AlertDialog(
+                                    title: const Text('Uppdatera sluttid'),
+                                    content: SizedBox(
+                                      height: 120,
+                                      child: Column(
+                                        children: [
+                                          const Text(
+                                              'Välj datum och tid för att uppdatera din sluttid'),
+                                          ValueListenableBuilder(
+                                              valueListenable: _selectedDate,
+                                              builder: (context, value, child) {
+                                                return const Text('');
+                                              }),
+                                          Datepicker(
+                                              parkingList[foundActiveParking!]
+                                                  .startTime, (value) {
+                                            setState(() {
+                                              _selectedDate.value = value;
+                                            });
                                           }),
-                                      Datepicker(
-                                          parkingList[foundActiveParking!]
-                                              .startTime, (value) {
-                                        setState(() {
-                                          _selectedDate.value = value;
-                                        });
-                                      }),
-                                    ],
-                                  ),
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(context, 'Avbryt'),
-                                    child: const Text('Avbryt'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      if (_selectedDate.value != null) {
-                                        if (context.mounted) {
-                                          final bloc =
-                                              context.read<ParkingBloc>();
+                                        ],
+                                      ),
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, 'Avbryt'),
+                                        child: const Text('Avbryt'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          if (_selectedDate.value != null) {
+                                            if (context.mounted) {
+                                              final bloc =
+                                                  context.read<ParkingBloc>();
 
-                                          _updateParkingSubscription =
-                                              bloc.stream.listen((state) {
-                                            if (state is ActiveParkingsLoaded) {
+                                              _updateParkingSubscription =
+                                                  bloc.stream.listen((state) {
+                                                if (state
+                                                    is ActiveParkingsLoaded) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      duration:
+                                                          Duration(seconds: 3),
+                                                      backgroundColor:
+                                                          Colors.lightGreen,
+                                                      content: Text(
+                                                          'Du har uppdaterat sluttiden på din parkering'),
+                                                    ),
+                                                  );
+
+                                                  setState(() {
+                                                    Navigator.pop(context);
+                                                    findActiveParking();
+                                                  });
+                                                } else if (state
+                                                    is ParkingsError) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      duration: const Duration(
+                                                          seconds: 3),
+                                                      backgroundColor:
+                                                          Colors.redAccent,
+                                                      content:
+                                                          Text(state.message),
+                                                    ),
+                                                  );
+                                                  Navigator.pop(context);
+                                                }
+                                              });
+                                              context.read<ParkingBloc>().add(UpdateParking(
+                                                  parking: Parking(
+                                                      vehicle: Vehicle(
+                                                          regNr: parkingList[foundActiveParking!]
+                                                              .vehicle!
+                                                              .regNr,
+                                                          vehicleType:
+                                                              parkingList[foundActiveParking!]
+                                                                  .vehicle!
+                                                                  .vehicleType,
+                                                          owner: person),
+                                                      parkingSpace: ParkingSpace(
+                                                          id: parkingList[foundActiveParking!]
+                                                              .parkingSpace!
+                                                              .id,
+                                                          address:
+                                                              parkingList[foundActiveParking!]
+                                                                  .parkingSpace!
+                                                                  .address,
+                                                          pricePerHour:
+                                                              parkingList[foundActiveParking!]
+                                                                  .parkingSpace!
+                                                                  .pricePerHour),
+                                                      id: parkingList[foundActiveParking!]
+                                                          .id,
+                                                      startTime:
+                                                          parkingList[foundActiveParking!]
+                                                              .startTime,
+                                                      endTime:
+                                                          _selectedDate.value!)));
+                                            }
+                                          } else {
+                                            if (context.mounted) {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(
                                                   duration:
                                                       Duration(seconds: 3),
                                                   backgroundColor:
-                                                      Colors.lightGreen,
-                                                  content: Text(
-                                                      'Du har uppdaterat sluttiden på din parkering'),
-                                                ),
-                                              );
-
-                                              setState(() {
-                                                Navigator.pop(context);
-                                                findActiveParking();
-                                              });
-                                            } else if (state is ParkingsError) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  duration: const Duration(
-                                                      seconds: 3),
-                                                  backgroundColor:
                                                       Colors.redAccent,
-                                                  content: Text(state.message),
+                                                  content: Text(
+                                                      'Du har inte valt korrekt datum och tid!'),
                                                 ),
                                               );
                                               Navigator.pop(context);
                                             }
-                                          });
-                                          context.read<ParkingBloc>().add(UpdateParking(
-                                              parking: Parking(
-                                                  vehicle: Vehicle(
-                                                      regNr:
-                                                          parkingList[foundActiveParking!]
-                                                              .vehicle!
-                                                              .regNr,
-                                                      vehicleType:
-                                                          parkingList[foundActiveParking!]
-                                                              .vehicle!
-                                                              .vehicleType,
-                                                      owner: person),
-                                                  parkingSpace: ParkingSpace(
-                                                      id: parkingList[foundActiveParking!]
-                                                          .parkingSpace!
-                                                          .id,
-                                                      address:
-                                                          parkingList[foundActiveParking!]
-                                                              .parkingSpace!
-                                                              .address,
-                                                      pricePerHour:
-                                                          parkingList[foundActiveParking!]
-                                                              .parkingSpace!
-                                                              .pricePerHour),
-                                                  id: parkingList[foundActiveParking!]
-                                                      .id,
-                                                  startTime:
-                                                      parkingList[foundActiveParking!]
-                                                          .startTime,
-                                                  endTime: _selectedDate.value!)));
-                                        }
-                                      } else {
-                                        if (context.mounted) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              duration: Duration(seconds: 3),
-                                              backgroundColor: Colors.redAccent,
-                                              content: Text(
-                                                  'Du har inte valt korrekt datum och tid!'),
-                                            ),
-                                          );
-                                          Navigator.pop(context);
-                                        }
-                                      }
-                                    },
-                                    child: const Text('Uppdatera'),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            child: const Text('Uppdatera'),
-                          ),
-                        ),
-                        tileColor: Theme.of(context).colorScheme.inversePrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(
-                              color: Theme.of(context).colorScheme.onSecondary),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      ListTile(
-                        title: Text(
-                          'Avsluta parkering',
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
-                        ),
-                        trailing: ConstrainedBox(
-                          constraints:
-                              const BoxConstraints.tightFor(width: 120),
-                          child: ElevatedButton(
-                            onPressed: () => showDialog<String>(
-                              context: context,
-                              builder: (BuildContext context) => AlertDialog(
-                                title: const Text('Avsluta parkering'),
-                                content: const Text(
-                                    'Är du säker på att du vill avsluta din parkering? Det går inte att ångra efter att du tryckt på knappen "Avsluta".'),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(context, 'Avbryt'),
-                                    child: const Text('Avbryt'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      if (context.mounted) {
-                                        final bloc =
-                                            context.read<ParkingBloc>();
-
-                                        _deleteParkingSubscription =
-                                            bloc.stream.listen((state) {
-                                          if (state is ActiveParkingsLoaded) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                duration: Duration(seconds: 3),
-                                                backgroundColor:
-                                                    Colors.lightGreen,
-                                                content: Text(
-                                                    'Du har avslutat din parkering!'),
-                                              ),
-                                            );
-
-                                            setState(() {
-                                              Navigator.pop(context);
-                                              findActiveParking();
-                                            });
-                                          } else if (state is ParkingsError) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                duration:
-                                                    const Duration(seconds: 3),
-                                                backgroundColor:
-                                                    Colors.redAccent,
-                                                content: Text(state.message),
-                                              ),
-                                            );
-                                            Navigator.pop(context);
                                           }
-                                        });
-                                        context.read<ParkingBloc>().add(
-                                            DeleteParking(
-                                                parking: parkingList[
-                                                    foundActiveParking!]));
-                                      }
-                                    },
-                                    child: const Text('Avsluta'),
+                                        },
+                                        child: BlocBuilder<ParkingBloc,
+                                            ParkingState>(
+                                          builder: (context, state) {
+                                            if (state is ParkingsLoading) {
+                                              return const SizedBox(
+                                                height: 24,
+                                                width: 24,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                ),
+                                              );
+                                            }
+                                            return const Text('Uppdatera');
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
+                                child: const Text('Uppdatera'),
                               ),
                             ),
-                            child: const Text('Avsluta'),
+                            tileColor:
+                                Theme.of(context).colorScheme.inversePrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: BorderSide(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondary),
+                            ),
                           ),
-                        ),
-                        tileColor: Theme.of(context).colorScheme.inversePrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(
-                              color: Theme.of(context).colorScheme.onSecondary),
-                        ),
+                          const SizedBox(height: 5),
+                          ListTile(
+                            title: Text(
+                              'Avsluta parkering',
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
+                            ),
+                            trailing: ConstrainedBox(
+                              constraints:
+                                  const BoxConstraints.tightFor(width: 120),
+                              child: ElevatedButton(
+                                onPressed: () => showDialog<String>(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      AlertDialog(
+                                    title: const Text('Avsluta parkering'),
+                                    content: const Text(
+                                        'Är du säker på att du vill avsluta din parkering? Det går inte att ångra efter att du tryckt på knappen "Avsluta".'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, 'Avbryt'),
+                                        child: const Text('Avbryt'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          if (context.mounted) {
+                                            final bloc =
+                                                context.read<ParkingBloc>();
+
+                                            final scaffoldMessenger =
+                                                ScaffoldMessenger.of(context);
+
+                                            _deleteParkingSubscription =
+                                                bloc.stream.listen((state) {
+                                              if (state
+                                                  is ActiveParkingsLoaded) {
+                                                scaffoldMessenger.showSnackBar(
+                                                  const SnackBar(
+                                                    duration:
+                                                        Duration(seconds: 3),
+                                                    backgroundColor:
+                                                        Colors.lightGreen,
+                                                    content: Text(
+                                                        'Du har avslutat din parkering!'),
+                                                  ),
+                                                );
+
+                                                setState(() {
+                                                  Navigator.of(context).pop();
+                                                  findActiveParking();
+                                                });
+                                              } else if (state
+                                                  is ParkingsError) {
+                                                scaffoldMessenger.showSnackBar(
+                                                  SnackBar(
+                                                    duration: const Duration(
+                                                        seconds: 3),
+                                                    backgroundColor:
+                                                        Colors.redAccent,
+                                                    content:
+                                                        Text(state.message),
+                                                  ),
+                                                );
+
+                                                if (context.mounted) {
+                                                  Navigator.pop(context);
+                                                }
+                                              }
+                                            });
+                                            context.read<ParkingBloc>().add(
+                                                DeleteParking(
+                                                    parking: parkingList[
+                                                        foundActiveParking!]));
+                                          }
+                                        },
+                                        child: BlocBuilder<ParkingBloc,
+                                            ParkingState>(
+                                          builder: (context, state) {
+                                            if (state is ParkingsLoading) {
+                                              return const SizedBox(
+                                                height: 24,
+                                                width: 24,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                ),
+                                              );
+                                            }
+                                            return const Text('Avsluta');
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                child: const Text('Avsluta'),
+                              ),
+                            ),
+                            tileColor:
+                                Theme.of(context).colorScheme.inversePrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: BorderSide(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondary),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        ),
-        floatingActionButton: ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (ctx) => const ShowParkingHistory(),
+                    ),
+                ],
               ),
-            );
-          },
-          style: TextButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary),
-          child: const Text('Visa historik'),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat);
+            ),
+            floatingActionButton: ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ctx) => const ShowParkingHistory(),
+                  ),
+                );
+              },
+              style: TextButton.styleFrom(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.inversePrimary),
+              child: const Text('Visa historik'),
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat);
+
+    return content;
   }
 }

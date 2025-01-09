@@ -99,45 +99,51 @@ class _ShowParkingHistoryState extends State<ShowParkingHistory> {
           BlocBuilder<ParkingBloc, ParkingState>(
             builder: (context, state) {
               if (state is ParkingInitial || state is ParkingsLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return const Expanded(
+                    child: Center(child: CircularProgressIndicator()));
               } else if (state is ParkingsLoaded) {
-                return Expanded(
-                  child: ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: parkingList.length,
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (context, index) {
-                        var parking = parkingList[index];
-                        return Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: ListTile(
-                              leading:
-                                  Text(parking.parkingSpace!.id.toString()),
-                              title: Text(
-                                parking.parkingSpace!.address,
-                                style: TextStyle(
-                                    color: Theme.of(context)
+                Widget content = parkingList.isEmpty
+                    ? const Expanded(
+                        child: Center(
+                        child: Text('Finns ingen historik att visa'),
+                      ))
+                    : Expanded(
+                        child: ListView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: parkingList.length,
+                            scrollDirection: Axis.vertical,
+                            itemBuilder: (context, index) {
+                              var parking = parkingList[index];
+                              return Padding(
+                                padding: const EdgeInsets.all(3.0),
+                                child: ListTile(
+                                    leading: Text(
+                                        parking.parkingSpace!.id.toString()),
+                                    title: Text(
+                                      parking.parkingSpace!.address,
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface),
+                                    ),
+                                    subtitle: Text(
+                                        '${DateFormat('yyyy-MM-dd kk:mm').format(parking.startTime)} - ${DateFormat('yyyy-MM-dd kk:mm').format(parking.endTime)}'),
+                                    trailing: Text(
+                                        '${calculateDuration(parking.startTime, parking.endTime, parking.parkingSpace!.pricePerHour).toStringAsFixed(2)} kr'),
+                                    tileColor: Theme.of(context)
                                         .colorScheme
-                                        .onSurface),
-                              ),
-                              subtitle: Text(
-                                  '${DateFormat('yyyy-MM-dd kk:mm').format(parking.startTime)} - ${DateFormat('yyyy-MM-dd kk:mm').format(parking.endTime)}'),
-                              trailing: Text(
-                                  '${calculateDuration(parking.startTime, parking.endTime, parking.parkingSpace!.pricePerHour).toStringAsFixed(2)} kr'),
-                              tileColor:
-                                  Theme.of(context).colorScheme.inversePrimary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                side: BorderSide(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary),
-                              )),
-                        );
-                      }),
-                );
+                                        .inversePrimary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      side: BorderSide(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary),
+                                    )),
+                              );
+                            }),
+                      );
+                return content;
               } else if (state is ParkingsError) {
                 return Text('Error: ${state.message}');
               } else {

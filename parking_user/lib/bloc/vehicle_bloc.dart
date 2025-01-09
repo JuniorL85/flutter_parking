@@ -53,6 +53,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
               vehicle.owner!.socialSecurityNumber ==
               person.socialSecurityNumber)
           .toList();
+      await Future.delayed(const Duration(seconds: 2));
       emit(VehiclesLoaded(vehicles: vehicleListByPerson));
     } catch (e) {
       emit(VehiclesError(message: e.toString()));

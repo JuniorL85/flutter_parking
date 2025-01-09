@@ -195,7 +195,20 @@ class _AddVehicleState extends State<AddVehicle> {
                           }
                         }
                       },
-                      child: const Text('Lägg till'),
+                      child: BlocBuilder<VehicleBloc, VehicleState>(
+                        builder: (context, state) {
+                          if (state is VehiclesLoading) {
+                            return const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            );
+                          }
+                          return const Text('Lägg till');
+                        },
+                      ),
                     )
                   ],
                 )

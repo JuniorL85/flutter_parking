@@ -143,15 +143,17 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
                           final index = vehicleList.indexWhere(
                               (vehicle) => vehicle.regNr == _selectedRegNr);
 
+                          final scaffoldMessenger =
+                              ScaffoldMessenger.of(context);
+
                           if (index != -1) {
                             if (context.mounted) {
                               savedRegNr = _selectedRegNr;
-                              print(savedRegNr);
                               final bloc = context.read<VehicleBloc>();
 
                               _blocSubscription = bloc.stream.listen((state) {
                                 if (state is VehiclesLoaded) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
+                                  scaffoldMessenger.showSnackBar(
                                     SnackBar(
                                       duration: const Duration(seconds: 3),
                                       backgroundColor: Colors.lightGreen,
@@ -167,8 +169,9 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
                                   } else {
                                     _selectedRegNr = null;
                                   }
+                                  Navigator.of(context).pop();
                                 } else if (state is VehiclesError) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
+                                  scaffoldMessenger.showSnackBar(
                                     const SnackBar(
                                       duration: Duration(seconds: 3),
                                       backgroundColor: Colors.redAccent,
@@ -190,8 +193,6 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
                                         socialSecurityNumber:
                                             person.socialSecurityNumber,
                                       ))));
-
-                              Navigator.of(context).pop();
                             }
                           } else {
                             if (mounted) {
@@ -207,7 +208,20 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
                           }
                         }
                       },
-                      child: const Text('Radera fordon'),
+                      child: BlocBuilder<VehicleBloc, VehicleState>(
+                        builder: (context, state) {
+                          if (state is VehiclesLoading) {
+                            return const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            );
+                          }
+                          return const Text('Radera fordon');
+                        },
+                      ),
                     )
                   ],
                 )

@@ -57,7 +57,7 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
                 DateTime.now().microsecondsSinceEpoch),
           )
           .toList();
-
+      await Future.delayed(const Duration(seconds: 2));
       emit(ActiveParkingsLoaded(parkings: activeParkings));
     } catch (e) {
       emit(ParkingsError(message: e.toString()));
@@ -72,7 +72,7 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
       List<Parking> nonActiveParkings = _parkingList
           .where((parking) => parking.endTime.isBefore(DateTime.now()))
           .toList();
-
+      await Future.delayed(const Duration(seconds: 2));
       emit(ParkingsLoaded(parkings: nonActiveParkings));
     } catch (e) {
       emit(ParkingsError(message: e.toString()));

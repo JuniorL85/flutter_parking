@@ -41,10 +41,8 @@ class _ShowVehiclesState extends State<ShowVehicles> {
       if (personState is PersonLoaded) {
         person = personState.person;
 
-        // Dispatch LoadVehiclesByPerson event unconditionally
         context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
 
-        // Update the vehicle list whenever VehiclesLoaded state is emitted
         vehicleSubscription =
             context.read<VehicleBloc>().stream.listen((state) {
           if (state is VehiclesLoaded) {
@@ -53,24 +51,6 @@ class _ShowVehiclesState extends State<ShowVehicles> {
             });
           }
         });
-
-        // final vehicleState = context.read<VehicleBloc>().state;
-        // if (vehicleState is! VehiclesLoaded) {
-        //   context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
-        // } else {
-        //   setState(() {
-        //     vehicleList = vehicleState.vehicles;
-        //   });
-        // }
-
-        // vehicleSubscription =
-        //     context.read<VehicleBloc>().stream.listen((state) {
-        //   if (state is VehiclesLoaded) {
-        //     setState(() {
-        //       vehicleList = state.vehicles;
-        //     });
-        //   }
-        // });
       }
     }
   }
@@ -112,40 +92,47 @@ class _ShowVehiclesState extends State<ShowVehicles> {
           BlocBuilder<VehicleBloc, VehicleState>(
             builder: (context, state) {
               if (state is VehiclesInitial || state is VehiclesLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return const Expanded(
+                    child: Center(child: CircularProgressIndicator()));
               } else if (state is VehiclesLoaded) {
-                return Expanded(
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: vehicleList.length,
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (context, index) {
-                        var vehicle = vehicleList[index];
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ListTile(
-                              leading: getIcon(vehicle.vehicleType),
-                              title: Text(
-                                vehicle.regNr,
-                                style: TextStyle(
-                                    color: Theme.of(context)
+                Widget content = vehicleList.isEmpty
+                    ? const Expanded(
+                        child: Center(
+                        child: Text(
+                            'Finns inga fordon att visa, lägg till fordon'),
+                      ))
+                    : Expanded(
+                        child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: vehicleList.length,
+                            scrollDirection: Axis.vertical,
+                            itemBuilder: (context, index) {
+                              var vehicle = vehicleList[index];
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ListTile(
+                                    leading: getIcon(vehicle.vehicleType),
+                                    title: Text(
+                                      vehicle.regNr,
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface),
+                                    ),
+                                    tileColor: Theme.of(context)
                                         .colorScheme
-                                        .onSurface),
-                              ),
-                              tileColor:
-                                  Theme.of(context).colorScheme.inversePrimary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                side: BorderSide(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary),
-                              )),
-                        );
-                      }),
-                );
+                                        .inversePrimary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      side: BorderSide(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary),
+                                    )),
+                              );
+                            }),
+                      );
+                return content;
               } else if (state is VehiclesError) {
                 return Text('Error: ${state.message}');
               } else {

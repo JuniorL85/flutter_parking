@@ -176,6 +176,8 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                           if (formKey.currentState!.validate()) {
                             final index = vehicleList.indexWhere(
                                 (vehicle) => vehicle.regNr == _selectedRegNr);
+                            final scaffoldMessenger =
+                                ScaffoldMessenger.of(context);
 
                             if (index != -1) {
                               if (context.mounted) {
@@ -183,7 +185,7 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
 
                                 _blocSubscription = bloc.stream.listen((state) {
                                   if (state is VehiclesLoaded) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
+                                    scaffoldMessenger.showSnackBar(
                                       SnackBar(
                                         duration: const Duration(seconds: 3),
                                         backgroundColor: Colors.lightGreen,
@@ -195,7 +197,7 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                                     formKey.currentState?.reset();
                                     Navigator.of(context).pop();
                                   } else if (state is VehiclesError) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
+                                    scaffoldMessenger.showSnackBar(
                                       SnackBar(
                                         duration: const Duration(seconds: 3),
                                         backgroundColor: Colors.redAccent,
@@ -230,7 +232,20 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                             }
                           }
                         },
-                        child: const Text('Uppdatera valt fordon'),
+                        child: BlocBuilder<VehicleBloc, VehicleState>(
+                          builder: (context, state) {
+                            if (state is VehiclesLoading) {
+                              return const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              );
+                            }
+                            return const Text('Uppdatera valt fordon');
+                          },
+                        ),
                       )
                   ],
                 )
