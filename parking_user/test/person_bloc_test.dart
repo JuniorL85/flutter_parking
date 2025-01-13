@@ -1,8 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:cli_shared/cli_shared.dart';
+import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:parking_app_cli/parking_app_cli.dart';
 import 'package:parking_user/bloc/person_bloc.dart';
 
 class MockPersonRepository extends Mock implements PersonRepository {}
@@ -27,8 +27,8 @@ void main() {
 
     group("Load persons", () {
       final existingPerson = [
-        Person(id: 1, name: 'Namn1', socialSecurityNumber: '111111111111'),
-        Person(id: 2, name: 'Namn2', socialSecurityNumber: '222222222222')
+        Person(id: '1', name: 'Namn1', socialSecurityNumber: '111111111111'),
+        Person(id: '2', name: 'Namn2', socialSecurityNumber: '222222222222')
       ];
 
       blocTest<PersonBloc, PersonState>(
@@ -67,8 +67,8 @@ void main() {
       final newPerson =
           Person(name: 'Namn3', socialSecurityNumber: '333333333333');
       final existingPerson = [
-        Person(id: 1, name: 'Namn1', socialSecurityNumber: '111111111111'),
-        Person(id: 2, name: 'Namn2', socialSecurityNumber: '222222222222')
+        Person(id: '1', name: 'Namn1', socialSecurityNumber: '111111111111'),
+        Person(id: '2', name: 'Namn2', socialSecurityNumber: '222222222222')
       ];
 
       blocTest<PersonBloc, PersonState>(
@@ -108,10 +108,10 @@ void main() {
 
     group("Update persons", () {
       final personToUpdate =
-          Person(id: 1, name: 'Namn11', socialSecurityNumber: '111111111111');
+          Person(id: '1', name: 'Namn11', socialSecurityNumber: '111111111111');
       final existingPerson = [
-        Person(id: 1, name: 'Namn1', socialSecurityNumber: '111111111111'),
-        Person(id: 2, name: 'Namn2', socialSecurityNumber: '222222222222')
+        Person(id: '1', name: 'Namn1', socialSecurityNumber: '111111111111'),
+        Person(id: '2', name: 'Namn2', socialSecurityNumber: '222222222222')
       ];
 
       blocTest<PersonBloc, PersonState>(
@@ -152,10 +152,10 @@ void main() {
 
     group("Delete persons", () {
       final personsToDelete =
-          Person(id: 1, name: 'Namn1', socialSecurityNumber: '111111111111');
+          Person(id: '1', name: 'Namn1', socialSecurityNumber: '111111111111');
       final existingPerson = [
-        Person(id: 1, name: 'Namn1', socialSecurityNumber: '111111111111'),
-        Person(id: 2, name: 'Namn2', socialSecurityNumber: '222222222222')
+        Person(id: '1', name: 'Namn1', socialSecurityNumber: '111111111111'),
+        Person(id: '2', name: 'Namn2', socialSecurityNumber: '222222222222')
       ];
 
       blocTest<PersonBloc, PersonState>(

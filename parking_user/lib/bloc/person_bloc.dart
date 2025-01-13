@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:cli_shared/cli_shared.dart';
 import 'package:equatable/equatable.dart';
-import 'package:parking_app_cli/parking_app_cli.dart';
+import 'package:firebase_repositories/firebase_repositories.dart';
 
 part 'person_event.dart';
 part 'person_state.dart';

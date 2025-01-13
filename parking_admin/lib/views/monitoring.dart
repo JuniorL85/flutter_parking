@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:cli_shared/cli_shared.dart';
+import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:parking_admin/bloc/parking_bloc.dart';
-import 'package:parking_app_cli/utils/calculate.dart';
 
 class Monitoring extends StatefulWidget {
   const Monitoring({super.key});
@@ -57,7 +57,8 @@ class _MonitoringState extends State<Monitoring> {
         for (var parking in state.parkings) {
           final parkingSpaceId = parking.parkingSpace?.id;
           if (parkingSpaceId != null) {
-            mapData[parkingSpaceId] = (mapData[parkingSpaceId] ?? 0) + 1;
+            mapData[int.parse(parkingSpaceId)] =
+                (mapData[int.parse(parkingSpaceId)] ?? 0) + 1;
           }
         }
         if (mapData.isNotEmpty) {
@@ -73,8 +74,8 @@ class _MonitoringState extends State<Monitoring> {
           for (var parking in state.parkings) {
             final parkingSpaceId = parking.parkingSpace?.id;
             if (parkingSpaceId != null &&
-                mostPopularIds.contains(parkingSpaceId)) {
-              uniqueMostPopularParkings[parkingSpaceId] = parking;
+                mostPopularIds.contains(int.parse(parkingSpaceId))) {
+              uniqueMostPopularParkings[int.parse(parkingSpaceId)] = parking;
             }
           }
           setState(() {

@@ -1,10 +1,10 @@
+import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_admin/bloc/parking_bloc.dart';
 import 'package:parking_admin/bloc/parking_spaces_bloc.dart';
 import 'package:parking_admin/bloc/theme_bloc.dart';
 import 'package:parking_admin/views/home.dart';
-import 'package:parking_app_cli/parking_app_cli.dart';
 
 void main() {
   runApp(

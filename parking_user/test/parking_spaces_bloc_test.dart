@@ -1,8 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:cli_shared/cli_shared.dart';
+import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:parking_app_cli/parking_app_cli.dart';
 import 'package:parking_user/bloc/parking_spaces_bloc.dart';
 
 class MockParkingSpaceRepository extends Mock
@@ -28,8 +28,8 @@ void main() {
 
     group("Load parkingSpaces", () {
       final existingParkingSpaces = [
-        ParkingSpace(id: 1, address: 'Testadress 1', pricePerHour: 10),
-        ParkingSpace(id: 2, address: 'Testadress 2', pricePerHour: 20)
+        ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+        ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 20)
       ];
 
       blocTest<ParkingSpacesBloc, ParkingSpacesState>(

@@ -1,11 +1,13 @@
-import 'package:objectbox/objectbox.dart';
+import 'package:uuid/uuid.dart';
 
-@Entity()
 class Person {
-  Person({required this.name, required this.socialSecurityNumber, this.id = 0});
+  Person({
+    required this.name,
+    required this.socialSecurityNumber,
+    String? id,
+  }) : id = id ?? Uuid().v4();
 
-  @Id()
-  int id;
+  String id;
   String name;
   String socialSecurityNumber;
 

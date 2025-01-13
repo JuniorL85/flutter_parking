@@ -9,6 +9,4 @@ export 'src/models/parking_space.dart';
 export 'src/models/person.dart';
 export 'src/models/vehicle.dart';
 
-export 'objectbox.g.dart';
-
 // TODO: Export any libraries intended for clients of this package.

@@ -1,23 +1,20 @@
 import 'dart:convert';
 
-import 'package:objectbox/objectbox.dart';
+import 'package:uuid/uuid.dart';
 
 import 'person.dart';
 
-@Entity()
 class Vehicle {
   Vehicle({
     required this.regNr,
     required this.vehicleType,
     this.owner,
-    this.id = 0,
-  });
+    String? id,
+  }) : id = id ?? Uuid().v4();
 
-  @Id()
-  int id;
+  String id;
   final String regNr;
   final String vehicleType;
-  @Transient()
   Person? owner;
 
   String? get ownerInDb {

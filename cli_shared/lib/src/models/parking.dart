@@ -1,25 +1,20 @@
 import 'dart:convert';
-
-import 'package:objectbox/objectbox.dart';
+import 'package:uuid/uuid.dart';
 
 import 'parking_space.dart';
 import 'vehicle.dart';
 
-@Entity()
 class Parking {
   Parking({
     this.vehicle,
     this.parkingSpace,
     required this.startTime,
     required this.endTime,
-    this.id = 0,
-  });
+    String? id,
+  }) : id = id ?? Uuid().v4();
 
-  @Id()
-  int id;
-  @Transient()
+  String id;
   Vehicle? vehicle;
-  @Transient()
   ParkingSpace? parkingSpace;
   final DateTime startTime;
   DateTime endTime;

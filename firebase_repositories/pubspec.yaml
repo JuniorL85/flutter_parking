@@ -1,0 +1,21 @@
+name: firebase_repositories
+description: "A new Flutter package project."
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.5.4
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cli_shared:
+    path: '../cli_shared'
+  firebase_core: ^3.10.0
+  cloud_firestore: ^5.6.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0

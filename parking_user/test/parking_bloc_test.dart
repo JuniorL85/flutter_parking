@@ -1,8 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:cli_shared/cli_shared.dart';
+import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:parking_app_cli/parking_app_cli.dart';
 import 'package:parking_user/bloc/parking_bloc.dart';
 
 class MockParkingRepository extends Mock implements ParkingRepository {}
@@ -28,11 +28,11 @@ void main() {
     group("Load active parkings", () {
       final existingParkings = [
         Parking(
-          id: 1,
+          id: '1',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 1)),
           parkingSpace:
-              ParkingSpace(id: 1, address: 'Testadress 1', pricePerHour: 10),
+              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
@@ -40,11 +40,11 @@ void main() {
                   Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
         ),
         Parking(
-          id: 2,
+          id: '2',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 2)),
           parkingSpace:
-              ParkingSpace(id: 2, address: 'Testadress 2', pricePerHour: 10),
+              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
@@ -88,11 +88,11 @@ void main() {
     group("Load non-active parkings", () {
       final existingParkings = [
         Parking(
-          id: 1,
+          id: '1',
           startTime: DateTime.now().add(const Duration(hours: -2)),
           endTime: DateTime.now().add(const Duration(hours: -1)),
           parkingSpace:
-              ParkingSpace(id: 1, address: 'Testadress 1', pricePerHour: 10),
+              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
@@ -100,11 +100,11 @@ void main() {
                   Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
         ),
         Parking(
-          id: 2,
+          id: '2',
           startTime: DateTime.now().add(const Duration(hours: -3)),
           endTime: DateTime.now().add(const Duration(hours: -2)),
           parkingSpace:
-              ParkingSpace(id: 2, address: 'Testadress 2', pricePerHour: 10),
+              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
@@ -151,7 +151,7 @@ void main() {
         startTime: DateTime.now(),
         endTime: DateTime.now().add(const Duration(hours: 1)),
         parkingSpace:
-            ParkingSpace(id: 1, address: 'Testadress 3', pricePerHour: 10),
+            ParkingSpace(id: '1', address: 'Testadress 3', pricePerHour: 10),
         vehicle: Vehicle(
             regNr: 'REG333',
             vehicleType: 'Car',
@@ -159,11 +159,11 @@ void main() {
       );
       final existingParkings = [
         Parking(
-          id: 1,
+          id: '1',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 1)),
           parkingSpace:
-              ParkingSpace(id: 1, address: 'Testadress 1', pricePerHour: 10),
+              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
@@ -171,11 +171,11 @@ void main() {
                   Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
         ),
         Parking(
-          id: 2,
+          id: '2',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 2)),
           parkingSpace:
-              ParkingSpace(id: 2, address: 'Testadress 2', pricePerHour: 10),
+              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
@@ -222,11 +222,11 @@ void main() {
 
     group("Update parkings", () {
       final parkingToUpdate = Parking(
-        id: 1,
+        id: '1',
         startTime: DateTime.now(),
         endTime: DateTime.now().add(const Duration(hours: 3)),
         parkingSpace:
-            ParkingSpace(id: 1, address: 'Testadress 1', pricePerHour: 10),
+            ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
         vehicle: Vehicle(
             regNr: 'REG111',
             vehicleType: 'Car',
@@ -234,11 +234,11 @@ void main() {
       );
       final existingParkings = [
         Parking(
-          id: 1,
+          id: '1',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 1)),
           parkingSpace:
-              ParkingSpace(id: 1, address: 'Testadress 1', pricePerHour: 10),
+              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
@@ -246,11 +246,11 @@ void main() {
                   Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
         ),
         Parking(
-          id: 2,
+          id: '2',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 2)),
           parkingSpace:
-              ParkingSpace(id: 2, address: 'Testadress 2', pricePerHour: 10),
+              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
@@ -297,11 +297,11 @@ void main() {
 
     group("Delete parkings", () {
       final parkingsToDelete = Parking(
-        id: 1,
+        id: '1',
         startTime: DateTime.now(),
         endTime: DateTime.now().add(const Duration(hours: 1)),
         parkingSpace:
-            ParkingSpace(id: 1, address: 'Testadress 1', pricePerHour: 10),
+            ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
         vehicle: Vehicle(
             regNr: 'REG111',
             vehicleType: 'Car',
@@ -309,11 +309,11 @@ void main() {
       );
       final existingParkings = [
         Parking(
-          id: 1,
+          id: '1',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 1)),
           parkingSpace:
-              ParkingSpace(id: 1, address: 'Testadress 1', pricePerHour: 10),
+              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
@@ -321,11 +321,11 @@ void main() {
                   Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
         ),
         Parking(
-          id: 2,
+          id: '2',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 2)),
           parkingSpace:
-              ParkingSpace(id: 2, address: 'Testadress 2', pricePerHour: 10),
+              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',

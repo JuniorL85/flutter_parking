@@ -1,15 +1,13 @@
-import 'package:objectbox/objectbox.dart';
+import 'package:uuid/uuid.dart';
 
-@Entity()
 class ParkingSpace {
   ParkingSpace({
     required this.address,
     required this.pricePerHour,
-    this.id = 0,
-  });
+    String? id,
+  }) : id = id ?? Uuid().v4();
 
-  @Id()
-  int id;
+  final String id;
   final String address;
   final int pricePerHour;
 
