@@ -20,7 +20,6 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
     emit(ParkingSpacesLoading());
     try {
       _parkingSpaceList = await parkingSpaceRepository.getAllParkingSpaces();
-      await Future.delayed(const Duration(seconds: 2));
       emit(ParkingSpacesLoaded(parkingSpaces: _parkingSpaceList));
     } catch (e) {
       emit(ParkingSpacesError(message: e.toString()));
