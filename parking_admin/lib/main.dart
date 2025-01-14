@@ -1,12 +1,19 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_admin/bloc/parking_bloc.dart';
 import 'package:parking_admin/bloc/parking_spaces_bloc.dart';
 import 'package:parking_admin/bloc/theme_bloc.dart';
+import 'package:parking_admin/firebase_options.dart';
 import 'package:parking_admin/views/home.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(
     MultiBlocProvider(
       providers: [
@@ -15,12 +22,13 @@ void main() {
         ),
         BlocProvider<ActiveParkingBloc>(
           create: (context) => ActiveParkingBloc(
-              activeParkingRepository: ParkingRepository.instance)
+              activeParkingRepository: ParkingRepository.parkingInstance)
             ..add(LoadActiveParkings()),
         ),
         BlocProvider<ParkingSpacesBloc>(
           create: (context) => ParkingSpacesBloc(
-              parkingSpaceRepository: ParkingSpaceRepository.instance)
+              parkingSpaceRepository:
+                  ParkingSpaceRepository.parkingSpaceInstance)
             ..add(LoadParkingSpaces()),
         ),
         BlocProvider<ThemeBloc>(

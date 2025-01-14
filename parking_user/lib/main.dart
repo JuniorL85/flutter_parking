@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:parking_user/bloc/parking_spaces_bloc.dart';
 import 'package:parking_user/bloc/person_bloc.dart';
 import 'package:parking_user/bloc/theme_bloc.dart';
 import 'package:parking_user/bloc/vehicle_bloc.dart';
+import 'package:parking_user/firebase_options.dart';
 import 'package:parking_user/screens/login.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,6 +22,11 @@ void main() async {
         ? HydratedStorage.webStorageDirectory
         : await getApplicationDocumentsDirectory(),
   );
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]).then((fn) {
@@ -28,27 +35,28 @@ void main() async {
         providers: [
           BlocProvider<PersonBloc>(
             create: (context) =>
-                PersonBloc(personRepository: PersonRepository.instance)
+                PersonBloc(personRepository: PersonRepository.personInstance)
                   ..add(LoadPersons()),
           ),
           BlocProvider<VehicleBloc>(
-            create: (context) =>
-                VehicleBloc(vehicleRepository: VehicleRepository.instance)
-                  ..add(LoadVehicles()),
+            create: (context) => VehicleBloc(
+                vehicleRepository: VehicleRepository.vehicleInstance)
+              ..add(LoadVehicles()),
           ),
           BlocProvider<ParkingBloc>(
-            create: (context) =>
-                ParkingBloc(parkingRepository: ParkingRepository.instance)
-                  ..add(LoadActiveParkings()),
+            create: (context) => ParkingBloc(
+                parkingRepository: ParkingRepository.parkingInstance)
+              ..add(LoadActiveParkings()),
           ),
           BlocProvider<ParkingSpacesBloc>(
             create: (context) => ParkingSpacesBloc(
-                parkingSpaceRepository: ParkingSpaceRepository.instance)
+                parkingSpaceRepository:
+                    ParkingSpaceRepository.parkingSpaceInstance)
               ..add(LoadParkingSpaces()),
           ),
           BlocProvider(
               create: (context) =>
-                  AuthCubit(personRepository: PersonRepository.instance)),
+                  AuthCubit(personRepository: PersonRepository.personInstance)),
           BlocProvider<ThemeBloc>(
             create: (context) => ThemeBloc()..add(InitialThemeEvent()),
           ),

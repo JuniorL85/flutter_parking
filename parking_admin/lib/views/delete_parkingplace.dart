@@ -97,8 +97,8 @@ class _DeleteParkingplaceState extends State<DeleteParkingplace> {
                     TextButton(
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
-                          final index = parkingSpaceList.indexWhere(
-                              (i) => i.id == int.parse(idToDelete!));
+                          final index = parkingSpaceList
+                              .indexWhere((i) => i.id == idToDelete);
 
                           if (index != -1) {
                             if (context.mounted) {

@@ -30,7 +30,6 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
 
   Future<void> onLoadParkingSpaces(Emitter<ParkingSpacesState> emit) async {
     emit(ParkingSpacesLoading());
-    await Future.delayed(const Duration(seconds: 2));
     try {
       _parkingSpaceList = await parkingSpaceRepository.getAllParkingSpaces();
       emit(ParkingSpacesLoaded(parkingSpaces: _parkingSpaceList));
@@ -41,8 +40,6 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
 
   onCreateParkingSpace(
       Emitter<ParkingSpacesState> emit, ParkingSpace parkingSpace) async {
-    emit(ParkingSpacesLoading());
-    await Future.delayed(const Duration(seconds: 2));
     try {
       await parkingSpaceRepository.addParkingSpace(ParkingSpace(
         address: parkingSpace.address,
@@ -59,8 +56,6 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
 
   onUpdateParkingSpace(
       Emitter<ParkingSpacesState> emit, ParkingSpace parkingSpace) async {
-    emit(ParkingSpacesLoading());
-    await Future.delayed(const Duration(seconds: 2));
     try {
       await parkingSpaceRepository.updateParkingSpace(ParkingSpace(
         id: parkingSpace.id,
@@ -78,8 +73,6 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
 
   onDeleteParkingSpace(
       Emitter<ParkingSpacesState> emit, ParkingSpace parkingSpace) async {
-    emit(ParkingSpacesLoading());
-    await Future.delayed(const Duration(seconds: 2));
     try {
       await parkingSpaceRepository.deleteParkingSpace(ParkingSpace(
         id: parkingSpace.id,

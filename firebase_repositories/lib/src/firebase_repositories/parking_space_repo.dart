@@ -1,70 +1,68 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:cli_shared/cli_shared.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ParkingSpaceRepository {
   ParkingSpaceRepository._privateConstructor();
 
-  static final instance = ParkingSpaceRepository._privateConstructor();
+  static final parkingSpaceInstance =
+      ParkingSpaceRepository._privateConstructor();
 
-  String host = Platform.isAndroid ? 'http://10.0.2.2' : 'http://localhost';
-  String port = '8080';
-  String resource = 'parkingSpaces';
+  final db = FirebaseFirestore.instance;
 
-  Future<dynamic> addParkingSpace(ParkingSpace parkingSpace) async {
-    final uri = Uri.parse('$host:$port/$resource');
+  Future<ParkingSpace> addParkingSpace(ParkingSpace parkingSpace) async {
+    await db
+        .collection("parkingSpaces")
+        .doc(parkingSpace.id)
+        .set(parkingSpace.toJson());
 
-    final response = await http.post(uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(parkingSpace.serialize(parkingSpace)));
-
-    return response;
+    return parkingSpace;
   }
 
   Future<List<ParkingSpace>> getAllParkingSpaces() async {
-    final uri = Uri.parse('$host:$port/$resource');
+    final snapshots = await db.collection("parkingSpaces").get();
 
-    final response =
-        await http.get(uri, headers: {'Content-Type': 'application/json'});
+    final docs = snapshots.docs;
 
-    final json = jsonDecode(response.body);
+    final jsons = docs.map((doc) {
+      final json = doc.data();
+      json["id"] = doc.id;
 
-    return (json as List)
+      return json;
+    }).toList();
+
+    return jsons
         .map((parkingSpaces) => ParkingSpace.fromJson(parkingSpaces))
         .toList();
   }
 
   Future<ParkingSpace> getParkingSpaceById(String id) async {
-    final uri = Uri.parse('$host:$port/$resource/$id');
+    final snapshot = await db.collection("parkingSpaces").doc(id).get();
 
-    final response = await http.get(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-    );
+    final json = snapshot.data();
 
-    final json = jsonDecode(response.body);
+    if (json == null) {
+      throw Exception("ParkingSpace with id $id not found");
+    }
+
+    json["id"] = snapshot.id;
 
     return ParkingSpace.fromJson(json);
   }
 
-  Future<dynamic> updateParkingSpace(ParkingSpace parkingSpace) async {
-    final uri = Uri.parse('$host:$port/$resource');
+  Future<ParkingSpace> updateParkingSpace(ParkingSpace parkingSpace) async {
+    await db
+        .collection("parkingSpaces")
+        .doc(parkingSpace.id)
+        .set(parkingSpace.toJson());
 
-    final response = await http.put(uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(parkingSpace.serialize(parkingSpace)));
-
-    return response;
+    return parkingSpace;
   }
 
-  Future<dynamic> deleteParkingSpace(ParkingSpace parkingSpace) async {
-    final uri = Uri.parse('$host:$port/$resource');
+  Future<ParkingSpace> deleteParkingSpace(ParkingSpace parkingSpace) async {
+    final parkingSpaceById = await getParkingSpaceById(parkingSpace.id);
 
-    final response = await http.delete(uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(parkingSpace.serialize(parkingSpace)));
+    await db.collection("parkingSpaces").doc(parkingSpace.id).delete();
 
-    return response;
+    return parkingSpaceById;
   }
 }
