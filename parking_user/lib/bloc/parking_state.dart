@@ -26,6 +26,7 @@ class ParkingsError extends ParkingState {
 
   ParkingsError({required this.message});
 
+  @override
   List<Object?> get props => [message];
 }
 
