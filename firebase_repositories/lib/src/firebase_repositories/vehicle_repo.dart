@@ -6,16 +6,16 @@ class VehicleRepository {
 
   static final vehicleInstance = VehicleRepository._privateConstructor();
 
-  final db = FirebaseFirestore.instance;
+  final db = FirebaseFirestore.instance.collection('vehicles');
 
   Future<Vehicle> addVehicle(Vehicle vehicle) async {
-    await db.collection("vehicles").doc(vehicle.id).set(vehicle.toJson());
+    await db.doc(vehicle.id).set(vehicle.toJson());
 
     return vehicle;
   }
 
   Future<List<Vehicle>> getAllVehicles() async {
-    final snapshots = await db.collection("vehicles").get();
+    final snapshots = await db.get();
 
     final docs = snapshots.docs;
 
@@ -30,7 +30,7 @@ class VehicleRepository {
   }
 
   Future<Vehicle> getVehicleById(String id) async {
-    final snapshot = await db.collection("vehicles").doc(id).get();
+    final snapshot = await db.doc(id).get();
 
     final json = snapshot.data();
 
@@ -44,7 +44,7 @@ class VehicleRepository {
   }
 
   Future<Vehicle> updateVehicles(Vehicle vehicle) async {
-    await db.collection("vehicles").doc(vehicle.id).set(vehicle.toJson());
+    await db.doc(vehicle.id).set(vehicle.toJson());
 
     return vehicle;
   }
@@ -52,7 +52,7 @@ class VehicleRepository {
   Future<Vehicle> deleteVehicle(Vehicle vehicle) async {
     final vehicleById = await getVehicleById(vehicle.id);
 
-    await db.collection("vehicles").doc(vehicle.id).delete();
+    await db.doc(vehicle.id).delete();
 
     return vehicleById;
   }

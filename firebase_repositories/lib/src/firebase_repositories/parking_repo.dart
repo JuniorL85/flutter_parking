@@ -6,16 +6,16 @@ class ParkingRepository {
 
   static final parkingInstance = ParkingRepository._privateConstructor();
 
-  final db = FirebaseFirestore.instance;
+  final db = FirebaseFirestore.instance.collection('parkings');
 
   Future<Parking> addParking(Parking parking) async {
-    await db.collection("parkings").doc(parking.id).set(parking.toJson());
+    await db.doc(parking.id).set(parking.toJson());
 
     return parking;
   }
 
   Future<List<Parking>> getAllParkings() async {
-    final snapshots = await db.collection("parkings").get();
+    final snapshots = await db.get();
 
     final docs = snapshots.docs;
 
@@ -30,7 +30,7 @@ class ParkingRepository {
   }
 
   Future<Parking> getParkingById(String id) async {
-    final snapshot = await db.collection("parkings").doc(id).get();
+    final snapshot = await db.doc(id).get();
 
     final json = snapshot.data();
 
@@ -44,7 +44,7 @@ class ParkingRepository {
   }
 
   Future<Parking> updateParkings(Parking parking) async {
-    await db.collection("parkings").doc(parking.id).set(parking.toJson());
+    await db.doc(parking.id).set(parking.toJson());
 
     return parking;
   }
@@ -52,7 +52,7 @@ class ParkingRepository {
   Future<Parking> deleteParkings(Parking parking) async {
     final parkingById = await getParkingById(parking.id);
 
-    await db.collection("parkings").doc(parking.id).delete();
+    await db.doc(parking.id).delete();
 
     return parkingById;
   }

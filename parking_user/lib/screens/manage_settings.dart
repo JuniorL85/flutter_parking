@@ -48,6 +48,13 @@ class _ManageSettingsState extends State<ManageSettings> {
       if (personState is PersonLoaded) {
         person = personState.person;
 
+        personSubscription = context.read<PersonBloc>().stream.listen((state) {
+          if (state is PersonLoaded) {
+            setState(() {
+              person = state.person;
+            });
+          }
+        });
         final vehicleState = context.read<VehicleBloc>().state;
         if (vehicleState is! VehiclesLoaded) {
           context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));

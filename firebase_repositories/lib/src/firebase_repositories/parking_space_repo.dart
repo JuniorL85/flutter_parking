@@ -7,19 +7,16 @@ class ParkingSpaceRepository {
   static final parkingSpaceInstance =
       ParkingSpaceRepository._privateConstructor();
 
-  final db = FirebaseFirestore.instance;
+  final db = FirebaseFirestore.instance.collection('parkingSpaces');
 
   Future<ParkingSpace> addParkingSpace(ParkingSpace parkingSpace) async {
-    await db
-        .collection("parkingSpaces")
-        .doc(parkingSpace.id)
-        .set(parkingSpace.toJson());
+    await db.doc(parkingSpace.id).set(parkingSpace.toJson());
 
     return parkingSpace;
   }
 
   Future<List<ParkingSpace>> getAllParkingSpaces() async {
-    final snapshots = await db.collection("parkingSpaces").get();
+    final snapshots = await db.get();
 
     final docs = snapshots.docs;
 
@@ -36,7 +33,7 @@ class ParkingSpaceRepository {
   }
 
   Future<ParkingSpace> getParkingSpaceById(String id) async {
-    final snapshot = await db.collection("parkingSpaces").doc(id).get();
+    final snapshot = await db.doc(id).get();
 
     final json = snapshot.data();
 
@@ -50,10 +47,7 @@ class ParkingSpaceRepository {
   }
 
   Future<ParkingSpace> updateParkingSpace(ParkingSpace parkingSpace) async {
-    await db
-        .collection("parkingSpaces")
-        .doc(parkingSpace.id)
-        .set(parkingSpace.toJson());
+    await db.doc(parkingSpace.id).set(parkingSpace.toJson());
 
     return parkingSpace;
   }
@@ -61,7 +55,7 @@ class ParkingSpaceRepository {
   Future<ParkingSpace> deleteParkingSpace(ParkingSpace parkingSpace) async {
     final parkingSpaceById = await getParkingSpaceById(parkingSpace.id);
 
-    await db.collection("parkingSpaces").doc(parkingSpace.id).delete();
+    await db.doc(parkingSpace.id).delete();
 
     return parkingSpaceById;
   }

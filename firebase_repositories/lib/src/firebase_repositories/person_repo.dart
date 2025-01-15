@@ -7,16 +7,16 @@ class PersonRepository {
 
   static final personInstance = PersonRepository._privateConstructor();
 
-  final db = FirebaseFirestore.instance;
+  final db = FirebaseFirestore.instance.collection('persons');
 
   Future<Person> addPerson(Person person) async {
-    await db.collection("persons").doc(person.id).set(person.toJson());
+    await db.doc(person.id).set(person.toJson());
 
     return person;
   }
 
   Future<List<Person>> getAllPersons() async {
-    final snapshots = await db.collection("persons").get();
+    final snapshots = await db.get();
 
     final docs = snapshots.docs;
 
@@ -31,7 +31,7 @@ class PersonRepository {
   }
 
   Future<Person> getPersonById(String id) async {
-    final snapshot = await db.collection("persons").doc(id).get();
+    final snapshot = await db.doc(id).get();
 
     final json = snapshot.data();
 
@@ -45,7 +45,7 @@ class PersonRepository {
   }
 
   Future<Person> updatePersons(Person person) async {
-    await db.collection("persons").doc(person.id).set(person.toJson());
+    await db.doc(person.id).set(person.toJson());
 
     return person;
   }
@@ -53,7 +53,7 @@ class PersonRepository {
   Future<Person> deletePerson(Person person) async {
     final personById = await getPersonById(person.id);
 
-    await db.collection("persons").doc(person.id).delete();
+    await db.doc(person.id).delete();
 
     return personById;
   }
