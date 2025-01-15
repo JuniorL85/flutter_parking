@@ -310,13 +310,12 @@ class _StartParkingState extends State<StartParking> {
                                           context.read<ParkingBloc>().add(
                                               CreateParking(
                                                   parking: Parking(
-                                                      vehicle:
-                                                          Vehicle(
-                                                              regNr:
-                                                                  _selectedRegNr!,
-                                                              vehicleType:
-                                                                  vehicleType,
-                                                              owner: person),
+                                                      vehicle: Vehicle(
+                                                          regNr:
+                                                              _selectedRegNr!,
+                                                          vehicleType:
+                                                              vehicleType,
+                                                          owner: person),
                                                       parkingSpace: ParkingSpace(
                                                           id: parkingSpace.id,
                                                           address: parkingSpace
@@ -324,7 +323,9 @@ class _StartParkingState extends State<StartParking> {
                                                           pricePerHour:
                                                               parkingSpace
                                                                   .pricePerHour),
-                                                      startTime: DateTime.now(),
+                                                      startTime: DateTime.now()
+                                                          .add(const Duration(
+                                                              hours: 1)),
                                                       endTime: _selectedDate
                                                           .value!)));
                                         }
