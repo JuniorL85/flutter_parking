@@ -103,6 +103,12 @@ class _StartParkingState extends State<StartParking> {
     }
   }
 
+  setShortenedId(String id) {
+    String del = '-';
+    int index = id.indexOf(del);
+    return id.substring(0, index);
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget content = isLoading
@@ -223,9 +229,9 @@ class _StartParkingState extends State<StartParking> {
                                     for (final parkingSpace
                                         in listAvailableParkingSpaces)
                                       DropdownMenuItem(
-                                        value: parkingSpace.id.toString(),
+                                        value: parkingSpace.id,
                                         child: Text(
-                                          '${parkingSpace.id}: ${parkingSpace.address} - ${parkingSpace.pricePerHour}kr/h',
+                                          '${setShortenedId(parkingSpace.id)}: ${parkingSpace.address} - ${parkingSpace.pricePerHour}kr/h',
                                           style: TextStyle(
                                             color: Theme.of(context)
                                                 .colorScheme
