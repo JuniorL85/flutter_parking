@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_user/bloc/auth_cubit.dart';
 import 'package:parking_user/bloc/person_bloc.dart';
 import 'package:parking_user/bloc/theme_bloc.dart';
+import 'package:parking_user/bloc/vehicle_bloc.dart';
 
 enum ThemeSelected { lightTheme, darkTheme, defaultTheme }
 
@@ -19,15 +20,17 @@ class ManageSettings extends StatefulWidget {
 class _ManageSettingsState extends State<ManageSettings> {
   final formKey = GlobalKey<FormState>();
   String? name;
+  List<Vehicle> vehicleList = [];
   late Person person;
   StreamSubscription? personSubscription;
+  StreamSubscription? vehicleSubscription;
   StreamSubscription? _updatePersonSubscription;
   StreamSubscription? _deletePersonSubscription;
 
   @override
   void initState() {
     super.initState();
-    getPerson();
+    getVehicleListAndPerson();
   }
 
   @override
@@ -35,26 +38,56 @@ class _ManageSettingsState extends State<ManageSettings> {
     personSubscription?.cancel();
     _updatePersonSubscription?.cancel();
     _deletePersonSubscription?.cancel();
+    vehicleSubscription?.cancel();
     super.dispose();
   }
 
-  getPerson() {
+  getVehicleListAndPerson() async {
     if (mounted) {
       final personState = context.read<PersonBloc>().state;
       if (personState is PersonLoaded) {
         person = personState.person;
+
+        final vehicleState = context.read<VehicleBloc>().state;
+        if (vehicleState is! VehiclesLoaded) {
+          context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
+        } else {
+          setState(() {
+            vehicleList = vehicleState.vehicles;
+          });
+        }
+
+        vehicleSubscription =
+            context.read<VehicleBloc>().stream.listen((state) {
+          if (state is VehiclesLoaded) {
+            setState(() {
+              vehicleList = state.vehicles;
+            });
+          }
+        });
       } else {
         person = Person(name: '', socialSecurityNumber: '');
       }
-      personSubscription = context.read<PersonBloc>().stream.listen((state) {
-        if (state is PersonLoaded) {
-          setState(() {
-            person = state.person;
-          });
-        }
-      });
     }
   }
+
+  // getPerson() {
+  //   if (mounted) {
+  //     final personState = context.read<PersonBloc>().state;
+  //     if (personState is PersonLoaded) {
+  //       person = personState.person;
+  //     } else {
+  //       person = Person(name: '', socialSecurityNumber: '');
+  //     }
+  //     personSubscription = context.read<PersonBloc>().stream.listen((state) {
+  //       if (state is PersonLoaded) {
+  //         setState(() {
+  //           person = state.person;
+  //         });
+  //       }
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -288,6 +321,10 @@ class _ManageSettingsState extends State<ManageSettings> {
               ),
               TextButton(
                 onPressed: () async {
+                  final index = vehicleList.indexWhere((vehicle) =>
+                      vehicle.owner?.socialSecurityNumber ==
+                      person.socialSecurityNumber);
+
                   if (mounted) {
                     final bloc = context.read<PersonBloc>();
 
@@ -303,6 +340,20 @@ class _ManageSettingsState extends State<ManageSettings> {
                         setState(() {
                           Navigator.popUntil(context, ModalRoute.withName('/'));
                         });
+
+                        if (index != -1) {
+                          context.read<VehicleBloc>().add(DeleteVehicles(
+                              vehicle: Vehicle(
+                                  id: vehicleList[index].id,
+                                  regNr: vehicleList[index].regNr,
+                                  vehicleType: vehicleList[index].vehicleType,
+                                  owner: Person(
+                                    id: person.id,
+                                    name: person.name,
+                                    socialSecurityNumber:
+                                        person.socialSecurityNumber,
+                                  ))));
+                        }
                       } else if (state is PersonsError) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
