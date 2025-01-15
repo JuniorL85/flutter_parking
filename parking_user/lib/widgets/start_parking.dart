@@ -257,8 +257,7 @@ class _StartParkingState extends State<StartParking> {
                                           listAvailableParkingSpaces
                                               .where((parkingSpace) =>
                                                   parkingSpace.id ==
-                                                  int.parse(
-                                                      dropdownAvailableParkingSpaces!))
+                                                  dropdownAvailableParkingSpaces)
                                               .first;
 
                                       if (_selectedDate.value != null &&

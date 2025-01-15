@@ -11,9 +11,7 @@ import 'package:parking_user/screens/manage_vehicle.dart';
 import 'package:parking_user/widgets/home.dart';
 
 class ManageAccount extends StatefulWidget {
-  const ManageAccount({super.key, this.onSetNewState});
-
-  final void Function(int index)? onSetNewState;
+  const ManageAccount({super.key});
 
   @override
   State<ManageAccount> createState() => _ManageAccountState();
