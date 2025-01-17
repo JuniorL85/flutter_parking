@@ -19,6 +19,8 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final formKey = GlobalKey<FormState>();
   String? socialSecurityNumber;
+  String? email;
+  String? password;
   List<Person> personList = [];
   StreamSubscription? personSubscription;
 
@@ -95,24 +97,60 @@ class _LoginState extends State<Login> {
                       const SizedBox(height: 20),
                       Padding(
                         padding: const EdgeInsets.all(10),
-                        child: TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Ange ett personnummer";
-                            }
+                        child: Column(
+                          children: [
+                            // TextFormField(
+                            //   validator: (value) {
+                            //     if (value == null || value.isEmpty) {
+                            //       return "Ange en e-post adress";
+                            //     }
+                            //     return null;
+                            //   },
+                            //   textAlign: TextAlign.center,
+                            //   decoration: InputDecoration(
+                            //     border: OutlineInputBorder(
+                            //         borderRadius: BorderRadius.circular(10)),
+                            //     labelText: 'Ange din e-postadress',
+                            //   ),
+                            //   onChanged: (value) => email = value,
+                            // ),
+                            // const SizedBox(height: 5),
+                            // TextFormField(
+                            //   validator: (value) {
+                            //     if (value == null || value.isEmpty) {
+                            //       return "Ange ett lösenord";
+                            //     }
+                            //     return null;
+                            //   },
+                            //   textAlign: TextAlign.center,
+                            //   decoration: InputDecoration(
+                            //     border: OutlineInputBorder(
+                            //         borderRadius: BorderRadius.circular(10)),
+                            //     labelText: 'Ange ditt lösenord',
+                            //   ),
+                            //   onChanged: (value) => password = value,
+                            // ),
+                            TextFormField(
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Ange ett personnummer";
+                                }
 
-                            if (!validateSocialSecurityNumber(value)) {
-                              return 'Du har angivit ett felaktigt format på personnumret!';
-                            }
-                            return null;
-                          },
-                          textAlign: TextAlign.center,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            labelText: 'Ange personnummer',
-                          ),
-                          onChanged: (value) => socialSecurityNumber = value,
+                                if (!validateSocialSecurityNumber(value)) {
+                                  return 'Du har angivit ett felaktigt format på personnumret!';
+                                }
+                                return null;
+                              },
+                              textAlign: TextAlign.center,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                labelText: 'Ange personnummer',
+                              ),
+                              onChanged: (value) =>
+                                  socialSecurityNumber = value,
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -156,16 +194,22 @@ class _LoginState extends State<Login> {
                         child: const Text('Logga in'),
                       ),
                       const SizedBox(height: 40),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (ctx) => const CreateAccount(),
-                            ),
-                          );
-                          formKey.currentState?.reset();
-                        },
-                        child: const Text('Skapa konto'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('Inget konto?'),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (ctx) => const CreateAccount(),
+                                ),
+                              );
+                              formKey.currentState?.reset();
+                            },
+                            child: const Text('Skapa konto'),
+                          ),
+                        ],
                       )
                     ],
                   ),

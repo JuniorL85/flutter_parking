@@ -17,6 +17,8 @@ class _CreateAccountState extends State<CreateAccount> {
   final formKey = GlobalKey<FormState>();
   String? name;
   String? socialSecurityNumber;
+  String? email;
+  String? password;
   List<Person> personList = [];
   StreamSubscription? personSubscription;
   StreamSubscription? _blocSubscription;
@@ -75,7 +77,7 @@ class _CreateAccountState extends State<CreateAccount> {
                   ),
                   onChanged: (value) => name = value,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
                 TextFormField(
                   validator: (value) {
                     if (value == null ||
@@ -91,6 +93,34 @@ class _CreateAccountState extends State<CreateAccount> {
                   ),
                   onChanged: (value) => socialSecurityNumber = value,
                 ),
+                // const SizedBox(height: 5),
+                // TextFormField(
+                //   validator: (value) {
+                //     if (value == null || value.isEmpty) {
+                //       return "Ange en e-postadress";
+                //     }
+                //     return null;
+                //   },
+                //   decoration: const InputDecoration(
+                //     border: OutlineInputBorder(),
+                //     labelText: 'Ange din e-postadress',
+                //   ),
+                //   onChanged: (value) => email = value,
+                // ),
+                // const SizedBox(height: 5),
+                // TextFormField(
+                //   validator: (value) {
+                //     if (value == null || value.isEmpty) {
+                //       return "Ange ett lösenord";
+                //     }
+                //     return null;
+                //   },
+                //   decoration: const InputDecoration(
+                //     border: OutlineInputBorder(),
+                //     labelText: 'Ange ditt lösenord',
+                //   ),
+                //   onChanged: (value) => password = value,
+                // ),
                 const SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
