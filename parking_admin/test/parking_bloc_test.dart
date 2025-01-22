@@ -37,8 +37,11 @@ void main() {
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+              owner: Person(
+                name: 'Namn1',
+                socialSecurityNumber: '111111111111',
+                email: 'test@test1.se',
+              )),
         ),
         Parking(
           id: '2',
@@ -49,8 +52,11 @@ void main() {
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn2', socialSecurityNumber: '222222222222')),
+              owner: Person(
+                name: 'Namn2',
+                socialSecurityNumber: '222222222222',
+                email: 'test@test2.se',
+              )),
         )
       ];
 
