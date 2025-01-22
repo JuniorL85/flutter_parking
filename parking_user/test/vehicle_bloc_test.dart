@@ -3,7 +3,7 @@ import 'package:cli_shared/cli_shared.dart';
 import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:parking_user/bloc/vehicle_bloc.dart';
+import 'package:parking_user/bloc/vehicle/vehicle_bloc.dart';
 
 class MockVehicleRepository extends Mock implements VehicleRepository {}
 
@@ -32,14 +32,22 @@ void main() {
           regNr: 'REG111',
           vehicleType: 'Car',
           owner: Person(
-              id: '1', name: 'Namn1', socialSecurityNumber: '111111111111'),
+            id: '1',
+            name: 'Namn1',
+            socialSecurityNumber: '111111111111',
+            email: 'test@test1.se',
+          ),
         ),
         Vehicle(
           id: '2',
           regNr: 'REG222',
           vehicleType: 'Car',
           owner: Person(
-              id: '2', name: 'Namn2', socialSecurityNumber: '222222222222'),
+            id: '2',
+            name: 'Namn2',
+            socialSecurityNumber: '222222222222',
+            email: 'test@test2.se',
+          ),
         )
       ];
 
@@ -80,7 +88,11 @@ void main() {
         regNr: 'REG333',
         vehicleType: 'Car',
         owner: Person(
-            id: '3', name: 'Namn3', socialSecurityNumber: '333333333333'),
+          id: '3',
+          name: 'Namn3',
+          socialSecurityNumber: '333333333333',
+          email: 'test@test3.se',
+        ),
       );
       final existingVehicles = [
         Vehicle(
@@ -88,14 +100,22 @@ void main() {
           regNr: 'REG111',
           vehicleType: 'Car',
           owner: Person(
-              id: '1', name: 'Namn1', socialSecurityNumber: '111111111111'),
+            id: '1',
+            name: 'Namn1',
+            socialSecurityNumber: '111111111111',
+            email: 'test@test1.se',
+          ),
         ),
         Vehicle(
           id: '2',
           regNr: 'REG222',
           vehicleType: 'Car',
           owner: Person(
-              id: '2', name: 'Namn2', socialSecurityNumber: '222222222222'),
+            id: '2',
+            name: 'Namn2',
+            socialSecurityNumber: '222222222222',
+            email: 'test@test2.se',
+          ),
         )
       ];
 
@@ -141,7 +161,11 @@ void main() {
         regNr: 'REG123',
         vehicleType: 'Car',
         owner: Person(
-            id: '1', name: 'Namn1', socialSecurityNumber: '111111111111'),
+          id: '1',
+          name: 'Namn1',
+          socialSecurityNumber: '111111111111',
+          email: 'test@test1.se',
+        ),
       );
       final existingVehicles = [
         Vehicle(
@@ -149,14 +173,22 @@ void main() {
           regNr: 'REG111',
           vehicleType: 'Car',
           owner: Person(
-              id: '1', name: 'Namn1', socialSecurityNumber: '111111111111'),
+            id: '1',
+            name: 'Namn1',
+            socialSecurityNumber: '111111111111',
+            email: 'test@test1.se',
+          ),
         ),
         Vehicle(
           id: '2',
           regNr: 'REG222',
           vehicleType: 'Car',
           owner: Person(
-              id: '2', name: 'Namn2', socialSecurityNumber: '222222222222'),
+            id: '2',
+            name: 'Namn2',
+            socialSecurityNumber: '222222222222',
+            email: 'test@test2.se',
+          ),
         )
       ];
       blocTest<VehicleBloc, VehicleState>(
@@ -201,7 +233,11 @@ void main() {
         regNr: 'REG111',
         vehicleType: 'Car',
         owner: Person(
-            id: '1', name: 'Namn1', socialSecurityNumber: '111111111111'),
+          id: '1',
+          name: 'Namn1',
+          socialSecurityNumber: '111111111111',
+          email: 'test@test1.se',
+        ),
       );
       final existingVehicles = [
         Vehicle(
@@ -209,14 +245,22 @@ void main() {
           regNr: 'REG111',
           vehicleType: 'Car',
           owner: Person(
-              id: '1', name: 'Namn1', socialSecurityNumber: '111111111111'),
+            id: '1',
+            name: 'Namn1',
+            socialSecurityNumber: '111111111111',
+            email: 'test@test1.se',
+          ),
         ),
         Vehicle(
           id: '2',
           regNr: 'REG222',
           vehicleType: 'Car',
           owner: Person(
-              id: '2', name: 'Namn2', socialSecurityNumber: '222222222222'),
+            id: '2',
+            name: 'Namn2',
+            socialSecurityNumber: '222222222222',
+            email: 'test@test2.se',
+          ),
         )
       ];
 

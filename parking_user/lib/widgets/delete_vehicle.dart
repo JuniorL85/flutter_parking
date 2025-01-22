@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:parking_user/bloc/person_bloc.dart';
-import 'package:parking_user/bloc/vehicle_bloc.dart';
+import 'package:parking_user/bloc/person/person_bloc.dart';
+import 'package:parking_user/bloc/vehicle/vehicle_bloc.dart';
 
 class DeleteVehicle extends StatefulWidget {
   const DeleteVehicle({super.key});
@@ -192,6 +192,7 @@ class _DeleteVehicleState extends State<DeleteVehicle> {
                                         name: person.name,
                                         socialSecurityNumber:
                                             person.socialSecurityNumber,
+                                        email: person.email,
                                       ))));
                             }
                           } else {

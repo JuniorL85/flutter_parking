@@ -5,8 +5,8 @@ import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:parking_user/bloc/parking_bloc.dart';
-import 'package:parking_user/bloc/person_bloc.dart';
+import 'package:parking_user/bloc/parking/parking_bloc.dart';
+import 'package:parking_user/bloc/person/person_bloc.dart';
 
 class ShowParkingHistory extends StatefulWidget {
   const ShowParkingHistory({super.key});
@@ -71,7 +71,7 @@ class _ShowParkingHistoryState extends State<ShowParkingHistory> {
           }
         });
       } else {
-        person = Person(name: '', socialSecurityNumber: '');
+        person = Person(name: '', socialSecurityNumber: '', email: '');
       }
     }
   }

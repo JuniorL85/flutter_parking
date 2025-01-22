@@ -4,9 +4,9 @@ import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_user/bloc/auth_cubit.dart';
-import 'package:parking_user/bloc/person_bloc.dart';
-import 'package:parking_user/bloc/theme_bloc.dart';
-import 'package:parking_user/bloc/vehicle_bloc.dart';
+import 'package:parking_user/bloc/person/person_bloc.dart';
+import 'package:parking_user/bloc/theme/theme_bloc.dart';
+import 'package:parking_user/bloc/vehicle/vehicle_bloc.dart';
 
 enum ThemeSelected { lightTheme, darkTheme, defaultTheme }
 
@@ -73,7 +73,7 @@ class _ManageSettingsState extends State<ManageSettings> {
           }
         });
       } else {
-        person = Person(name: '', socialSecurityNumber: '');
+        person = Person(name: '', socialSecurityNumber: '', email: '');
       }
     }
   }
@@ -201,6 +201,7 @@ class _ManageSettingsState extends State<ManageSettings> {
                                               name: name!,
                                               socialSecurityNumber:
                                                   person.socialSecurityNumber,
+                                              email: person.email,
                                             )));
                                       }
                                     }
@@ -359,6 +360,7 @@ class _ManageSettingsState extends State<ManageSettings> {
                                     name: person.name,
                                     socialSecurityNumber:
                                         person.socialSecurityNumber,
+                                    email: person.email,
                                   ))));
                         }
                       } else if (state is PersonsError) {

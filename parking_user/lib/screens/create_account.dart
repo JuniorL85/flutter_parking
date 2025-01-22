@@ -4,7 +4,7 @@ import 'package:cli_shared/cli_shared.dart';
 import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:parking_user/bloc/person_bloc.dart';
+import 'package:parking_user/bloc/person/person_bloc.dart';
 
 class CreateAccount extends StatefulWidget {
   const CreateAccount({super.key});
@@ -93,20 +93,20 @@ class _CreateAccountState extends State<CreateAccount> {
                   ),
                   onChanged: (value) => socialSecurityNumber = value,
                 ),
-                // const SizedBox(height: 5),
-                // TextFormField(
-                //   validator: (value) {
-                //     if (value == null || value.isEmpty) {
-                //       return "Ange en e-postadress";
-                //     }
-                //     return null;
-                //   },
-                //   decoration: const InputDecoration(
-                //     border: OutlineInputBorder(),
-                //     labelText: 'Ange din e-postadress',
-                //   ),
-                //   onChanged: (value) => email = value,
-                // ),
+                const SizedBox(height: 5),
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Ange en e-postadress";
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Ange din e-postadress',
+                  ),
+                  onChanged: (value) => email = value,
+                ),
                 // const SizedBox(height: 5),
                 // TextFormField(
                 //   validator: (value) {
@@ -168,6 +168,7 @@ class _CreateAccountState extends State<CreateAccount> {
                                       person: Person(
                                     name: name!,
                                     socialSecurityNumber: socialSecurityNumber!,
+                                    email: email!,
                                   )));
                             }
                           } else {

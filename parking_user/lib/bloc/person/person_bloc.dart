@@ -46,7 +46,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     emit(PersonsLoading());
     try {
       final personById = await personRepository.getPersonById(person.id);
-      emit(PersonLoaded(person: personById));
+      emit(PersonLoaded(person: personById!));
     } catch (e) {
       emit(PersonsError(message: e.toString()));
     }
@@ -55,8 +55,10 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   onCreatePerson(Emitter<PersonState> emit, Person person) async {
     try {
       await personRepository.addPerson(Person(
-          name: person.name,
-          socialSecurityNumber: person.socialSecurityNumber));
+        name: person.name,
+        socialSecurityNumber: person.socialSecurityNumber,
+        email: person.email,
+      ));
 
       _personList = await personRepository.getAllPersons();
       emit(PersonsLoaded(persons: _personList));
@@ -68,9 +70,11 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   onUpdatePerson(Emitter<PersonState> emit, Person person) async {
     try {
       await personRepository.updatePersons(Person(
-          id: person.id,
-          name: person.name,
-          socialSecurityNumber: person.socialSecurityNumber));
+        id: person.id,
+        name: person.name,
+        socialSecurityNumber: person.socialSecurityNumber,
+        email: person.email,
+      ));
 
       add(LoadPersonsById(person: person));
     } catch (e) {
@@ -81,9 +85,11 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   onDeletePerson(Emitter<PersonState> emit, Person person) async {
     try {
       await personRepository.deletePerson(Person(
-          id: person.id,
-          name: person.name,
-          socialSecurityNumber: person.socialSecurityNumber));
+        id: person.id,
+        name: person.name,
+        socialSecurityNumber: person.socialSecurityNumber,
+        email: person.email,
+      ));
 
       _personList = await personRepository.getAllPersons();
       emit(PersonsLoaded(persons: _personList));

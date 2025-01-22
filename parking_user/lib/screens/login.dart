@@ -5,7 +5,7 @@ import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_user/bloc/auth_cubit.dart';
-import 'package:parking_user/bloc/person_bloc.dart';
+import 'package:parking_user/bloc/person/person_bloc.dart';
 import 'package:parking_user/screens/create_account.dart';
 import 'package:parking_user/screens/manage_account.dart';
 

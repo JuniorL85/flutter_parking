@@ -3,7 +3,7 @@ import 'package:cli_shared/cli_shared.dart';
 import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:parking_user/bloc/parking_bloc.dart';
+import 'package:parking_user/bloc/parking/parking_bloc.dart';
 
 class MockParkingRepository extends Mock implements ParkingRepository {}
 
@@ -36,8 +36,11 @@ void main() {
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+              owner: Person(
+                name: 'Namn1',
+                socialSecurityNumber: '111111111111',
+                email: 'test@test1.se',
+              )),
         ),
         Parking(
           id: '2',
@@ -48,8 +51,11 @@ void main() {
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn2', socialSecurityNumber: '222222222222')),
+              owner: Person(
+                name: 'Namn2',
+                socialSecurityNumber: '222222222222',
+                email: 'test@test2.se',
+              )),
         )
       ];
 
@@ -96,8 +102,11 @@ void main() {
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+              owner: Person(
+                name: 'Namn1',
+                socialSecurityNumber: '111111111111',
+                email: 'test@test1.se',
+              )),
         ),
         Parking(
           id: '2',
@@ -108,8 +117,11 @@ void main() {
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn2', socialSecurityNumber: '222222222222')),
+              owner: Person(
+                name: 'Namn2',
+                socialSecurityNumber: '222222222222',
+                email: 'test@test2.se',
+              )),
         )
       ];
 
@@ -155,7 +167,11 @@ void main() {
         vehicle: Vehicle(
             regNr: 'REG333',
             vehicleType: 'Car',
-            owner: Person(name: 'Namn3', socialSecurityNumber: '333333333333')),
+            owner: Person(
+              name: 'Namn3',
+              socialSecurityNumber: '333333333333',
+              email: 'test@test3.se',
+            )),
       );
       final existingParkings = [
         Parking(
@@ -167,8 +183,11 @@ void main() {
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+              owner: Person(
+                name: 'Namn1',
+                socialSecurityNumber: '111111111111',
+                email: 'test@test1.se',
+              )),
         ),
         Parking(
           id: '2',
@@ -179,8 +198,11 @@ void main() {
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn2', socialSecurityNumber: '222222222222')),
+              owner: Person(
+                name: 'Namn2',
+                socialSecurityNumber: '222222222222',
+                email: 'test@test2.se',
+              )),
         )
       ];
 
@@ -230,7 +252,11 @@ void main() {
         vehicle: Vehicle(
             regNr: 'REG111',
             vehicleType: 'Car',
-            owner: Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+            owner: Person(
+              name: 'Namn1',
+              socialSecurityNumber: '111111111111',
+              email: 'test@test1.se',
+            )),
       );
       final existingParkings = [
         Parking(
@@ -242,8 +268,11 @@ void main() {
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+              owner: Person(
+                name: 'Namn1',
+                socialSecurityNumber: '111111111111',
+                email: 'test@test1.se',
+              )),
         ),
         Parking(
           id: '2',
@@ -254,8 +283,11 @@ void main() {
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn2', socialSecurityNumber: '222222222222')),
+              owner: Person(
+                name: 'Namn2',
+                socialSecurityNumber: '222222222222',
+                email: 'test@test2.se',
+              )),
         )
       ];
       blocTest<ParkingBloc, ParkingState>(
@@ -305,7 +337,11 @@ void main() {
         vehicle: Vehicle(
             regNr: 'REG111',
             vehicleType: 'Car',
-            owner: Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+            owner: Person(
+              name: 'Namn1',
+              socialSecurityNumber: '111111111111',
+              email: 'test@test1.se',
+            )),
       );
       final existingParkings = [
         Parking(
@@ -317,8 +353,11 @@ void main() {
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+              owner: Person(
+                name: 'Namn1',
+                socialSecurityNumber: '111111111111',
+                email: 'test@test1.se',
+              )),
         ),
         Parking(
           id: '2',
@@ -329,8 +368,11 @@ void main() {
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn2', socialSecurityNumber: '222222222222')),
+              owner: Person(
+                name: 'Namn2',
+                socialSecurityNumber: '222222222222',
+                email: 'test@test2.se',
+              )),
         )
       ];
 

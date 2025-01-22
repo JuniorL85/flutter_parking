@@ -4,7 +4,7 @@ import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_user/bloc/auth_cubit.dart';
-import 'package:parking_user/bloc/person_bloc.dart';
+import 'package:parking_user/bloc/person/person_bloc.dart';
 import 'package:parking_user/screens/manage_parkings.dart';
 import 'package:parking_user/screens/manage_settings.dart';
 import 'package:parking_user/screens/manage_vehicle.dart';
@@ -46,7 +46,7 @@ class _ManageAccountState extends State<ManageAccount> {
       if (personState is PersonLoaded) {
         person = personState.person;
       } else {
-        person = Person(name: '', socialSecurityNumber: '');
+        person = Person(name: '', socialSecurityNumber: '', email: '');
       }
       personSubscription = context.read<PersonBloc>().stream.listen((state) {
         if (state is PersonLoaded) {

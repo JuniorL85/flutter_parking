@@ -3,7 +3,7 @@ import 'package:cli_shared/cli_shared.dart';
 import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:parking_user/bloc/parking_spaces_bloc.dart';
+import 'package:parking_user/bloc/parking_space/parking_spaces_bloc.dart';
 
 class MockParkingSpaceRepository extends Mock
     implements ParkingSpaceRepository {}

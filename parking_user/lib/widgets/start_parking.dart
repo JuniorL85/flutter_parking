@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:parking_user/bloc/parking_bloc.dart';
-import 'package:parking_user/bloc/parking_spaces_bloc.dart';
-import 'package:parking_user/bloc/person_bloc.dart';
-import 'package:parking_user/bloc/vehicle_bloc.dart';
+import 'package:parking_user/bloc/parking/parking_bloc.dart';
+import 'package:parking_user/bloc/parking_space/parking_spaces_bloc.dart';
+import 'package:parking_user/bloc/person/person_bloc.dart';
+import 'package:parking_user/bloc/vehicle/vehicle_bloc.dart';
 import 'package:parking_user/widgets/datepicker_parking.dart';
 
 List<ParkingSpace> listAvailableParkingSpaces = [];
