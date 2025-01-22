@@ -19,7 +19,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             await _onLogin(emit, email, password);
           case Register(:final email, :final password):
             await _onRegister(emit, email, password);
-
           case Logout():
             await onLogout(emit);
           case AuthUserSubscriptionRequested():
@@ -30,7 +29,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
               } else {
                 // user is authenticated in firebase auth, does user exist in db?
                 Person? person =
-                    await personRepository.getPersonById(authUser.uid);
+                    await personRepository.getByAuthId(authUser.uid);
                 if (person == null) {
                   emit(AuthenticatedNoUser(
                       authId: authUser.uid, email: authUser.email!));

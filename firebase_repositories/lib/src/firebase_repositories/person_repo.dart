@@ -30,8 +30,22 @@ class PersonRepository {
     return jsons.map((person) => Person.fromJson(person)).toList();
   }
 
-  Future<Person?> getPersonById(String id) async {
-    final snapshot = await db.where('authId', isEqualTo: id).get();
+  Future<Person> getPersonById(String id) async {
+    final snapshot = await db.doc(id).get();
+
+    final json = snapshot.data();
+
+    if (json == null) {
+      throw Exception("Person with id $id not found");
+    }
+
+    json["id"] = snapshot.id;
+
+    return Person.fromJson(json);
+  }
+
+  Future<Person?> getByAuthId(String authId) async {
+    final snapshot = await db.where("authId", isEqualTo: authId).get();
 
     if (snapshot.docs.isEmpty) {
       return null;
@@ -53,6 +67,6 @@ class PersonRepository {
 
     await db.doc(person.id).delete();
 
-    return personById!;
+    return personById;
   }
 }

@@ -9,14 +9,14 @@ import 'package:parking_user/bloc/person/person_bloc.dart';
 import 'package:parking_user/screens/create_account.dart';
 import 'package:parking_user/screens/manage_account.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key});
+class LoginView extends StatefulWidget {
+  const LoginView({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  State<LoginView> createState() => _LoginViewState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginViewState extends State<LoginView> {
   final formKey = GlobalKey<FormState>();
   String? socialSecurityNumber;
   String? email;

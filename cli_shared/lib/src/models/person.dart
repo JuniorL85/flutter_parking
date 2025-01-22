@@ -13,9 +13,19 @@ class Person {
   String socialSecurityNumber;
   String email;
 
-  Person deserialize(Map<String, dynamic> json) => Person.fromJson(json);
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
 
-  Map<String, dynamic> serialize(item) => toJson();
+    return other is Person && other.email == email && other.id == id;
+  }
+
+  @override
+  int get hashCode => email.hashCode ^ id.hashCode;
+
+  // Person deserialize(Map<String, dynamic> json) => Person.fromJson(json);
+
+  // Map<String, dynamic> serialize(item) => toJson();
 
   factory Person.fromJson(Map<String, dynamic> json) {
     return Person(

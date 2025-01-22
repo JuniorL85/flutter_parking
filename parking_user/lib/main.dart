@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_user/bloc/auth/auth_bloc.dart';
 import 'package:parking_user/bloc/auth_cubit.dart';
 import 'package:parking_user/bloc/parking/parking_bloc.dart';
 import 'package:parking_user/bloc/parking_space/parking_spaces_bloc.dart';
@@ -60,6 +61,12 @@ void main() async {
           BlocProvider<ThemeBloc>(
             create: (context) => ThemeBloc()..add(InitialThemeEvent()),
           ),
+          BlocProvider(
+            create: (context) => AuthBloc(
+                authRepository: context.read<AuthRepository>(),
+                personRepository: context.read<PersonRepository>())
+              ..add(AuthUserSubscriptionRequested()),
+          )
         ],
         child: const MyApp(),
       ),
@@ -95,7 +102,7 @@ class MyApp extends StatelessWidget {
         title: 'ParkHere',
         debugShowCheckedModeBanner: false,
         theme: currentTheme,
-        home: const Login(),
+        home: const LoginView(),
         locale: const Locale('sv', ''),
       );
     });

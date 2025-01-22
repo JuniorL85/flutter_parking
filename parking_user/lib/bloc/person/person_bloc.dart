@@ -46,7 +46,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     emit(PersonsLoading());
     try {
       final personById = await personRepository.getPersonById(person.id);
-      emit(PersonLoaded(person: personById!));
+      emit(PersonLoaded(person: personById));
     } catch (e) {
       emit(PersonsError(message: e.toString()));
     }
