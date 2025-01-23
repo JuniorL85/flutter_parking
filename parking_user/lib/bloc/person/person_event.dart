@@ -5,9 +5,9 @@ sealed class PersonEvent {}
 class LoadPersons extends PersonEvent {}
 
 class LoadPersonsById extends PersonEvent {
-  final Person person;
+  String id;
 
-  LoadPersonsById({required this.person});
+  LoadPersonsById({required this.id});
 }
 
 class CreatePerson extends PersonEvent {

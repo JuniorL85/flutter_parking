@@ -171,6 +171,12 @@ class _AddVehicleState extends State<AddVehicle> {
                                   );
                                 }
                               });
+                              print(person.id);
+                              print(person.name);
+                              print(person.socialSecurityNumber);
+                              print(person.email);
+                              print(dropdownValue);
+                              print(regNr);
                               context.read<VehicleBloc>().add(CreateVehicle(
                                   vehicle: Vehicle(
                                       regNr: regNr!,

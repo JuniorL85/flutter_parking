@@ -14,6 +14,7 @@ import 'package:parking_user/bloc/vehicle/vehicle_bloc.dart';
 import 'package:parking_user/firebase_options.dart';
 import 'package:parking_user/screens/login.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:parking_user/screens/manage_account.dart';
 import 'package:path_provider/path_provider.dart';
 
 void main() async {
@@ -61,10 +62,10 @@ void main() async {
           BlocProvider<ThemeBloc>(
             create: (context) => ThemeBloc()..add(InitialThemeEvent()),
           ),
-          BlocProvider(
+          BlocProvider<AuthBloc>(
             create: (context) => AuthBloc(
-                authRepository: context.read<AuthRepository>(),
-                personRepository: context.read<PersonRepository>())
+                authRepository: AuthRepository(),
+                personRepository: PersonRepository.personInstance)
               ..add(AuthUserSubscriptionRequested()),
           )
         ],
@@ -79,6 +80,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.watch<AuthBloc>().state;
+
+    getStateAndPerson(AuthState state) {
+      if (state is Authenticated) {
+        context.read<PersonBloc>().add(LoadPersonsById(id: state.person.id));
+        return const ManageAccount();
+      } else {
+        return const LoginView();
+      }
+    }
+
     return BlocBuilder<ThemeBloc, AppTheme>(builder: (context, state) {
       ThemeData currentTheme;
       if (state == AppTheme.light) {
@@ -102,7 +114,7 @@ class MyApp extends StatelessWidget {
         title: 'ParkHere',
         debugShowCheckedModeBanner: false,
         theme: currentTheme,
-        home: const LoginView(),
+        home: getStateAndPerson(authState),
         locale: const Locale('sv', ''),
       );
     });

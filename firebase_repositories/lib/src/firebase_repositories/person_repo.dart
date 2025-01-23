@@ -45,7 +45,7 @@ class PersonRepository {
   }
 
   Future<Person?> getByAuthId(String authId) async {
-    final snapshot = await db.where("authId", isEqualTo: authId).get();
+    final snapshot = await db.where("id", isEqualTo: authId).get();
 
     if (snapshot.docs.isEmpty) {
       return null;

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_user/bloc/auth/auth_bloc.dart';
 import 'package:parking_user/bloc/auth_cubit.dart';
 import 'package:parking_user/bloc/person/person_bloc.dart';
 import 'package:parking_user/screens/manage_parkings.dart';
@@ -92,7 +93,7 @@ class _ManageAccountState extends State<ManageAccount> {
             IconButton(
               onPressed: () {
                 Navigator.popUntil(context, ModalRoute.withName('/'));
-                context.read<AuthCubit>().logout();
+                context.read<AuthBloc>().authRepository.logout();
               },
               icon: const Icon(Icons.logout_sharp),
             )

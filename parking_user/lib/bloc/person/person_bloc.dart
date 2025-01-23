@@ -15,7 +15,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     });
 
     on<LoadPersonsById>((event, emit) async {
-      await onLoadPersonsById(emit, event.person);
+      await onLoadPersonsById(emit, event.id);
     });
 
     on<DeletePersons>((event, emit) async {
@@ -41,11 +41,10 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     }
   }
 
-  Future<void> onLoadPersonsById(
-      Emitter<PersonState> emit, Person person) async {
+  Future<void> onLoadPersonsById(Emitter<PersonState> emit, String id) async {
     emit(PersonsLoading());
     try {
-      final personById = await personRepository.getPersonById(person.id);
+      final personById = await personRepository.getPersonById(id);
       emit(PersonLoaded(person: personById));
     } catch (e) {
       emit(PersonsError(message: e.toString()));
@@ -76,7 +75,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
         email: person.email,
       ));
 
-      add(LoadPersonsById(person: person));
+      add(LoadPersonsById(id: person.id));
     } catch (e) {
       emit(PersonsError(message: e.toString()));
     }

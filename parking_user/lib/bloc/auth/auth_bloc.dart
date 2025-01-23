@@ -23,7 +23,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             await onLogout(emit);
           case AuthUserSubscriptionRequested():
             // todo: perhaps return
-            emit.onEach(authRepository.userStream, onData: (authUser) async {
+            await emit.onEach(authRepository.userStream,
+                onData: (authUser) async {
               if (authUser == null) {
                 emit(Unauthenticated());
               } else {
@@ -74,8 +75,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> onLogout(Emitter<AuthState> emit) async {
     await authRepository.logout();
-    // no reason to emit state here because this triggers a change on the authStateChanges stream
-    // the stream handler will emit the appropriate state
   }
 
   Future<void> _onRegister(
