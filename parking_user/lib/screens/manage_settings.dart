@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:parking_user/bloc/auth_cubit.dart';
+import 'package:parking_user/bloc/auth/auth_bloc.dart';
 import 'package:parking_user/bloc/person/person_bloc.dart';
 import 'package:parking_user/bloc/theme/theme_bloc.dart';
 import 'package:parking_user/bloc/vehicle/vehicle_bloc.dart';
@@ -77,24 +77,6 @@ class _ManageSettingsState extends State<ManageSettings> {
       }
     }
   }
-
-  // getPerson() {
-  //   if (mounted) {
-  //     final personState = context.read<PersonBloc>().state;
-  //     if (personState is PersonLoaded) {
-  //       person = personState.person;
-  //     } else {
-  //       person = Person(name: '', socialSecurityNumber: '');
-  //     }
-  //     personSubscription = context.read<PersonBloc>().stream.listen((state) {
-  //       if (state is PersonLoaded) {
-  //         setState(() {
-  //           person = state.person;
-  //         });
-  //       }
-  //     });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -299,7 +281,7 @@ class _ManageSettingsState extends State<ManageSettings> {
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.popUntil(context, ModalRoute.withName('/'));
-                          context.read<AuthCubit>().logout();
+                          context.read<AuthBloc>().authRepository.logout();
                         },
                         child: const Text('Logga ut'),
                       ),

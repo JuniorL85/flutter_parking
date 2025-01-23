@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cli_shared/cli_shared.dart';
 import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,36 +23,6 @@ class _LoginViewState extends State<LoginView> {
       TextEditingController();
   String? email;
   String? password;
-  List<Person> personList = [];
-  StreamSubscription? personSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    getPersonList();
-  }
-
-  @override
-  void dispose() {
-    personSubscription?.cancel();
-    super.dispose();
-  }
-
-  getPersonList() async {
-    print('jag körs visst!');
-
-    if (mounted) {
-      context.read<PersonBloc>().add(LoadPersons());
-      personSubscription = context.read<PersonBloc>().stream.listen((state) {
-        if (state is PersonsLoaded) {
-          print('personer är laddade');
-          setState(() {
-            personList = state.persons;
-          });
-        }
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +93,9 @@ class _LoginViewState extends State<LoginView> {
                             ),
                             const SizedBox(height: 5),
                             TextFormField(
+                              obscureText: true,
+                              autocorrect: false,
+                              enableSuggestions: false,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return "Ange ett lösenord";
@@ -138,26 +110,6 @@ class _LoginViewState extends State<LoginView> {
                               ),
                               onChanged: (value) => password = value,
                             ),
-                            // TextFormField(
-                            //   validator: (value) {
-                            //     if (value == null || value.isEmpty) {
-                            //       return "Ange ett personnummer";
-                            //     }
-
-                            //     if (!validateSocialSecurityNumber(value)) {
-                            //       return 'Du har angivit ett felaktigt format på personnumret!';
-                            //     }
-                            //     return null;
-                            //   },
-                            //   textAlign: TextAlign.center,
-                            //   decoration: InputDecoration(
-                            //     border: OutlineInputBorder(
-                            //         borderRadius: BorderRadius.circular(10)),
-                            //     labelText: 'Ange personnummer',
-                            //   ),
-                            //   onChanged: (value) =>
-                            //       socialSecurityNumber = value,
-                            // ),
                           ],
                         ),
                       ),
@@ -191,6 +143,7 @@ class _LoginViewState extends State<LoginView> {
                                   content: Form(
                                     key: _key,
                                     child: Column(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
                                         const Text(
                                             'Fyll i namn och personnummer för att slutföra registreringen'),

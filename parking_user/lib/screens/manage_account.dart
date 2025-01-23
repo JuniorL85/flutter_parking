@@ -4,7 +4,6 @@ import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_user/bloc/auth/auth_bloc.dart';
-import 'package:parking_user/bloc/auth_cubit.dart';
 import 'package:parking_user/bloc/person/person_bloc.dart';
 import 'package:parking_user/screens/manage_parkings.dart';
 import 'package:parking_user/screens/manage_settings.dart';
@@ -61,9 +60,9 @@ class _ManageAccountState extends State<ManageAccount> {
 
   @override
   Widget build(BuildContext context) {
-    final authStatus = context.watch<AuthCubit>().state;
+    final authState = context.watch<AuthBloc>().state;
 
-    if (authStatus == AuthStatus.authenticating) {
+    if (authState is AuthPending || authState is AuthInitial) {
       return const Center(
         child: CircularProgressIndicator(),
       );

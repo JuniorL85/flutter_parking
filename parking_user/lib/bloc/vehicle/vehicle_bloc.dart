@@ -46,18 +46,13 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
       Emitter<VehicleState> emit, Person person) async {
     emit(VehiclesLoading());
     _vehicleList = [];
-    print(person.id);
-    print(person.name);
     try {
       _vehicleList = await vehicleRepository.getAllVehicles();
-      print('jag är ändå inne här också');
       final vehicleListByPerson = _vehicleList
           .where((vehicle) => vehicle.owner!.id == person.id)
           .toList();
-      print(vehicleListByPerson.length);
       emit(VehiclesLoaded(vehicles: vehicleListByPerson));
     } catch (e) {
-      print('i error $e');
       emit(VehiclesError(message: e.toString()));
     }
   }
