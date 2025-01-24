@@ -329,6 +329,7 @@ class _ManageSettingsState extends State<ManageSettings> {
                         );
                         setState(() {
                           Navigator.popUntil(context, ModalRoute.withName('/'));
+                          context.read<AuthBloc>().authRepository.logout();
                         });
 
                         if (index != -1) {

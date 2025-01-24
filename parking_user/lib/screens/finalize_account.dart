@@ -1,29 +1,25 @@
 import 'dart:async';
 
+import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_user/bloc/auth/auth_bloc.dart';
-import 'package:parking_user/screens/finalize_account.dart';
 
-class CreateAccount extends StatefulWidget {
-  const CreateAccount({super.key});
+class FinalizeAccount extends StatefulWidget {
+  const FinalizeAccount({super.key, required this.email, required this.authId});
+
+  final String email;
+  final String authId;
 
   @override
-  State<CreateAccount> createState() => _CreateAccountState();
+  State<FinalizeAccount> createState() => _FinalizeAccountState();
 }
 
-class _CreateAccountState extends State<CreateAccount> {
+class _FinalizeAccountState extends State<FinalizeAccount> {
   final formKey = GlobalKey<FormState>();
-  String? email;
-  String? password;
-  // var authState;
+  String? name;
+  String? socialSecurityNumber;
   StreamSubscription? _blocSubscription;
-
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //   // authState = context.watch<AuthBloc>().state;
-  // }
 
   @override
   void dispose() {
@@ -35,7 +31,7 @@ class _CreateAccountState extends State<CreateAccount> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Skapa konto'),
+        title: const Text('Slutför kontoregistrering'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: Center(
@@ -49,34 +45,33 @@ class _CreateAccountState extends State<CreateAccount> {
                 TextFormField(
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Ange en e-postadress";
+                      return "Ange ett namn";
                     }
                     return null;
                   },
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'Ange din e-postadress',
+                    labelText: 'Ange namn',
                   ),
-                  onChanged: (value) => email = value,
-                  onSaved: (value) => email = value,
+                  onChanged: (value) => name = value,
+                  onSaved: (value) => name = value,
                 ),
                 const SizedBox(height: 5),
                 TextFormField(
-                  obscureText: true,
-                  enableSuggestions: false,
-                  autocorrect: false,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Ange ett lösenord";
+                    if (value == null ||
+                        value.isEmpty ||
+                        !validateSocialSecurityNumber(value)) {
+                      return "Ange ett korrekt personnummer (12 siffror)";
                     }
                     return null;
                   },
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'Ange ditt lösenord',
+                    labelText: 'Ange personnummer',
                   ),
-                  onChanged: (value) => password = value,
-                  onSaved: (value) => password = value,
+                  onChanged: (value) => socialSecurityNumber = value,
+                  onSaved: (value) => socialSecurityNumber = value,
                 ),
                 const SizedBox(height: 30),
                 Row(
@@ -97,32 +92,26 @@ class _CreateAccountState extends State<CreateAccount> {
                           final bloc = context.read<AuthBloc>();
 
                           _blocSubscription = bloc.stream.listen((state) {
-                            if (state is AuthenticatedNoUser) {
+                            if (state is Authenticated) {
                               if (context.mounted) {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (ctx) => FinalizeAccount(
-                                      authId: state.authId,
-                                      email: state.email,
-                                    ),
+                                ScaffoldMessenger.of(context).clearSnackBars();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    duration: Duration(seconds: 3),
+                                    backgroundColor: Colors.lightGreen,
+                                    content: Text('Du har skapat ett konto'),
                                   ),
                                 );
+
                                 formKey.currentState?.reset();
+                                Navigator.popUntil(
+                                    context, ModalRoute.withName('/'));
                               }
-                            } else if (state is AuthPending) {
+                            } else if (state is AuthenticatedNoUserPending) {
                               const Center(
                                 child: CircularProgressIndicator(),
                               );
                             } else if (state is AuthFail) {
-                              ScaffoldMessenger.of(context).clearSnackBars();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  duration: const Duration(seconds: 3),
-                                  backgroundColor: Colors.redAccent,
-                                  content: Text(state.message),
-                                ),
-                              );
-                            } else {
                               ScaffoldMessenger.of(context).clearSnackBars();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -134,11 +123,15 @@ class _CreateAccountState extends State<CreateAccount> {
                               );
                             }
                           });
-                          context.read<AuthBloc>().add(
-                              Register(email: email!, password: password!));
+                          context.read<AuthBloc>().add(FinalizeRegistration(
+                                email: widget.email,
+                                authId: widget.authId,
+                                name: name!,
+                                socialSecurityNumber: socialSecurityNumber!,
+                              ));
                         }
                       },
-                      child: const Text('Skapa konto'),
+                      child: const Text('Slutför registrering'),
                     )
                   ],
                 )

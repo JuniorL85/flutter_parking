@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_user/bloc/auth/auth_bloc.dart';
 import 'package:parking_user/bloc/person/person_bloc.dart';
 import 'package:parking_user/screens/create_account.dart';
+import 'package:parking_user/screens/finalize_account.dart';
 import 'package:parking_user/screens/manage_account.dart';
 
 class LoginView extends StatefulWidget {
@@ -17,17 +17,18 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   final formKey = GlobalKey<FormState>();
-  final _key = GlobalKey<FormState>();
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController socialSecurityNumberController =
-      TextEditingController();
   String? email;
   String? password;
+  StreamSubscription? _blocSubscription;
+
+  @override
+  void dispose() {
+    _blocSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.watch<AuthBloc>().state;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('ParkHere'),
@@ -90,6 +91,7 @@ class _LoginViewState extends State<LoginView> {
                                 labelText: 'Ange din e-postadress',
                               ),
                               onChanged: (value) => email = value,
+                              onSaved: (value) => email = value,
                             ),
                             const SizedBox(height: 5),
                             TextFormField(
@@ -109,6 +111,7 @@ class _LoginViewState extends State<LoginView> {
                                 labelText: 'Ange ditt lösenord',
                               ),
                               onChanged: (value) => password = value,
+                              onSaved: (value) => password = value,
                             ),
                           ],
                         ),
@@ -117,127 +120,58 @@ class _LoginViewState extends State<LoginView> {
                       ElevatedButton(
                         onPressed: () async {
                           if (formKey.currentState!.validate()) {
+                            formKey.currentState!.save();
+
+                            final bloc = context.read<AuthBloc>();
+
+                            _blocSubscription = bloc.stream.listen((state) {
+                              if (state is Authenticated) {
+                                context
+                                    .read<PersonBloc>()
+                                    .add(LoadPersonsById(id: state.person.id));
+                                if (context.mounted) {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (ctx) => const ManageAccount(),
+                                    ),
+                                  );
+                                  formKey.currentState?.reset();
+                                }
+                              } else if (state is AuthenticatedNoUser) {
+                                if (context.mounted) {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (ctx) => FinalizeAccount(
+                                        authId: state.authId,
+                                        email: state.email,
+                                      ),
+                                    ),
+                                  );
+                                  formKey.currentState?.reset();
+                                }
+                              } else if (state is AuthPending) {
+                                const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              } else {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context)
+                                      .clearSnackBars();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      duration: Duration(seconds: 3),
+                                      backgroundColor: Colors.redAccent,
+                                      content: Text(
+                                          'Finns ingen person med angivna inloggingsuppgifter, välj skapa konto'),
+                                    ),
+                                  );
+                                }
+                                formKey.currentState?.reset();
+                              }
+                            });
                             context
                                 .read<AuthBloc>()
                                 .add(Login(email: email!, password: password!));
-
-                            await Future.delayed(const Duration(seconds: 1));
-
-                            if (authState is Authenticated) {
-                              context.read<PersonBloc>().add(
-                                  LoadPersonsById(id: authState.person.id));
-                              if (context.mounted) {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (ctx) => const ManageAccount(),
-                                  ),
-                                );
-                                formKey.currentState?.reset();
-                              }
-                            } else if (authState is AuthenticatedNoUser) {
-                              showDialog<String>(
-                                context: context,
-                                builder: (BuildContext context) => AlertDialog(
-                                  title: const Text(
-                                      'Nu är det bara några uppgifter kvar'),
-                                  content: Form(
-                                    key: _key,
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Text(
-                                            'Fyll i namn och personnummer för att slutföra registreringen'),
-                                        TextFormField(
-                                          controller: nameController,
-                                          validator: (value) {
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return "Ange ett namn";
-                                            }
-                                            return null;
-                                          },
-                                          decoration: const InputDecoration(
-                                            border: OutlineInputBorder(),
-                                            labelText: 'Ange namn',
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        TextFormField(
-                                          controller:
-                                              socialSecurityNumberController,
-                                          validator: (value) {
-                                            if (value == null ||
-                                                value.isEmpty ||
-                                                !validateSocialSecurityNumber(
-                                                    value)) {
-                                              return "Ange ett korrekt personnummer (12 siffror)";
-                                            }
-                                            return null;
-                                          },
-                                          decoration: const InputDecoration(
-                                            border: OutlineInputBorder(),
-                                            labelText: 'Ange personnummer',
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, 'Avbryt'),
-                                      child: const Text('Avbryt'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () async {
-                                        if (_key.currentState!.validate()) {
-                                          context
-                                              .read<AuthBloc>()
-                                              .add(FinalizeRegistration(
-                                                email: authState.email,
-                                                authId: authState.authId,
-                                                name: nameController.text,
-                                                socialSecurityNumber:
-                                                    socialSecurityNumberController
-                                                        .text,
-                                              ));
-
-                                          if (authState is Authenticated) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                duration: Duration(seconds: 3),
-                                                backgroundColor:
-                                                    Colors.lightGreen,
-                                                content: Text(
-                                                    'Du har skapat ett konto, testa att logga in på nytt'),
-                                              ),
-                                            );
-
-                                            formKey.currentState?.reset();
-                                            _key.currentState?.reset();
-                                            Navigator.pop(context);
-                                          }
-                                        }
-                                      },
-                                      child: const Text('Skapa konto'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            } else {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    duration: Duration(seconds: 3),
-                                    backgroundColor: Colors.redAccent,
-                                    content: Text(
-                                        'Finns ingen person med angivna inloggingsuppgifter, välj skapa konto'),
-                                  ),
-                                );
-                              }
-                              formKey.currentState?.reset();
-                            }
                           }
                         },
                         child: const Text('Logga in'),
