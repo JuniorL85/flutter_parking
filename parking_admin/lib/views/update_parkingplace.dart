@@ -238,6 +238,8 @@ class _UpdateParkingplaceState extends State<UpdateParkingplace> {
                                       .add(UpdateParkingSpace(
                                           parkingSpace: ParkingSpace(
                                         id: chosenParkingSpace!.id,
+                                        creatorId:
+                                            chosenParkingSpace!.creatorId,
                                         address: address!,
                                         pricePerHour: int.parse(pricePerHour!),
                                       )));

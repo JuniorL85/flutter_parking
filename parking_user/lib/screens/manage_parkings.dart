@@ -323,6 +323,10 @@ class _ManageParkingsState extends State<ManageParkings> {
                                                           id: parkingList[foundActiveParking!]
                                                               .parkingSpace!
                                                               .id,
+                                                          creatorId:
+                                                              parkingList[foundActiveParking!]
+                                                                  .parkingSpace!
+                                                                  .creatorId,
                                                           address:
                                                               parkingList[foundActiveParking!]
                                                                   .parkingSpace!
@@ -334,10 +338,8 @@ class _ManageParkingsState extends State<ManageParkings> {
                                                       id: parkingList[foundActiveParking!]
                                                           .id,
                                                       startTime:
-                                                          parkingList[foundActiveParking!]
-                                                              .startTime,
-                                                      endTime:
-                                                          _selectedDate.value!)));
+                                                          parkingList[foundActiveParking!].startTime,
+                                                      endTime: _selectedDate.value!)));
                                             }
                                           } else {
                                             if (context.mounted) {

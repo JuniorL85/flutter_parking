@@ -59,4 +59,14 @@ class ParkingSpaceRepository {
 
     return parkingSpaceById;
   }
+
+  Stream<List<ParkingSpace>> userItemsStream(String parkingSpaceId) {
+    return db
+        .where("creatorId", isEqualTo: parkingSpaceId)
+        .snapshots()
+        .map((snapshot) {
+      final docs = snapshot.docs;
+      return docs.map((doc) => ParkingSpace.fromJson(doc.data())).toList();
+    });
+  }
 }

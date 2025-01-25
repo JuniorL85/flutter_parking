@@ -104,9 +104,7 @@ class _StartParkingState extends State<StartParking> {
   }
 
   setShortenedId(String id) {
-    String del = '-';
-    int index = id.indexOf(del);
-    return id.substring(0, index);
+    return id.substring(0, 5);
   }
 
   @override
@@ -318,6 +316,8 @@ class _StartParkingState extends State<StartParking> {
                                                           owner: person),
                                                       parkingSpace: ParkingSpace(
                                                           id: parkingSpace.id,
+                                                          creatorId: parkingSpace
+                                                              .creatorId,
                                                           address: parkingSpace
                                                               .address,
                                                           pricePerHour:

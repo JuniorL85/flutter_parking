@@ -29,7 +29,7 @@ void main() async {
           create: (context) => ParkingSpacesBloc(
               parkingSpaceRepository:
                   ParkingSpaceRepository.parkingSpaceInstance)
-            ..add(LoadParkingSpaces()),
+            ..add(SubscribeToParkingSpaces(parkingSpaceId: 'Admin1')),
         ),
         BlocProvider<ThemeBloc>(
           create: (context) => ThemeBloc()..add(InitialThemeEvent()),

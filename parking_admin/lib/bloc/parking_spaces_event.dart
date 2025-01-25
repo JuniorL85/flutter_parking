@@ -2,6 +2,12 @@ part of 'parking_spaces_bloc.dart';
 
 sealed class ParkingSpacesEvent {}
 
+class SubscribeToParkingSpaces extends ParkingSpacesEvent {
+  final String parkingSpaceId;
+
+  SubscribeToParkingSpaces({required this.parkingSpaceId});
+}
+
 class LoadParkingSpaces extends ParkingSpacesEvent {}
 
 class CreateParkingSpace extends ParkingSpacesEvent {

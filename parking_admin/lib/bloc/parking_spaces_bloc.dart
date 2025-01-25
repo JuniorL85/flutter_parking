@@ -26,6 +26,14 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
     on<UpdateParkingSpace>((event, emit) async {
       await onUpdateParkingSpace(emit, event.parkingSpace);
     });
+
+    on<SubscribeToParkingSpaces>((event, emit) async {
+      return emit
+          .onEach(parkingSpaceRepository.userItemsStream(event.parkingSpaceId),
+              onData: (parkingSpaces) {
+        return emit(ParkingSpacesLoaded(parkingSpaces: parkingSpaces));
+      });
+    });
   }
 
   Future<void> onLoadParkingSpaces(Emitter<ParkingSpacesState> emit) async {
@@ -42,6 +50,7 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
       Emitter<ParkingSpacesState> emit, ParkingSpace parkingSpace) async {
     try {
       await parkingSpaceRepository.addParkingSpace(ParkingSpace(
+        creatorId: parkingSpace.creatorId,
         address: parkingSpace.address,
         pricePerHour: parkingSpace.pricePerHour,
       ));
@@ -59,6 +68,7 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
     try {
       await parkingSpaceRepository.updateParkingSpace(ParkingSpace(
         id: parkingSpace.id,
+        creatorId: parkingSpace.creatorId,
         address: parkingSpace.address,
         pricePerHour: parkingSpace.pricePerHour,
       ));
@@ -76,6 +86,7 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
     try {
       await parkingSpaceRepository.deleteParkingSpace(ParkingSpace(
         id: parkingSpace.id,
+        creatorId: parkingSpace.creatorId,
         address: parkingSpace.address,
         pricePerHour: parkingSpace.pricePerHour,
       ));

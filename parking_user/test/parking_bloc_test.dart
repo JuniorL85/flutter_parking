@@ -31,8 +31,11 @@ void main() {
           id: '1',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 1)),
-          parkingSpace:
-              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '1',
+              creatorId: 'Admin1',
+              address: 'Testadress 1',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
@@ -46,8 +49,11 @@ void main() {
           id: '2',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 2)),
-          parkingSpace:
-              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '2',
+              creatorId: 'Admin1',
+              address: 'Testadress 2',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
@@ -97,8 +103,11 @@ void main() {
           id: '1',
           startTime: DateTime.now().add(const Duration(hours: -2)),
           endTime: DateTime.now().add(const Duration(hours: -1)),
-          parkingSpace:
-              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '1',
+              creatorId: 'Admin1',
+              address: 'Testadress 1',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
@@ -112,8 +121,11 @@ void main() {
           id: '2',
           startTime: DateTime.now().add(const Duration(hours: -3)),
           endTime: DateTime.now().add(const Duration(hours: -2)),
-          parkingSpace:
-              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '2',
+              creatorId: 'Admin1',
+              address: 'Testadress 2',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
@@ -162,8 +174,11 @@ void main() {
       final newParking = Parking(
         startTime: DateTime.now(),
         endTime: DateTime.now().add(const Duration(hours: 1)),
-        parkingSpace:
-            ParkingSpace(id: '1', address: 'Testadress 3', pricePerHour: 10),
+        parkingSpace: ParkingSpace(
+            id: '1',
+            creatorId: 'Admin1',
+            address: 'Testadress 3',
+            pricePerHour: 10),
         vehicle: Vehicle(
             regNr: 'REG333',
             vehicleType: 'Car',
@@ -178,8 +193,11 @@ void main() {
           id: '1',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 1)),
-          parkingSpace:
-              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '1',
+              creatorId: 'Admin1',
+              address: 'Testadress 1',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
@@ -193,8 +211,11 @@ void main() {
           id: '2',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 2)),
-          parkingSpace:
-              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '2',
+              creatorId: 'Admin1',
+              address: 'Testadress 2',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
@@ -247,8 +268,11 @@ void main() {
         id: '1',
         startTime: DateTime.now(),
         endTime: DateTime.now().add(const Duration(hours: 3)),
-        parkingSpace:
-            ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+        parkingSpace: ParkingSpace(
+            id: '1',
+            creatorId: 'Admin1',
+            address: 'Testadress 1',
+            pricePerHour: 10),
         vehicle: Vehicle(
             regNr: 'REG111',
             vehicleType: 'Car',
@@ -263,8 +287,11 @@ void main() {
           id: '1',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 1)),
-          parkingSpace:
-              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '1',
+              creatorId: 'Admin1',
+              address: 'Testadress 1',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
@@ -278,8 +305,11 @@ void main() {
           id: '2',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 2)),
-          parkingSpace:
-              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '2',
+              creatorId: 'Admin1',
+              address: 'Testadress 2',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
@@ -332,8 +362,11 @@ void main() {
         id: '1',
         startTime: DateTime.now(),
         endTime: DateTime.now().add(const Duration(hours: 1)),
-        parkingSpace:
-            ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+        parkingSpace: ParkingSpace(
+            id: '1',
+            creatorId: 'Admin1',
+            address: 'Testadress 1',
+            pricePerHour: 10),
         vehicle: Vehicle(
             regNr: 'REG111',
             vehicleType: 'Car',
@@ -348,8 +381,11 @@ void main() {
           id: '1',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 1)),
-          parkingSpace:
-              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '1',
+              creatorId: 'Admin1',
+              address: 'Testadress 1',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
@@ -363,8 +399,11 @@ void main() {
           id: '2',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 2)),
-          parkingSpace:
-              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '2',
+              creatorId: 'Admin1',
+              address: 'Testadress 2',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',

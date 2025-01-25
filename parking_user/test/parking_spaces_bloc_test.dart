@@ -28,8 +28,16 @@ void main() {
 
     group("Load parkingSpaces", () {
       final existingParkingSpaces = [
-        ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
-        ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 20)
+        ParkingSpace(
+            id: '1',
+            creatorId: 'Admin1',
+            address: 'Testadress 1',
+            pricePerHour: 10),
+        ParkingSpace(
+            id: '2',
+            creatorId: 'Admin1',
+            address: 'Testadress 2',
+            pricePerHour: 20)
       ];
 
       blocTest<ParkingSpacesBloc, ParkingSpacesState>(
