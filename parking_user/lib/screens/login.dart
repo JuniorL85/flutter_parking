@@ -126,19 +126,22 @@ class _LoginViewState extends State<LoginView> {
 
                             _blocSubscription = bloc.stream.listen((state) {
                               if (state is Authenticated) {
-                                context
-                                    .read<PersonBloc>()
-                                    .add(LoadPersonsById(id: state.person.id));
                                 if (context.mounted) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (ctx) => const ManageAccount(),
-                                    ),
-                                  );
-                                  formKey.currentState?.reset();
+                                  context.read<PersonBloc>().add(
+                                      LoadPersonsById(id: state.person.id));
+                                  if (context.mounted) {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (ctx) => const ManageAccount(),
+                                      ),
+                                    );
+                                    formKey.currentState?.reset();
+                                  }
                                 }
                               } else if (state is AuthenticatedNoUser) {
                                 if (context.mounted) {
+                                  ScaffoldMessenger.of(context)
+                                      .clearSnackBars();
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (ctx) => FinalizeAccount(
@@ -149,10 +152,21 @@ class _LoginViewState extends State<LoginView> {
                                   );
                                   formKey.currentState?.reset();
                                 }
-                              } else if (state is AuthPending) {
-                                const Center(
-                                  child: CircularProgressIndicator(),
-                                );
+                              } else if (state is AuthPending ||
+                                  state is AuthenticatedNoUserPending) {
+                                if (context.mounted) {
+                                  showDialog(
+                                    barrierDismissible: false,
+                                    builder: (ctx) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      );
+                                    },
+                                    context: context,
+                                  );
+                                }
                               } else {
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context)
@@ -165,6 +179,7 @@ class _LoginViewState extends State<LoginView> {
                                           'Finns ingen person med angivna inloggingsuppgifter, välj skapa konto'),
                                     ),
                                   );
+                                  Navigator.of(context).pop();
                                 }
                                 formKey.currentState?.reset();
                               }

@@ -99,6 +99,7 @@ class _CreateAccountState extends State<CreateAccount> {
                           _blocSubscription = bloc.stream.listen((state) {
                             if (state is AuthenticatedNoUser) {
                               if (context.mounted) {
+                                ScaffoldMessenger.of(context).clearSnackBars();
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (ctx) => FinalizeAccount(
@@ -109,29 +110,46 @@ class _CreateAccountState extends State<CreateAccount> {
                                 );
                                 formKey.currentState?.reset();
                               }
-                            } else if (state is AuthPending) {
-                              const Center(
-                                child: CircularProgressIndicator(),
-                              );
+                            } else if (state is AuthPending ||
+                                state is AuthenticatedNoUserPending) {
+                              if (context.mounted) {
+                                showDialog(
+                                  barrierDismissible: false,
+                                  builder: (ctx) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    );
+                                  },
+                                  context: context,
+                                );
+                              }
                             } else if (state is AuthFail) {
-                              ScaffoldMessenger.of(context).clearSnackBars();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  duration: const Duration(seconds: 3),
-                                  backgroundColor: Colors.redAccent,
-                                  content: Text(state.message),
-                                ),
-                              );
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).clearSnackBars();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    duration: const Duration(seconds: 3),
+                                    backgroundColor: Colors.redAccent,
+                                    content: Text(state.message),
+                                  ),
+                                );
+                                Navigator.of(context).pop();
+                              }
                             } else {
-                              ScaffoldMessenger.of(context).clearSnackBars();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  duration: Duration(seconds: 3),
-                                  backgroundColor: Colors.redAccent,
-                                  content: Text(
-                                      'Något gick fel, vänligen försök igen senare'),
-                                ),
-                              );
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).clearSnackBars();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    duration: Duration(seconds: 3),
+                                    backgroundColor: Colors.redAccent,
+                                    content: Text(
+                                        'Något gick fel, vänligen försök igen senare'),
+                                  ),
+                                );
+                                Navigator.of(context).pop();
+                              }
                             }
                           });
                           context.read<AuthBloc>().add(

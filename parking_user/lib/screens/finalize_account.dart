@@ -42,6 +42,10 @@ class _FinalizeAccountState extends State<FinalizeAccount> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const Text('Du är snart färdig bara några uppgifter kvar.'),
+                const SizedBox(
+                  height: 30,
+                ),
                 TextFormField(
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -108,19 +112,31 @@ class _FinalizeAccountState extends State<FinalizeAccount> {
                                     context, ModalRoute.withName('/'));
                               }
                             } else if (state is AuthenticatedNoUserPending) {
-                              const Center(
-                                child: CircularProgressIndicator(),
-                              );
+                              if (context.mounted) {
+                                showDialog(
+                                  barrierDismissible: false,
+                                  builder: (ctx) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    );
+                                  },
+                                  context: context,
+                                );
+                              }
                             } else if (state is AuthFail) {
-                              ScaffoldMessenger.of(context).clearSnackBars();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  duration: Duration(seconds: 3),
-                                  backgroundColor: Colors.redAccent,
-                                  content: Text(
-                                      'Något gick fel, vänligen försök igen senare'),
-                                ),
-                              );
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).clearSnackBars();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    duration: Duration(seconds: 3),
+                                    backgroundColor: Colors.redAccent,
+                                    content: Text(
+                                        'Något gick fel, vänligen försök igen senare'),
+                                  ),
+                                );
+                              }
                             }
                           });
                           context.read<AuthBloc>().add(FinalizeRegistration(
