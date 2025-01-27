@@ -18,7 +18,7 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
   Future<void> onLoadParkings(Emitter<ParkingState> emit) async {
     emit(ParkingsLoading());
     try {
-      _parkingList = await ParkingRepository.instance.getAllParkings();
+      _parkingList = await ParkingRepository.parkingInstance.getAllParkings();
       emit(ParkingsLoaded(parkings: _parkingList));
     } catch (e) {
       emit(ParkingsError(message: e.toString()));
@@ -48,7 +48,6 @@ class ActiveParkingBloc extends Bloc<ParkingEvent, ActiveParkingState> {
                 DateTime.now().microsecondsSinceEpoch),
           )
           .toList();
-      await Future.delayed(const Duration(seconds: 2));
       emit(ActiveParkingsLoaded(activeParkings: activeParkings));
     } catch (e) {
       emit(ActiveParkingsError(message: e.toString()));

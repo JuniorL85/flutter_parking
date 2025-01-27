@@ -1,71 +1,72 @@
-import 'dart:convert';
-import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'vehicle_repo.dart';
 import 'package:cli_shared/cli_shared.dart';
 
 class PersonRepository {
   PersonRepository._privateConstructor();
 
-  static final instance = PersonRepository._privateConstructor();
+  static final personInstance = PersonRepository._privateConstructor();
 
-  String host = Platform.isAndroid ? 'http://10.0.2.2' : 'http://localhost';
-  String port = '8080';
-  String resource = 'persons';
+  final db = FirebaseFirestore.instance.collection('persons');
 
-  final VehicleRepository vehicleRepository = VehicleRepository.instance;
+  Future<Person> addPerson(Person person) async {
+    await db.doc(person.id).set(person.toJson());
 
-  Future<dynamic> addPerson(Person person) async {
-    final uri = Uri.parse('$host:$port/$resource');
-
-    final response = await http.post(uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(person.serialize(person)));
-
-    return response;
+    return person;
   }
 
-  Future<dynamic> getAllPersons() async {
-    final uri = Uri.parse('$host:$port/$resource');
+  Future<List<Person>> getAllPersons() async {
+    final snapshots = await db.get();
 
-    final response =
-        await http.get(uri, headers: {'Content-Type': 'application/json'});
+    final docs = snapshots.docs;
 
-    final json = jsonDecode(response.body);
+    final jsons = docs.map((doc) {
+      final json = doc.data();
+      json["id"] = doc.id;
 
-    return (json as List).map((person) => Person.fromJson(person)).toList();
+      return json;
+    }).toList();
+
+    return jsons.map((person) => Person.fromJson(person)).toList();
   }
 
   Future<Person> getPersonById(String id) async {
-    final uri = Uri.parse('$host:$port/$resource/$id');
+    final snapshot = await db.doc(id).get();
 
-    final response = await http.get(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-    );
+    final json = snapshot.data();
 
-    final json = jsonDecode(response.body);
+    if (json == null) {
+      throw Exception("Person with id $id not found");
+    }
+
+    json["id"] = snapshot.id;
 
     return Person.fromJson(json);
   }
 
-  Future<dynamic> updatePersons(Person person) async {
-    final uri = Uri.parse('$host:$port/$resource');
+  Future<Person?> getByAuthId(String authId) async {
+    final snapshot = await db.where("id", isEqualTo: authId).get();
 
-    final response = await http.put(uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(person.serialize(person)));
+    if (snapshot.docs.isEmpty) {
+      return null;
+    }
 
-    return response;
+    final json = snapshot.docs.first.data();
+
+    return Person.fromJson(json);
   }
 
-  Future<dynamic> deletePerson(Person person) async {
-    final uri = Uri.parse('$host:$port/$resource');
+  Future<Person> updatePersons(Person person) async {
+    await db.doc(person.id).set(person.toJson());
 
-    final response = await http.delete(uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(person.serialize(person)));
+    return person;
+  }
 
-    return response;
+  Future<Person> deletePerson(Person person) async {
+    final personById = await getPersonById(person.id);
+
+    await db.doc(person.id).delete();
+
+    return personById;
   }
 }

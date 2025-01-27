@@ -102,8 +102,7 @@ class _ShowParkingplacesState extends State<ShowParkingplaces> {
                 TextButton(
                   onPressed: () {
                     setState(() {
-                      parkingSpaceList.sort(
-                          (a, b) => a.id.toString().compareTo(b.id.toString()));
+                      parkingSpaceList.sort((a, b) => a.id.compareTo(b.id));
                     });
                   },
                   child: const Text('Sortera på id stigande'),
@@ -112,8 +111,7 @@ class _ShowParkingplacesState extends State<ShowParkingplaces> {
                 TextButton(
                   onPressed: () {
                     setState(() {
-                      parkingSpaceList.sort(
-                          (a, b) => b.id.toString().compareTo(a.id.toString()));
+                      parkingSpaceList.sort((a, b) => b.id.compareTo(a.id));
                     });
                   },
                   child: const Text('Sortera på id fallande'),

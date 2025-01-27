@@ -75,7 +75,7 @@ class _UpdateParkingplaceState extends State<UpdateParkingplace> {
                       },
                       decoration: InputDecoration(
                         label: const Text(
-                          'Ange id för parkeringsplats du vill ta bort',
+                          'Ange id för parkeringsplats du vill ta uppdatera',
                           style: TextStyle(fontSize: 14),
                         ),
                         border: OutlineInputBorder(
@@ -92,9 +92,8 @@ class _UpdateParkingplaceState extends State<UpdateParkingplace> {
                   ElevatedButton(
                     onPressed: () async {
                       if (formKey.currentState!.validate()) {
-                        final formattedParkingSpaceId = int.parse(idToUpdate!);
                         final index = parkingSpaceList
-                            .indexWhere((i) => i.id == formattedParkingSpaceId);
+                            .indexWhere((i) => i.id == idToUpdate);
 
                         if (index != -1) {
                           chosenParkingSpace = parkingSpaceList[index];
@@ -239,6 +238,8 @@ class _UpdateParkingplaceState extends State<UpdateParkingplace> {
                                       .add(UpdateParkingSpace(
                                           parkingSpace: ParkingSpace(
                                         id: chosenParkingSpace!.id,
+                                        creatorId:
+                                            chosenParkingSpace!.creatorId,
                                         address: address!,
                                         pricePerHour: int.parse(pricePerHour!),
                                       )));

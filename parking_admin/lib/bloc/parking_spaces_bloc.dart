@@ -26,11 +26,18 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
     on<UpdateParkingSpace>((event, emit) async {
       await onUpdateParkingSpace(emit, event.parkingSpace);
     });
+
+    on<SubscribeToParkingSpaces>((event, emit) async {
+      return emit
+          .onEach(parkingSpaceRepository.userItemsStream(event.parkingSpaceId),
+              onData: (parkingSpaces) {
+        return emit(ParkingSpacesLoaded(parkingSpaces: parkingSpaces));
+      });
+    });
   }
 
   Future<void> onLoadParkingSpaces(Emitter<ParkingSpacesState> emit) async {
     emit(ParkingSpacesLoading());
-    await Future.delayed(const Duration(seconds: 2));
     try {
       _parkingSpaceList = await parkingSpaceRepository.getAllParkingSpaces();
       emit(ParkingSpacesLoaded(parkingSpaces: _parkingSpaceList));
@@ -41,10 +48,9 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
 
   onCreateParkingSpace(
       Emitter<ParkingSpacesState> emit, ParkingSpace parkingSpace) async {
-    emit(ParkingSpacesLoading());
-    await Future.delayed(const Duration(seconds: 2));
     try {
       await parkingSpaceRepository.addParkingSpace(ParkingSpace(
+        creatorId: parkingSpace.creatorId,
         address: parkingSpace.address,
         pricePerHour: parkingSpace.pricePerHour,
       ));
@@ -59,11 +65,10 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
 
   onUpdateParkingSpace(
       Emitter<ParkingSpacesState> emit, ParkingSpace parkingSpace) async {
-    emit(ParkingSpacesLoading());
-    await Future.delayed(const Duration(seconds: 2));
     try {
       await parkingSpaceRepository.updateParkingSpace(ParkingSpace(
         id: parkingSpace.id,
+        creatorId: parkingSpace.creatorId,
         address: parkingSpace.address,
         pricePerHour: parkingSpace.pricePerHour,
       ));
@@ -78,11 +83,10 @@ class ParkingSpacesBloc extends Bloc<ParkingSpacesEvent, ParkingSpacesState> {
 
   onDeleteParkingSpace(
       Emitter<ParkingSpacesState> emit, ParkingSpace parkingSpace) async {
-    emit(ParkingSpacesLoading());
-    await Future.delayed(const Duration(seconds: 2));
     try {
       await parkingSpaceRepository.deleteParkingSpace(ParkingSpace(
         id: parkingSpace.id,
+        creatorId: parkingSpace.creatorId,
         address: parkingSpace.address,
         pricePerHour: parkingSpace.pricePerHour,
       ));

@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:parking_user/bloc/auth_cubit.dart';
-import 'package:parking_user/bloc/person_bloc.dart';
-import 'package:parking_user/bloc/theme_bloc.dart';
+import 'package:parking_user/bloc/auth/auth_bloc.dart';
+import 'package:parking_user/bloc/person/person_bloc.dart';
+import 'package:parking_user/bloc/theme/theme_bloc.dart';
+import 'package:parking_user/bloc/vehicle/vehicle_bloc.dart';
 
 enum ThemeSelected { lightTheme, darkTheme, defaultTheme }
 
@@ -19,15 +20,17 @@ class ManageSettings extends StatefulWidget {
 class _ManageSettingsState extends State<ManageSettings> {
   final formKey = GlobalKey<FormState>();
   String? name;
+  List<Vehicle> vehicleList = [];
   late Person person;
   StreamSubscription? personSubscription;
+  StreamSubscription? vehicleSubscription;
   StreamSubscription? _updatePersonSubscription;
   StreamSubscription? _deletePersonSubscription;
 
   @override
   void initState() {
     super.initState();
-    getPerson();
+    getVehicleListAndPerson();
   }
 
   @override
@@ -35,24 +38,43 @@ class _ManageSettingsState extends State<ManageSettings> {
     personSubscription?.cancel();
     _updatePersonSubscription?.cancel();
     _deletePersonSubscription?.cancel();
+    vehicleSubscription?.cancel();
     super.dispose();
   }
 
-  getPerson() {
+  getVehicleListAndPerson() async {
     if (mounted) {
       final personState = context.read<PersonBloc>().state;
       if (personState is PersonLoaded) {
         person = personState.person;
-      } else {
-        person = Person(name: '', socialSecurityNumber: '');
-      }
-      personSubscription = context.read<PersonBloc>().stream.listen((state) {
-        if (state is PersonLoaded) {
+
+        personSubscription = context.read<PersonBloc>().stream.listen((state) {
+          if (state is PersonLoaded) {
+            setState(() {
+              person = state.person;
+            });
+          }
+        });
+        final vehicleState = context.read<VehicleBloc>().state;
+        if (vehicleState is! VehiclesLoaded) {
+          context.read<VehicleBloc>().add(LoadVehiclesByPerson(person: person));
+        } else {
           setState(() {
-            person = state.person;
+            vehicleList = vehicleState.vehicles;
           });
         }
-      });
+
+        vehicleSubscription =
+            context.read<VehicleBloc>().stream.listen((state) {
+          if (state is VehiclesLoaded) {
+            setState(() {
+              vehicleList = state.vehicles;
+            });
+          }
+        });
+      } else {
+        person = Person(name: '', socialSecurityNumber: '', email: '');
+      }
     }
   }
 
@@ -161,6 +183,7 @@ class _ManageSettingsState extends State<ManageSettings> {
                                               name: name!,
                                               socialSecurityNumber:
                                                   person.socialSecurityNumber,
+                                              email: person.email,
                                             )));
                                       }
                                     }
@@ -258,7 +281,7 @@ class _ManageSettingsState extends State<ManageSettings> {
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.popUntil(context, ModalRoute.withName('/'));
-                          context.read<AuthCubit>().logout();
+                          context.read<AuthBloc>().authRepository.logout();
                         },
                         child: const Text('Logga ut'),
                       ),
@@ -288,6 +311,10 @@ class _ManageSettingsState extends State<ManageSettings> {
               ),
               TextButton(
                 onPressed: () async {
+                  final index = vehicleList.indexWhere((vehicle) =>
+                      vehicle.owner?.socialSecurityNumber ==
+                      person.socialSecurityNumber);
+
                   if (mounted) {
                     final bloc = context.read<PersonBloc>();
 
@@ -302,7 +329,23 @@ class _ManageSettingsState extends State<ManageSettings> {
                         );
                         setState(() {
                           Navigator.popUntil(context, ModalRoute.withName('/'));
+                          context.read<AuthBloc>().authRepository.logout();
                         });
+
+                        if (index != -1) {
+                          context.read<VehicleBloc>().add(DeleteVehicles(
+                              vehicle: Vehicle(
+                                  id: vehicleList[index].id,
+                                  regNr: vehicleList[index].regNr,
+                                  vehicleType: vehicleList[index].vehicleType,
+                                  owner: Person(
+                                    id: person.id,
+                                    name: person.name,
+                                    socialSecurityNumber:
+                                        person.socialSecurityNumber,
+                                    email: person.email,
+                                  ))));
+                        }
                       } else if (state is PersonsError) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

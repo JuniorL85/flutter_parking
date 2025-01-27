@@ -3,17 +3,15 @@ import 'dart:async';
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:parking_user/bloc/auth_cubit.dart';
-import 'package:parking_user/bloc/person_bloc.dart';
+import 'package:parking_user/bloc/auth/auth_bloc.dart';
+import 'package:parking_user/bloc/person/person_bloc.dart';
 import 'package:parking_user/screens/manage_parkings.dart';
 import 'package:parking_user/screens/manage_settings.dart';
 import 'package:parking_user/screens/manage_vehicle.dart';
 import 'package:parking_user/widgets/home.dart';
 
 class ManageAccount extends StatefulWidget {
-  const ManageAccount({super.key, this.onSetNewState});
-
-  final void Function(int index)? onSetNewState;
+  const ManageAccount({super.key});
 
   @override
   State<ManageAccount> createState() => _ManageAccountState();
@@ -48,7 +46,7 @@ class _ManageAccountState extends State<ManageAccount> {
       if (personState is PersonLoaded) {
         person = personState.person;
       } else {
-        person = Person(name: '', socialSecurityNumber: '');
+        person = Person(name: '', socialSecurityNumber: '', email: '');
       }
       personSubscription = context.read<PersonBloc>().stream.listen((state) {
         if (state is PersonLoaded) {
@@ -62,9 +60,9 @@ class _ManageAccountState extends State<ManageAccount> {
 
   @override
   Widget build(BuildContext context) {
-    final authStatus = context.watch<AuthCubit>().state;
+    final authState = context.watch<AuthBloc>().state;
 
-    if (authStatus == AuthStatus.authenticating) {
+    if (authState is AuthPending || authState is AuthInitial) {
       return const Center(
         child: CircularProgressIndicator(),
       );
@@ -94,7 +92,7 @@ class _ManageAccountState extends State<ManageAccount> {
             IconButton(
               onPressed: () {
                 Navigator.popUntil(context, ModalRoute.withName('/'));
-                context.read<AuthCubit>().logout();
+                context.read<AuthBloc>().authRepository.logout();
               },
               icon: const Icon(Icons.logout_sharp),
             )

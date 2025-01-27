@@ -32,25 +32,37 @@ void main() {
           id: '1',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 1)),
-          parkingSpace:
-              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '1',
+              creatorId: 'Admin1',
+              address: 'Testadress 1',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+              owner: Person(
+                name: 'Namn1',
+                socialSecurityNumber: '111111111111',
+                email: 'test@test1.se',
+              )),
         ),
         Parking(
           id: '2',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 2)),
-          parkingSpace:
-              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '2',
+              creatorId: 'Admin1',
+              address: 'Testadress 2',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn2', socialSecurityNumber: '222222222222')),
+              owner: Person(
+                name: 'Namn2',
+                socialSecurityNumber: '222222222222',
+                email: 'test@test2.se',
+              )),
         )
       ];
 

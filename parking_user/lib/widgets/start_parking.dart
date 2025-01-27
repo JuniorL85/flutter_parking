@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:parking_user/bloc/parking_bloc.dart';
-import 'package:parking_user/bloc/parking_spaces_bloc.dart';
-import 'package:parking_user/bloc/person_bloc.dart';
-import 'package:parking_user/bloc/vehicle_bloc.dart';
+import 'package:parking_user/bloc/parking/parking_bloc.dart';
+import 'package:parking_user/bloc/parking_space/parking_spaces_bloc.dart';
+import 'package:parking_user/bloc/person/person_bloc.dart';
+import 'package:parking_user/bloc/vehicle/vehicle_bloc.dart';
 import 'package:parking_user/widgets/datepicker_parking.dart';
 
 List<ParkingSpace> listAvailableParkingSpaces = [];
@@ -101,6 +101,10 @@ class _StartParkingState extends State<StartParking> {
         });
       }
     }
+  }
+
+  setShortenedId(String id) {
+    return id.substring(0, 5);
   }
 
   @override
@@ -223,9 +227,9 @@ class _StartParkingState extends State<StartParking> {
                                     for (final parkingSpace
                                         in listAvailableParkingSpaces)
                                       DropdownMenuItem(
-                                        value: parkingSpace.id.toString(),
+                                        value: parkingSpace.id,
                                         child: Text(
-                                          '${parkingSpace.id}: ${parkingSpace.address} - ${parkingSpace.pricePerHour}kr/h',
+                                          '${setShortenedId(parkingSpace.id)}: ${parkingSpace.address} - ${parkingSpace.pricePerHour}kr/h',
                                           style: TextStyle(
                                             color: Theme.of(context)
                                                 .colorScheme
@@ -257,8 +261,7 @@ class _StartParkingState extends State<StartParking> {
                                           listAvailableParkingSpaces
                                               .where((parkingSpace) =>
                                                   parkingSpace.id ==
-                                                  int.parse(
-                                                      dropdownAvailableParkingSpaces!))
+                                                  dropdownAvailableParkingSpaces)
                                               .first;
 
                                       if (_selectedDate.value != null &&
@@ -305,21 +308,24 @@ class _StartParkingState extends State<StartParking> {
                                           context.read<ParkingBloc>().add(
                                               CreateParking(
                                                   parking: Parking(
-                                                      vehicle:
-                                                          Vehicle(
-                                                              regNr:
-                                                                  _selectedRegNr!,
-                                                              vehicleType:
-                                                                  vehicleType,
-                                                              owner: person),
+                                                      vehicle: Vehicle(
+                                                          regNr:
+                                                              _selectedRegNr!,
+                                                          vehicleType:
+                                                              vehicleType,
+                                                          owner: person),
                                                       parkingSpace: ParkingSpace(
                                                           id: parkingSpace.id,
+                                                          creatorId: parkingSpace
+                                                              .creatorId,
                                                           address: parkingSpace
                                                               .address,
                                                           pricePerHour:
                                                               parkingSpace
                                                                   .pricePerHour),
-                                                      startTime: DateTime.now(),
+                                                      startTime: DateTime.now()
+                                                          .add(const Duration(
+                                                              hours: 1)),
                                                       endTime: _selectedDate
                                                           .value!)));
                                         }

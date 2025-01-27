@@ -49,11 +49,8 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
     try {
       _vehicleList = await vehicleRepository.getAllVehicles();
       final vehicleListByPerson = _vehicleList
-          .where((vehicle) =>
-              vehicle.owner!.socialSecurityNumber ==
-              person.socialSecurityNumber)
+          .where((vehicle) => vehicle.owner!.id == person.id)
           .toList();
-      await Future.delayed(const Duration(seconds: 2));
       emit(VehiclesLoaded(vehicles: vehicleListByPerson));
     } catch (e) {
       emit(VehiclesError(message: e.toString()));

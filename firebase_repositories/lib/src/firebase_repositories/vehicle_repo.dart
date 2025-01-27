@@ -1,68 +1,59 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:cli_shared/cli_shared.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class VehicleRepository {
   VehicleRepository._privateConstructor();
 
-  static final instance = VehicleRepository._privateConstructor();
+  static final vehicleInstance = VehicleRepository._privateConstructor();
 
-  String host = Platform.isAndroid ? 'http://10.0.2.2' : 'http://localhost';
-  String port = '8080';
-  String resource = 'vehicles';
+  final db = FirebaseFirestore.instance.collection('vehicles');
 
-  Future<dynamic> addVehicle(Vehicle vehicle) async {
-    final uri = Uri.parse('$host:$port/$resource');
+  Future<Vehicle> addVehicle(Vehicle vehicle) async {
+    await db.doc(vehicle.id).set(vehicle.toJson());
 
-    final response = await http.post(uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(vehicle.serialize(vehicle)));
-
-    return response;
+    return vehicle;
   }
 
   Future<List<Vehicle>> getAllVehicles() async {
-    final uri = Uri.parse('$host:$port/$resource');
+    final snapshots = await db.get();
 
-    final response =
-        await http.get(uri, headers: {'Content-Type': 'application/json'});
+    final docs = snapshots.docs;
 
-    final json = jsonDecode(response.body);
+    final jsons = docs.map((doc) {
+      final json = doc.data();
+      json["id"] = doc.id;
 
-    return (json as List).map((vehicle) => Vehicle.fromJson(vehicle)).toList();
+      return json;
+    }).toList();
+
+    return jsons.map((vehicle) => Vehicle.fromJson(vehicle)).toList();
   }
 
   Future<Vehicle> getVehicleById(String id) async {
-    final uri = Uri.parse('$host:$port/$resource/$id');
+    final snapshot = await db.doc(id).get();
 
-    final response = await http.get(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-    );
+    final json = snapshot.data();
 
-    final json = jsonDecode(response.body);
+    if (json == null) {
+      throw Exception("Vehicle with id $id not found");
+    }
+
+    json["id"] = snapshot.id;
 
     return Vehicle.fromJson(json);
   }
 
-  Future<dynamic> updateVehicles(Vehicle vehicle) async {
-    final uri = Uri.parse('$host:$port/$resource');
+  Future<Vehicle> updateVehicles(Vehicle vehicle) async {
+    await db.doc(vehicle.id).set(vehicle.toJson());
 
-    final response = await http.put(uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(vehicle.serialize(vehicle)));
-
-    return response;
+    return vehicle;
   }
 
-  Future<dynamic> deleteVehicle(Vehicle vehicle) async {
-    final uri = Uri.parse('$host:$port/$resource');
+  Future<Vehicle> deleteVehicle(Vehicle vehicle) async {
+    final vehicleById = await getVehicleById(vehicle.id);
 
-    final response = await http.delete(uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(vehicle.serialize(vehicle)));
+    await db.doc(vehicle.id).delete();
 
-    return response;
+    return vehicleById;
   }
 }

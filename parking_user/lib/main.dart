@@ -1,16 +1,20 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_user/bloc/auth/auth_bloc.dart';
 import 'package:parking_user/bloc/auth_cubit.dart';
-import 'package:parking_user/bloc/parking_bloc.dart';
-import 'package:parking_user/bloc/parking_spaces_bloc.dart';
-import 'package:parking_user/bloc/person_bloc.dart';
-import 'package:parking_user/bloc/theme_bloc.dart';
-import 'package:parking_user/bloc/vehicle_bloc.dart';
+import 'package:parking_user/bloc/parking/parking_bloc.dart';
+import 'package:parking_user/bloc/parking_space/parking_spaces_bloc.dart';
+import 'package:parking_user/bloc/person/person_bloc.dart';
+import 'package:parking_user/bloc/theme/theme_bloc.dart';
+import 'package:parking_user/bloc/vehicle/vehicle_bloc.dart';
+import 'package:parking_user/firebase_options.dart';
 import 'package:parking_user/screens/login.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:parking_user/screens/manage_account.dart';
 import 'package:path_provider/path_provider.dart';
 
 void main() async {
@@ -20,6 +24,11 @@ void main() async {
         ? HydratedStorage.webStorageDirectory
         : await getApplicationDocumentsDirectory(),
   );
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]).then((fn) {
@@ -28,30 +37,37 @@ void main() async {
         providers: [
           BlocProvider<PersonBloc>(
             create: (context) =>
-                PersonBloc(personRepository: PersonRepository.instance)
+                PersonBloc(personRepository: PersonRepository.personInstance)
                   ..add(LoadPersons()),
           ),
           BlocProvider<VehicleBloc>(
-            create: (context) =>
-                VehicleBloc(vehicleRepository: VehicleRepository.instance)
-                  ..add(LoadVehicles()),
+            create: (context) => VehicleBloc(
+                vehicleRepository: VehicleRepository.vehicleInstance)
+              ..add(LoadVehicles()),
           ),
           BlocProvider<ParkingBloc>(
-            create: (context) =>
-                ParkingBloc(parkingRepository: ParkingRepository.instance)
-                  ..add(LoadActiveParkings()),
+            create: (context) => ParkingBloc(
+                parkingRepository: ParkingRepository.parkingInstance)
+              ..add(LoadActiveParkings()),
           ),
           BlocProvider<ParkingSpacesBloc>(
             create: (context) => ParkingSpacesBloc(
-                parkingSpaceRepository: ParkingSpaceRepository.instance)
+                parkingSpaceRepository:
+                    ParkingSpaceRepository.parkingSpaceInstance)
               ..add(LoadParkingSpaces()),
           ),
           BlocProvider(
               create: (context) =>
-                  AuthCubit(personRepository: PersonRepository.instance)),
+                  AuthCubit(personRepository: PersonRepository.personInstance)),
           BlocProvider<ThemeBloc>(
             create: (context) => ThemeBloc()..add(InitialThemeEvent()),
           ),
+          BlocProvider<AuthBloc>(
+            create: (context) => AuthBloc(
+                authRepository: AuthRepository(),
+                personRepository: PersonRepository.personInstance)
+              ..add(AuthUserSubscriptionRequested()),
+          )
         ],
         child: const MyApp(),
       ),
@@ -64,6 +80,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.watch<AuthBloc>().state;
+
+    getStateAndPerson(AuthState state) {
+      if (state is Authenticated) {
+        context.read<PersonBloc>().add(LoadPersonsById(id: state.person.id));
+        return const ManageAccount();
+      } else {
+        return const LoginView();
+      }
+    }
+
     return BlocBuilder<ThemeBloc, AppTheme>(builder: (context, state) {
       ThemeData currentTheme;
       if (state == AppTheme.light) {
@@ -87,7 +114,7 @@ class MyApp extends StatelessWidget {
         title: 'ParkHere',
         debugShowCheckedModeBanner: false,
         theme: currentTheme,
-        home: const Login(),
+        home: getStateAndPerson(authState),
         locale: const Locale('sv', ''),
       );
     });

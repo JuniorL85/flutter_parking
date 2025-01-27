@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:cli_shared/cli_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:parking_user/bloc/person_bloc.dart';
-import 'package:parking_user/bloc/vehicle_bloc.dart';
+import 'package:parking_user/bloc/person/person_bloc.dart';
+import 'package:parking_user/bloc/vehicle/vehicle_bloc.dart';
 
 List<String> list = <String>['Bil', 'Motorcykel', 'Annan'];
 
@@ -171,6 +171,12 @@ class _AddVehicleState extends State<AddVehicle> {
                                   );
                                 }
                               });
+                              print(person.id);
+                              print(person.name);
+                              print(person.socialSecurityNumber);
+                              print(person.email);
+                              print(dropdownValue);
+                              print(regNr);
                               context.read<VehicleBloc>().add(CreateVehicle(
                                   vehicle: Vehicle(
                                       regNr: regNr!,
@@ -180,6 +186,7 @@ class _AddVehicleState extends State<AddVehicle> {
                                         name: person.name,
                                         socialSecurityNumber:
                                             person.socialSecurityNumber,
+                                        email: person.email,
                                       ))));
                             }
                           } else {

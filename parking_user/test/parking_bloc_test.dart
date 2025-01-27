@@ -3,7 +3,7 @@ import 'package:cli_shared/cli_shared.dart';
 import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:parking_user/bloc/parking_bloc.dart';
+import 'package:parking_user/bloc/parking/parking_bloc.dart';
 
 class MockParkingRepository extends Mock implements ParkingRepository {}
 
@@ -31,25 +31,37 @@ void main() {
           id: '1',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 1)),
-          parkingSpace:
-              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '1',
+              creatorId: 'Admin1',
+              address: 'Testadress 1',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+              owner: Person(
+                name: 'Namn1',
+                socialSecurityNumber: '111111111111',
+                email: 'test@test1.se',
+              )),
         ),
         Parking(
           id: '2',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 2)),
-          parkingSpace:
-              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '2',
+              creatorId: 'Admin1',
+              address: 'Testadress 2',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn2', socialSecurityNumber: '222222222222')),
+              owner: Person(
+                name: 'Namn2',
+                socialSecurityNumber: '222222222222',
+                email: 'test@test2.se',
+              )),
         )
       ];
 
@@ -91,25 +103,37 @@ void main() {
           id: '1',
           startTime: DateTime.now().add(const Duration(hours: -2)),
           endTime: DateTime.now().add(const Duration(hours: -1)),
-          parkingSpace:
-              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '1',
+              creatorId: 'Admin1',
+              address: 'Testadress 1',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+              owner: Person(
+                name: 'Namn1',
+                socialSecurityNumber: '111111111111',
+                email: 'test@test1.se',
+              )),
         ),
         Parking(
           id: '2',
           startTime: DateTime.now().add(const Duration(hours: -3)),
           endTime: DateTime.now().add(const Duration(hours: -2)),
-          parkingSpace:
-              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '2',
+              creatorId: 'Admin1',
+              address: 'Testadress 2',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn2', socialSecurityNumber: '222222222222')),
+              owner: Person(
+                name: 'Namn2',
+                socialSecurityNumber: '222222222222',
+                email: 'test@test2.se',
+              )),
         )
       ];
 
@@ -150,37 +174,56 @@ void main() {
       final newParking = Parking(
         startTime: DateTime.now(),
         endTime: DateTime.now().add(const Duration(hours: 1)),
-        parkingSpace:
-            ParkingSpace(id: '1', address: 'Testadress 3', pricePerHour: 10),
+        parkingSpace: ParkingSpace(
+            id: '1',
+            creatorId: 'Admin1',
+            address: 'Testadress 3',
+            pricePerHour: 10),
         vehicle: Vehicle(
             regNr: 'REG333',
             vehicleType: 'Car',
-            owner: Person(name: 'Namn3', socialSecurityNumber: '333333333333')),
+            owner: Person(
+              name: 'Namn3',
+              socialSecurityNumber: '333333333333',
+              email: 'test@test3.se',
+            )),
       );
       final existingParkings = [
         Parking(
           id: '1',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 1)),
-          parkingSpace:
-              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '1',
+              creatorId: 'Admin1',
+              address: 'Testadress 1',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+              owner: Person(
+                name: 'Namn1',
+                socialSecurityNumber: '111111111111',
+                email: 'test@test1.se',
+              )),
         ),
         Parking(
           id: '2',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 2)),
-          parkingSpace:
-              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '2',
+              creatorId: 'Admin1',
+              address: 'Testadress 2',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn2', socialSecurityNumber: '222222222222')),
+              owner: Person(
+                name: 'Namn2',
+                socialSecurityNumber: '222222222222',
+                email: 'test@test2.se',
+              )),
         )
       ];
 
@@ -225,37 +268,56 @@ void main() {
         id: '1',
         startTime: DateTime.now(),
         endTime: DateTime.now().add(const Duration(hours: 3)),
-        parkingSpace:
-            ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+        parkingSpace: ParkingSpace(
+            id: '1',
+            creatorId: 'Admin1',
+            address: 'Testadress 1',
+            pricePerHour: 10),
         vehicle: Vehicle(
             regNr: 'REG111',
             vehicleType: 'Car',
-            owner: Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+            owner: Person(
+              name: 'Namn1',
+              socialSecurityNumber: '111111111111',
+              email: 'test@test1.se',
+            )),
       );
       final existingParkings = [
         Parking(
           id: '1',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 1)),
-          parkingSpace:
-              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '1',
+              creatorId: 'Admin1',
+              address: 'Testadress 1',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+              owner: Person(
+                name: 'Namn1',
+                socialSecurityNumber: '111111111111',
+                email: 'test@test1.se',
+              )),
         ),
         Parking(
           id: '2',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 2)),
-          parkingSpace:
-              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '2',
+              creatorId: 'Admin1',
+              address: 'Testadress 2',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn2', socialSecurityNumber: '222222222222')),
+              owner: Person(
+                name: 'Namn2',
+                socialSecurityNumber: '222222222222',
+                email: 'test@test2.se',
+              )),
         )
       ];
       blocTest<ParkingBloc, ParkingState>(
@@ -300,37 +362,56 @@ void main() {
         id: '1',
         startTime: DateTime.now(),
         endTime: DateTime.now().add(const Duration(hours: 1)),
-        parkingSpace:
-            ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+        parkingSpace: ParkingSpace(
+            id: '1',
+            creatorId: 'Admin1',
+            address: 'Testadress 1',
+            pricePerHour: 10),
         vehicle: Vehicle(
             regNr: 'REG111',
             vehicleType: 'Car',
-            owner: Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+            owner: Person(
+              name: 'Namn1',
+              socialSecurityNumber: '111111111111',
+              email: 'test@test1.se',
+            )),
       );
       final existingParkings = [
         Parking(
           id: '1',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 1)),
-          parkingSpace:
-              ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '1',
+              creatorId: 'Admin1',
+              address: 'Testadress 1',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG111',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn1', socialSecurityNumber: '111111111111')),
+              owner: Person(
+                name: 'Namn1',
+                socialSecurityNumber: '111111111111',
+                email: 'test@test1.se',
+              )),
         ),
         Parking(
           id: '2',
           startTime: DateTime.now(),
           endTime: DateTime.now().add(const Duration(hours: 2)),
-          parkingSpace:
-              ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 10),
+          parkingSpace: ParkingSpace(
+              id: '2',
+              creatorId: 'Admin1',
+              address: 'Testadress 2',
+              pricePerHour: 10),
           vehicle: Vehicle(
               regNr: 'REG222',
               vehicleType: 'Car',
-              owner:
-                  Person(name: 'Namn2', socialSecurityNumber: '222222222222')),
+              owner: Person(
+                name: 'Namn2',
+                socialSecurityNumber: '222222222222',
+                email: 'test@test2.se',
+              )),
         )
       ];
 

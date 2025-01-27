@@ -167,7 +167,7 @@ class _MonitoringState extends State<Monitoring> {
                                 return Text(
                                   'Id: ${parking.parkingSpace?.id}, '
                                   'Adress: ${parking.parkingSpace?.address}, '
-                                  'Parkerad på: ${mapData[parking.parkingSpace?.id]}',
+                                  'Parkerad på: ${mapData[int.tryParse(parking.parkingSpace!.id)]}',
                                 );
                               }).toList(),
                             ),
@@ -249,8 +249,7 @@ class _MonitoringState extends State<Monitoring> {
                 TextButton(
                   onPressed: () {
                     setState(() {
-                      activeParkingsList.sort(
-                          (a, b) => a.id.toString().compareTo(b.id.toString()));
+                      activeParkingsList.sort((a, b) => a.id.compareTo(b.id));
                     });
                   },
                   child: const Text('Sortera på id stigande'),
@@ -259,8 +258,7 @@ class _MonitoringState extends State<Monitoring> {
                 TextButton(
                   onPressed: () {
                     setState(() {
-                      activeParkingsList.sort(
-                          (a, b) => b.id.toString().compareTo(a.id.toString()));
+                      activeParkingsList.sort((a, b) => b.id.compareTo(a.id));
                     });
                   },
                   child: const Text('Sortera på id fallande'),

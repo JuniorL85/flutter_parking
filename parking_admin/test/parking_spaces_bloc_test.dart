@@ -28,8 +28,16 @@ void main() {
 
     group("Load parkingSpaces", () {
       final existingParkingSpaces = [
-        ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
-        ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 20)
+        ParkingSpace(
+            id: '1',
+            creatorId: 'Admin1',
+            address: 'Testadress 1',
+            pricePerHour: 10),
+        ParkingSpace(
+            id: '2',
+            creatorId: 'Admin1',
+            address: 'Testadress 2',
+            pricePerHour: 20)
       ];
 
       blocTest<ParkingSpacesBloc, ParkingSpacesState>(
@@ -67,10 +75,20 @@ void main() {
 
     group("Create parkingSpace", () {
       final newParkingSpace = ParkingSpace(
-          address: 'Testadress 44, 555 66 Testar', pricePerHour: 12);
+          creatorId: 'Admin1',
+          address: 'Testadress 44, 555 66 Testar',
+          pricePerHour: 12);
       final existingParkingSpaces = [
-        ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
-        ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 20)
+        ParkingSpace(
+            id: '1',
+            creatorId: 'Admin1',
+            address: 'Testadress 1',
+            pricePerHour: 10),
+        ParkingSpace(
+            id: '2',
+            creatorId: 'Admin1',
+            address: 'Testadress 2',
+            pricePerHour: 20)
       ];
 
       blocTest<ParkingSpacesBloc, ParkingSpacesState>(
@@ -113,11 +131,22 @@ void main() {
     });
 
     group("Update parkingSpace", () {
-      final parkingSpaceToUpdate =
-          ParkingSpace(id: '1', address: 'Testadress 11', pricePerHour: 10);
+      final parkingSpaceToUpdate = ParkingSpace(
+          id: '1',
+          creatorId: 'Admin1',
+          address: 'Testadress 11',
+          pricePerHour: 10);
       final existingParkingSpaces = [
-        ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
-        ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 20)
+        ParkingSpace(
+            id: '1',
+            creatorId: 'Admin1',
+            address: 'Testadress 1',
+            pricePerHour: 10),
+        ParkingSpace(
+            id: '2',
+            creatorId: 'Admin1',
+            address: 'Testadress 2',
+            pricePerHour: 20)
       ];
 
       blocTest<ParkingSpacesBloc, ParkingSpacesState>(
@@ -161,11 +190,22 @@ void main() {
     });
 
     group("Delete parkingSpace", () {
-      final parkingSpaceToDelete =
-          ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10);
+      final parkingSpaceToDelete = ParkingSpace(
+          id: '1',
+          creatorId: 'Admin1',
+          address: 'Testadress 1',
+          pricePerHour: 10);
       final existingParkingSpaces = [
-        ParkingSpace(id: '1', address: 'Testadress 1', pricePerHour: 10),
-        ParkingSpace(id: '2', address: 'Testadress 2', pricePerHour: 20)
+        ParkingSpace(
+            id: '1',
+            creatorId: 'Admin1',
+            address: 'Testadress 1',
+            pricePerHour: 10),
+        ParkingSpace(
+            id: '2',
+            creatorId: 'Admin1',
+            address: 'Testadress 2',
+            pricePerHour: 20)
       ];
 
       blocTest<ParkingSpacesBloc, ParkingSpacesState>(

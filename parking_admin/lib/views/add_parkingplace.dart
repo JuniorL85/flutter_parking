@@ -137,6 +137,7 @@ class _AddParkingplaceState extends State<AddParkingplace> {
                               context.read<ParkingSpacesBloc>().add(
                                   CreateParkingSpace(
                                       parkingSpace: ParkingSpace(
+                                          creatorId: 'Admin1',
                                           address: address!,
                                           pricePerHour:
                                               int.parse(pricePerHour!))));
