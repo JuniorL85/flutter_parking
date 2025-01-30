@@ -223,6 +223,10 @@ class _ManageParkingsState extends State<ManageParkings> {
                             children: [
                               IconButton(
                                   onPressed: () async {
+                                    setState(() {
+                                      findActiveParking();
+                                    });
+
                                     if (widget.isScheduled) {
                                       context.read<NotificationBloc>().add(
                                           CancelNotification(
@@ -242,6 +246,8 @@ class _ManageParkingsState extends State<ManageParkings> {
                                               deliveryTime: parkingList[
                                                       foundActiveParking!]
                                                   .endTime));
+                                      print(
+                                          'Notification endTime: ${parkingList[foundActiveParking!].endTime}');
                                     }
                                   },
                                   icon: !widget.isScheduled
