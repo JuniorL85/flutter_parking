@@ -5,6 +5,7 @@ import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:parking_user/bloc/notifications/notification_bloc.dart';
 import 'package:parking_user/bloc/parking/parking_bloc.dart';
 import 'package:parking_user/bloc/person/person_bloc.dart';
 import 'package:parking_user/bloc/vehicle/vehicle_bloc.dart';
@@ -17,6 +18,7 @@ class ManageParkings extends StatefulWidget {
   ManageParkings({super.key});
 
   bool isActiveParking = false;
+  bool isScheduled = false;
 
   @override
   State<ManageParkings> createState() => _ManageParkingsState();
@@ -108,10 +110,17 @@ class _ManageParkingsState extends State<ManageParkings> {
         return matchingVehicle;
       }).toList();
 
+      NotificationState notificationState =
+          context.read<NotificationBloc>().state;
+
       setState(() {
         parkingList = filteredParkings;
         foundActiveParking = parkingList.isEmpty ? -1 : 0;
         widget.isActiveParking = foundActiveParking != -1;
+        widget.isScheduled = foundActiveParking != -1
+            ? notificationState
+                .isIdScheduled(parkingList[foundActiveParking!].id)
+            : false;
       });
     }
   }
@@ -212,6 +221,35 @@ class _ManageParkingsState extends State<ManageParkings> {
                         children: <Widget>[
                           Column(
                             children: [
+                              IconButton(
+                                  onPressed: () async {
+                                    if (widget.isScheduled) {
+                                      context.read<NotificationBloc>().add(
+                                          CancelNotification(
+                                              id: parkingList[
+                                                      foundActiveParking!]
+                                                  .id));
+                                    } else {
+                                      context.read<NotificationBloc>().add(
+                                          ScheduleNotification(
+                                              id: parkingList[
+                                                      foundActiveParking!]
+                                                  .id,
+                                              title:
+                                                  "Din parkering håller på att gå ut",
+                                              content:
+                                                  'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}',
+                                              deliveryTime: parkingList[
+                                                      foundActiveParking!]
+                                                  .endTime));
+                                    }
+                                  },
+                                  icon: !widget.isScheduled
+                                      ? const Icon(Icons.notification_add)
+                                      : const Icon(
+                                          Icons.notification_important,
+                                          color: Colors.red,
+                                        )),
                               Text(
                                   'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}'),
                               Text(

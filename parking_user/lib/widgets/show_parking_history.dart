@@ -117,8 +117,9 @@ class _ShowParkingHistoryState extends State<ShowParkingHistory> {
                               return Padding(
                                 padding: const EdgeInsets.all(3.0),
                                 child: ListTile(
-                                    leading: Text(
-                                        parking.parkingSpace!.id.toString()),
+                                    leading: Text(parking.parkingSpace!.id
+                                        .substring(0, 5)
+                                        .toString()),
                                     title: Text(
                                       parking.parkingSpace!.address,
                                       style: TextStyle(

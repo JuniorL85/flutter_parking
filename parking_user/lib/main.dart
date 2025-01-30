@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:parking_user/bloc/auth/auth_bloc.dart';
-import 'package:parking_user/bloc/auth_cubit.dart';
+import 'package:parking_user/bloc/notifications/notification_bloc.dart';
 import 'package:parking_user/bloc/parking/parking_bloc.dart';
 import 'package:parking_user/bloc/parking_space/parking_spaces_bloc.dart';
 import 'package:parking_user/bloc/person/person_bloc.dart';
@@ -28,6 +28,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  NotificationsRepository notificationsRepository =
+      await NotificationsRepository.initialize();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -56,12 +59,11 @@ void main() async {
                     ParkingSpaceRepository.parkingSpaceInstance)
               ..add(LoadParkingSpaces()),
           ),
-          BlocProvider(
-              create: (context) =>
-                  AuthCubit(personRepository: PersonRepository.personInstance)),
           BlocProvider<ThemeBloc>(
             create: (context) => ThemeBloc()..add(InitialThemeEvent()),
           ),
+          BlocProvider<NotificationBloc>(
+              create: (context) => NotificationBloc(notificationsRepository)),
           BlocProvider<AuthBloc>(
             create: (context) => AuthBloc(
                 authRepository: AuthRepository(),
