@@ -240,12 +240,14 @@ class _ManageParkingsState extends State<ManageParkings> {
                                                       foundActiveParking!]
                                                   .id,
                                               title:
-                                                  "Din parkering håller på att gå ut",
+                                                  "Din parkering går ut om 15 min",
                                               content:
                                                   'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}',
                                               deliveryTime: parkingList[
                                                       foundActiveParking!]
-                                                  .endTime));
+                                                  .endTime
+                                                  .add(const Duration(
+                                                      minutes: -15))));
                                       print(
                                           'Notification endTime: ${parkingList[foundActiveParking!].endTime}');
                                     }
