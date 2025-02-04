@@ -163,10 +163,15 @@ class _MonitoringState extends State<Monitoring> {
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: mostPopularParkings.map((parking) {
-                                return Text(
-                                  'Id: ${parking.parkingSpace?.id}, '
-                                  'Adress: ${parking.parkingSpace?.address}, '
-                                  'Parkerad på (antal): ${mapData[parking.parkingSpace!.id]}',
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Id: ${parking.parkingSpace?.id}'),
+                                    Text(
+                                        'Adress: ${parking.parkingSpace?.address}'),
+                                    Text(
+                                        'Antal ggr parkerad på: ${mapData[parking.parkingSpace!.id]}'),
+                                  ],
                                 );
                               }).toList(),
                             ),
