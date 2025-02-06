@@ -25,6 +25,9 @@ class NotificationBloc
 
         case CancelNotification(:final id):
           await _onCancelNotification(id, emit);
+
+        // case NotificationActionReceived(:final actionId, :final notificationId):
+        //   _onNotificationActionReceived(actionId, notificationId, emit);
       }
     });
   }
@@ -56,6 +59,19 @@ class NotificationBloc
     newState[id] = notificationId;
     emit(NotificationState(scheduledIds: newState));
   }
+
+  // void _onNotificationActionReceived(
+  //     String actionId, String notificationId, Emitter<NotificationState> emit) {
+  //   print("User selected action: $actionId for notification: $notificationId");
+
+  //   // You can store the response in the state if needed
+  //   emit(
+  //     NotificationState(
+  //       scheduledIds: state.scheduledIds,
+  //       lastAction: {'id': notificationId, 'action': actionId},
+  //     ),
+  //   );
+  // }
 
   @override
   NotificationState? fromJson(Map<String, dynamic> json) {

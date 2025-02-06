@@ -41,6 +41,19 @@ class _ManageParkingsState extends State<ManageParkings> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => findActiveParking());
+    // AppLifecycleListener(
+    //   onResume: () {
+    //     if (!mounted) return;
+    //     final lastActionVar =
+    //         context.watch<NotificationBloc>().state.lastAction;
+    //     print('lastAction $lastActionVar');
+    //   },
+    // );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override
@@ -81,6 +94,7 @@ class _ManageParkingsState extends State<ManageParkings> {
         return;
       }
 
+      if (!mounted) return;
       context.read<ParkingBloc>().add(LoadActiveParkings());
       final parkingState =
           await context.read<ParkingBloc>().stream.firstWhere((state) {
@@ -110,17 +124,29 @@ class _ManageParkingsState extends State<ManageParkings> {
         return matchingVehicle;
       }).toList();
 
-      NotificationState notificationState =
-          context.read<NotificationBloc>().state;
+      // if (!mounted) return;
+      // NotificationState notificationState =
+      //     context.read<NotificationBloc>().state;
 
       setState(() {
         parkingList = filteredParkings;
         foundActiveParking = parkingList.isEmpty ? -1 : 0;
         widget.isActiveParking = foundActiveParking != -1;
-        widget.isScheduled = foundActiveParking != -1
-            ? notificationState
-                .isIdScheduled(parkingList[foundActiveParking!].id)
-            : false;
+        // widget.isScheduled = foundActiveParking != -1
+        //     ? notificationState
+        //         .isIdScheduled(parkingList[foundActiveParking!].id)
+        //     : false;
+
+        if (foundActiveParking != -1) {
+          context.read<NotificationBloc>().add(ScheduleNotification(
+              id: parkingList[foundActiveParking!].id,
+              title: "Din parkering går ut om 15 min",
+              content:
+                  'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}',
+              deliveryTime: parkingList[foundActiveParking!]
+                  .endTime
+                  .add(const Duration(minutes: -15))));
+        }
       });
     }
   }
@@ -221,43 +247,41 @@ class _ManageParkingsState extends State<ManageParkings> {
                         children: <Widget>[
                           Column(
                             children: [
-                              IconButton(
-                                  onPressed: () async {
-                                    setState(() {
-                                      findActiveParking();
-                                    });
+                              // IconButton(
+                              //     onPressed: () async {
+                              //       setState(() {
+                              //         findActiveParking();
+                              //       });
 
-                                    if (widget.isScheduled) {
-                                      context.read<NotificationBloc>().add(
-                                          CancelNotification(
-                                              id: parkingList[
-                                                      foundActiveParking!]
-                                                  .id));
-                                    } else {
-                                      context.read<NotificationBloc>().add(
-                                          ScheduleNotification(
-                                              id: parkingList[
-                                                      foundActiveParking!]
-                                                  .id,
-                                              title:
-                                                  "Din parkering går ut om 15 min",
-                                              content:
-                                                  'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}',
-                                              deliveryTime: parkingList[
-                                                      foundActiveParking!]
-                                                  .endTime
-                                                  .add(const Duration(
-                                                      minutes: -15))));
-                                      print(
-                                          'Notification endTime: ${parkingList[foundActiveParking!].endTime}');
-                                    }
-                                  },
-                                  icon: !widget.isScheduled
-                                      ? const Icon(Icons.notification_add)
-                                      : const Icon(
-                                          Icons.notification_important,
-                                          color: Colors.red,
-                                        )),
+                              //       if (widget.isScheduled) {
+                              //         context.read<NotificationBloc>().add(
+                              //             CancelNotification(
+                              //                 id: parkingList[
+                              //                         foundActiveParking!]
+                              //                     .id));
+                              //       } else {
+                              //         context.read<NotificationBloc>().add(
+                              //             ScheduleNotification(
+                              //                 id: parkingList[
+                              //                         foundActiveParking!]
+                              //                     .id,
+                              //                 title:
+                              //                     "Din parkering går ut om 15 min",
+                              //                 content:
+                              //                     'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}',
+                              //                 deliveryTime: parkingList[
+                              //                         foundActiveParking!]
+                              //                     .endTime
+                              //                     .add(const Duration(
+                              //                         minutes: -15))));
+                              //       }
+                              //     },
+                              //     icon: !widget.isScheduled
+                              //         ? const Icon(Icons.notification_add)
+                              //         : const Icon(
+                              //             Icons.notification_important,
+                              //             color: Colors.red,
+                              //           )),
                               Text(
                                   'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}'),
                               Text(

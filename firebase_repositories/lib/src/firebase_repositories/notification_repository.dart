@@ -21,12 +21,30 @@ Future<void> _configureLocalTimeZone() async {
 Future<FlutterLocalNotificationsPlugin> initializeNotifications() async {
   var flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   var initializationSettingsAndroid = const AndroidInitializationSettings(
-      '@mipmap/ic_launcher'); // TODO: Change this to an icon of your choice if you want to fix it.
+      '@mipmap/ic_parkhere'); // TODO: Change this to an icon of your choice if you want to fix it.
   var initializationSettingsIOS = const DarwinInitializationSettings();
   var initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: (NotificationResponse response) {
+      handleNotificationAction(response);
+    },
+  );
   return flutterLocalNotificationsPlugin;
+}
+
+void handleNotificationAction(NotificationResponse response) {
+  switch (response.actionId) {
+    case 'accept':
+      print("User accepted the action.");
+      break;
+    case 'decline':
+      print("User declined the action.");
+      break;
+    default:
+      print("Notification clicked.");
+  }
 }
 
 class NotificationsRepository {
@@ -75,7 +93,11 @@ class NotificationsRepository {
         channelDescription: channelDescription,
         importance: Importance.max,
         priority: Priority.high,
-        ticker: 'ticker');
+        ticker: 'ticker',
+        actions: [
+          const AndroidNotificationAction('accept', 'Förläng 1h',
+              showsUserInterface: true),
+        ]);
     var iOSPlatformChannelSpecifics = const DarwinNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,

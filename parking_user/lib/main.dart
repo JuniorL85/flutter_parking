@@ -117,7 +117,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: currentTheme,
         home: getStateAndPerson(authState),
-        locale: const Locale('sv', ''),
+        locale: const Locale('sv', 'SE'),
       );
     });
   }

@@ -22,3 +22,15 @@ class CancelNotification extends NotificationEvent {
     required this.id,
   });
 }
+
+// class NotificationActionReceived extends NotificationEvent {
+//   final String actionId;
+//   final String notificationId;
+
+//   NotificationActionReceived({
+//     required this.actionId,
+//     required this.notificationId,
+//   });
+
+//   List<Object?> get props => [actionId, notificationId];
+// }
