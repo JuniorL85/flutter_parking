@@ -31,6 +31,7 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text('ParkHere'),
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -38,9 +39,28 @@ class _LoginViewState extends State<LoginView> {
                 begin: Alignment.bottomLeft,
                 end: Alignment.topRight,
                 colors: <Color>[
-                  Theme.of(context).colorScheme.onInverseSurface,
-                  Theme.of(context).colorScheme.inversePrimary
+                  Theme.of(context).colorScheme.inversePrimary,
+                  Theme.of(context).colorScheme.onInverseSurface
                 ]),
+          ),
+        ),
+        leading: Container(
+          margin: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Theme.of(context).colorScheme.onSecondary,
+            ),
+          ),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Image.asset(
+              'assets/images/ph.png',
+              height: 40,
+              width: 40,
+              opacity: const AlwaysStoppedAnimation(0.5),
+              color: Theme.of(context).colorScheme.onInverseSurface,
+            ),
           ),
         ),
       ),
