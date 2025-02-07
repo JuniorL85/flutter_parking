@@ -69,12 +69,14 @@ class _ManageAccountState extends State<ManageAccount> {
     } else {
       return Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           title: Text(
             'Välkommen ${person.name}',
             style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface),
+              fontSize: 20,
+              color: Theme.of(context).colorScheme.onSurface,
+              fontStyle: FontStyle.italic,
+            ),
           ),
           flexibleSpace: Container(
             decoration: BoxDecoration(
@@ -82,12 +84,31 @@ class _ManageAccountState extends State<ManageAccount> {
                   begin: Alignment.bottomLeft,
                   end: Alignment.topRight,
                   colors: <Color>[
-                    Theme.of(context).colorScheme.onInverseSurface,
-                    Theme.of(context).colorScheme.inversePrimary
+                    Theme.of(context).colorScheme.inversePrimary,
+                    Theme.of(context).colorScheme.onInverseSurface
                   ]),
             ),
           ),
           automaticallyImplyLeading: false,
+          leading: Container(
+            margin: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
+            ),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Image.asset(
+                'assets/images/ph.png',
+                height: 40,
+                width: 40,
+                opacity: const AlwaysStoppedAnimation(0.5),
+                color: Theme.of(context).colorScheme.onInverseSurface,
+              ),
+            ),
+          ),
           actions: [
             IconButton(
               onPressed: () {

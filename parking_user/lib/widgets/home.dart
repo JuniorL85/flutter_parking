@@ -5,8 +5,15 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Välj bland nedanstående alternativ vad du vill göra'),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Image.asset(
+          'assets/images/parkHere1.png',
+          fit: BoxFit.cover,
+          opacity: const AlwaysStoppedAnimation(.1),
+        ),
+      ),
     );
   }
 }
