@@ -55,6 +55,8 @@ class _ShowParkingHistoryState extends State<ShowParkingHistory> {
                     parking.vehicle?.owner?.socialSecurityNumber ==
                     person.socialSecurityNumber)
                 .toList();
+            parkingList.sort((a, b) =>
+                a.startTime.toString().compareTo(b.startTime.toString()));
           });
         }
 
@@ -67,6 +69,8 @@ class _ShowParkingHistoryState extends State<ShowParkingHistory> {
                       parking.vehicle?.owner?.socialSecurityNumber ==
                       person.socialSecurityNumber)
                   .toList();
+              parkingList.sort((a, b) =>
+                  a.startTime.toString().compareTo(b.startTime.toString()));
             });
           }
         });
@@ -82,7 +86,7 @@ class _ShowParkingHistoryState extends State<ShowParkingHistory> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          'Din parkeringshistorik',
+          'Parkeringshistorik',
           style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -136,9 +140,18 @@ class _ShowParkingHistoryState extends State<ShowParkingHistory> {
                                         ]),
                                   ),
                                   child: ListTile(
-                                      leading: Text(parking.parkingSpace!.id
-                                          .substring(0, 5)
-                                          .toString()),
+                                      leading: Column(
+                                        children: [
+                                          Text(
+                                            DateFormat('dd')
+                                                .format(parking.startTime),
+                                            style:
+                                                const TextStyle(fontSize: 24),
+                                          ),
+                                          Text(DateFormat('MMM')
+                                              .format(parking.startTime)),
+                                        ],
+                                      ),
                                       title: Text(
                                         parking.parkingSpace!.address,
                                         style: TextStyle(
@@ -146,10 +159,41 @@ class _ShowParkingHistoryState extends State<ShowParkingHistory> {
                                                 .colorScheme
                                                 .onSurface),
                                       ),
-                                      subtitle: Text(
-                                          '${DateFormat('yyyy-MM-dd kk:mm').format(parking.startTime)} - ${DateFormat('yyyy-MM-dd kk:mm').format(parking.endTime)}'),
-                                      trailing: Text(
-                                          '${calculateDuration(parking.startTime, parking.endTime, parking.parkingSpace!.pricePerHour).toStringAsFixed(2)} kr'),
+                                      subtitle: Column(
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  const Icon(
+                                                      Icons.schedule_sharp),
+                                                  const SizedBox(width: 5),
+                                                  Text(
+                                                      '${DateFormat('kk:mm').format(parking.startTime)} - ${DateFormat('kk:mm').format(parking.endTime)}'),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  const Icon(Icons.tag),
+                                                  Text(parking.parkingSpace!.id
+                                                      .substring(0, 5)
+                                                      .toString()),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              const Icon(Icons.paid_sharp),
+                                              const SizedBox(width: 5),
+                                              Text(
+                                                  '${calculateDuration(parking.startTime, parking.endTime, parking.parkingSpace!.pricePerHour).toStringAsFixed(2)} kr'),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                       tileColor: Theme.of(context)
                                           .colorScheme
                                           .inversePrimary,

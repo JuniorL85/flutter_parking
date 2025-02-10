@@ -75,7 +75,7 @@ class _ShowVehiclesState extends State<ShowVehicles> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          'Dina fordon',
+          'Fordon',
           style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -95,21 +95,6 @@ class _ShowVehiclesState extends State<ShowVehicles> {
       ),
       body: Column(
         children: [
-          // const SizedBox(height: 50),
-          // Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.center,
-          //     children: [
-          //       Text(
-          //         'Dina fordon',
-          //         style: TextStyle(
-          //             fontSize: 24,
-          //             color: Theme.of(context).colorScheme.inversePrimary),
-          //       ),
-          //     ],
-          //   ),
-          // ),
           BlocBuilder<VehicleBloc, VehicleState>(
             builder: (context, state) {
               if (state is VehiclesInitial || state is VehiclesLoading) {
