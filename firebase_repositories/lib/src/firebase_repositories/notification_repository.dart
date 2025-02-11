@@ -89,21 +89,21 @@ class NotificationsRepository {
     String channelDescription =
         "Standard notifications"; // description is optional but shows up in user system settings
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        channelId, channelName,
-        channelDescription: channelDescription,
-        importance: Importance.max,
-        priority: Priority.high,
-        ticker: 'ticker',
-        actions: [
-          const AndroidNotificationAction('accept', 'Förläng 1h',
-              showsUserInterface: true),
-        ]);
+      channelId,
+      channelName,
+      channelDescription: channelDescription,
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+      // actions: [
+      //   const AndroidNotificationAction('accept', 'Förläng 1h',
+      //       showsUserInterface: true),
+      // ],
+    );
     var iOSPlatformChannelSpecifics = const DarwinNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
         iOS: iOSPlatformChannelSpecifics);
-
-    // from docs, not sure about specifics
 
     return await _flutterLocalNotificationsPlugin.zonedSchedule(
         id,
@@ -119,7 +119,7 @@ class NotificationsRepository {
             UILocalNotificationDateInterpretation.absoluteTime);
   }
 
-  Future<void> requestPermissions() async {
+  Future<dynamic> requestPermissions() async {
     if (Platform.isIOS || Platform.isMacOS) {
       await _flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
@@ -143,7 +143,10 @@ class NotificationsRepository {
               .resolvePlatformSpecificImplementation<
                   AndroidFlutterLocalNotificationsPlugin>();
 
-      await androidImplementation?.requestNotificationsPermission();
+      final permission =
+          await androidImplementation?.requestNotificationsPermission();
+
+      return permission;
     }
   }
 }

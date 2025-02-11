@@ -36,10 +36,12 @@ class _ManageParkingsState extends State<ManageParkings> {
   StreamSubscription? parkingSubscription;
   StreamSubscription? _updateParkingSubscription;
   StreamSubscription? _deleteParkingSubscription;
+  bool permission = false;
 
   @override
   void initState() {
     super.initState();
+    requestPermission();
     WidgetsBinding.instance.addPostFrameCallback((_) => findActiveParking());
     // AppLifecycleListener(
     //   onResume: () {
@@ -64,6 +66,13 @@ class _ManageParkingsState extends State<ManageParkings> {
     _updateParkingSubscription?.cancel();
     _deleteParkingSubscription?.cancel();
     super.dispose();
+  }
+
+  requestPermission() {
+    if (permission == false) {
+      context.read<NotificationBloc>().add(RequestPermission());
+      findActiveParking();
+    }
   }
 
   findActiveParking() async {
@@ -124,20 +133,16 @@ class _ManageParkingsState extends State<ManageParkings> {
         return matchingVehicle;
       }).toList();
 
-      // if (!mounted) return;
-      // NotificationState notificationState =
-      //     context.read<NotificationBloc>().state;
+      if (context.read<NotificationBloc>().state.permission != null) {
+        permission = context.read<NotificationBloc>().state.permission!;
+      }
 
       setState(() {
         parkingList = filteredParkings;
         foundActiveParking = parkingList.isEmpty ? -1 : 0;
         widget.isActiveParking = foundActiveParking != -1;
-        // widget.isScheduled = foundActiveParking != -1
-        //     ? notificationState
-        //         .isIdScheduled(parkingList[foundActiveParking!].id)
-        //     : false;
 
-        if (foundActiveParking != -1) {
+        if (foundActiveParking != -1 && permission == true) {
           context.read<NotificationBloc>().add(ScheduleNotification(
               id: parkingList[foundActiveParking!].id,
               title: "Din parkering går ut om 15 min",
@@ -247,41 +252,6 @@ class _ManageParkingsState extends State<ManageParkings> {
                         children: <Widget>[
                           Column(
                             children: [
-                              // IconButton(
-                              //     onPressed: () async {
-                              //       setState(() {
-                              //         findActiveParking();
-                              //       });
-
-                              //       if (widget.isScheduled) {
-                              //         context.read<NotificationBloc>().add(
-                              //             CancelNotification(
-                              //                 id: parkingList[
-                              //                         foundActiveParking!]
-                              //                     .id));
-                              //       } else {
-                              //         context.read<NotificationBloc>().add(
-                              //             ScheduleNotification(
-                              //                 id: parkingList[
-                              //                         foundActiveParking!]
-                              //                     .id,
-                              //                 title:
-                              //                     "Din parkering går ut om 15 min",
-                              //                 content:
-                              //                     'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}',
-                              //                 deliveryTime: parkingList[
-                              //                         foundActiveParking!]
-                              //                     .endTime
-                              //                     .add(const Duration(
-                              //                         minutes: -15))));
-                              //       }
-                              //     },
-                              //     icon: !widget.isScheduled
-                              //         ? const Icon(Icons.notification_add)
-                              //         : const Icon(
-                              //             Icons.notification_important,
-                              //             color: Colors.red,
-                              //           )),
                               Text(
                                   'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}'),
                               Text(

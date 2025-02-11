@@ -26,10 +26,18 @@ class NotificationBloc
         case CancelNotification(:final id):
           await _onCancelNotification(id, emit);
 
+        case RequestPermission():
+          await _onRequestPermission(emit);
+
         // case NotificationActionReceived(:final actionId, :final notificationId):
         //   _onNotificationActionReceived(actionId, notificationId, emit);
       }
     });
+  }
+
+  Future<dynamic> _onRequestPermission(Emitter<NotificationState> emit) async {
+    final permission = await repository.requestPermissions();
+    emit(NotificationState(scheduledIds: const {}, permission: permission));
   }
 
   Future<void> _onCancelNotification(

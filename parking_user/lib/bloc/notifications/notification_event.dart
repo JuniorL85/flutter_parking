@@ -23,6 +23,10 @@ class CancelNotification extends NotificationEvent {
   });
 }
 
+class RequestPermission extends NotificationEvent {
+  RequestPermission();
+}
+
 // class NotificationActionReceived extends NotificationEvent {
 //   final String actionId;
 //   final String notificationId;
