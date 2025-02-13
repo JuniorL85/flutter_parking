@@ -17,7 +17,7 @@ class Monitoring extends StatefulWidget {
 class _MonitoringState extends State<Monitoring> {
   List<Parking> activeParkingsList = [];
   List<Parking> mostPopularParkings = [];
-  Map<int, int> mapData = {};
+  Map<String, int> mapData = {};
   StreamSubscription? activeParkingsSubscription;
   StreamSubscription? popularParkingsSubscription;
 
@@ -57,25 +57,24 @@ class _MonitoringState extends State<Monitoring> {
         for (var parking in state.parkings) {
           final parkingSpaceId = parking.parkingSpace?.id;
           if (parkingSpaceId != null) {
-            mapData[int.parse(parkingSpaceId)] =
-                (mapData[int.parse(parkingSpaceId)] ?? 0) + 1;
+            mapData[parkingSpaceId] = (mapData[parkingSpaceId] ?? 0) + 1;
           }
         }
         if (mapData.isNotEmpty) {
           int maxCount =
               mapData.values.fold(0, (prev, curr) => curr > prev ? curr : prev);
 
-          List<int> mostPopularIds = mapData.entries
+          List<String> mostPopularIds = mapData.entries
               .where((entry) => entry.value == maxCount)
               .map((entry) => entry.key)
               .toList();
 
-          Map<int, Parking> uniqueMostPopularParkings = {};
+          Map<String, Parking> uniqueMostPopularParkings = {};
           for (var parking in state.parkings) {
             final parkingSpaceId = parking.parkingSpace?.id;
             if (parkingSpaceId != null &&
-                mostPopularIds.contains(int.parse(parkingSpaceId))) {
-              uniqueMostPopularParkings[int.parse(parkingSpaceId)] = parking;
+                mostPopularIds.contains(parkingSpaceId)) {
+              uniqueMostPopularParkings[parkingSpaceId] = parking;
             }
           }
           setState(() {
@@ -164,10 +163,15 @@ class _MonitoringState extends State<Monitoring> {
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: mostPopularParkings.map((parking) {
-                                return Text(
-                                  'Id: ${parking.parkingSpace?.id}, '
-                                  'Adress: ${parking.parkingSpace?.address}, '
-                                  'Parkerad på: ${mapData[int.tryParse(parking.parkingSpace!.id)]}',
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Id: ${parking.parkingSpace?.id}'),
+                                    Text(
+                                        'Adress: ${parking.parkingSpace?.address}'),
+                                    Text(
+                                        'Antal ggr parkerad på: ${mapData[parking.parkingSpace!.id]}'),
+                                  ],
                                 );
                               }).toList(),
                             ),

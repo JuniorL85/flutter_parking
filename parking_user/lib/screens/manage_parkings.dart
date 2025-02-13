@@ -5,6 +5,7 @@ import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:parking_user/bloc/notifications/notification_bloc.dart';
 import 'package:parking_user/bloc/parking/parking_bloc.dart';
 import 'package:parking_user/bloc/person/person_bloc.dart';
 import 'package:parking_user/bloc/vehicle/vehicle_bloc.dart';
@@ -17,6 +18,7 @@ class ManageParkings extends StatefulWidget {
   ManageParkings({super.key});
 
   bool isActiveParking = false;
+  bool isScheduled = false;
 
   @override
   State<ManageParkings> createState() => _ManageParkingsState();
@@ -34,11 +36,27 @@ class _ManageParkingsState extends State<ManageParkings> {
   StreamSubscription? parkingSubscription;
   StreamSubscription? _updateParkingSubscription;
   StreamSubscription? _deleteParkingSubscription;
+  bool permission = false;
+  String notificationId = '';
 
   @override
   void initState() {
     super.initState();
+    requestPermission();
     WidgetsBinding.instance.addPostFrameCallback((_) => findActiveParking());
+    // AppLifecycleListener(
+    //   onResume: () {
+    //     if (!mounted) return;
+    //     final lastActionVar =
+    //         context.watch<NotificationBloc>().state.lastAction;
+    //     print('lastAction $lastActionVar');
+    //   },
+    // );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override
@@ -49,6 +67,13 @@ class _ManageParkingsState extends State<ManageParkings> {
     _updateParkingSubscription?.cancel();
     _deleteParkingSubscription?.cancel();
     super.dispose();
+  }
+
+  requestPermission() {
+    if (permission == false) {
+      context.read<NotificationBloc>().add(RequestPermission());
+      findActiveParking();
+    }
   }
 
   findActiveParking() async {
@@ -79,6 +104,7 @@ class _ManageParkingsState extends State<ManageParkings> {
         return;
       }
 
+      if (!mounted) return;
       context.read<ParkingBloc>().add(LoadActiveParkings());
       final parkingState =
           await context.read<ParkingBloc>().stream.firstWhere((state) {
@@ -108,10 +134,26 @@ class _ManageParkingsState extends State<ManageParkings> {
         return matchingVehicle;
       }).toList();
 
+      if (context.read<NotificationBloc>().state.permission != null) {
+        permission = context.read<NotificationBloc>().state.permission!;
+      }
+
       setState(() {
         parkingList = filteredParkings;
         foundActiveParking = parkingList.isEmpty ? -1 : 0;
         widget.isActiveParking = foundActiveParking != -1;
+
+        if (foundActiveParking != -1 && permission == true) {
+          notificationId = parkingList[foundActiveParking!].id;
+          context.read<NotificationBloc>().add(ScheduleNotification(
+              id: parkingList[foundActiveParking!].id,
+              title: "Din parkering går ut om 15 min",
+              content:
+                  'Du är parkerad på: ${parkingList[foundActiveParking!].parkingSpace!.address}',
+              deliveryTime: parkingList[foundActiveParking!]
+                  .endTime
+                  .add(const Duration(minutes: -15))));
+        }
       });
     }
   }
@@ -429,6 +471,10 @@ class _ManageParkingsState extends State<ManageParkings> {
                                                 bloc.stream.listen((state) {
                                               if (state
                                                   is ActiveParkingsLoaded) {
+                                                context
+                                                    .read<NotificationBloc>()
+                                                    .add(CancelNotification(
+                                                        id: notificationId));
                                                 scaffoldMessenger.showSnackBar(
                                                   const SnackBar(
                                                     duration:

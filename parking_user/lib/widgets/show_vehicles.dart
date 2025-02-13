@@ -72,23 +72,29 @@ class _ShowVehiclesState extends State<ShowVehicles> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          'Fordon',
+          style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface),
+        ),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.bottomLeft,
+                end: Alignment.topRight,
+                colors: <Color>[
+                  Theme.of(context).colorScheme.onInverseSurface,
+                  Theme.of(context).colorScheme.inversePrimary
+                ]),
+          ),
+        ),
+      ),
       body: Column(
         children: [
-          const SizedBox(height: 50),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Dina fordon',
-                  style: TextStyle(
-                      fontSize: 24,
-                      color: Theme.of(context).colorScheme.inversePrimary),
-                ),
-              ],
-            ),
-          ),
           BlocBuilder<VehicleBloc, VehicleState>(
             builder: (context, state) {
               if (state is VehiclesInitial || state is VehiclesLoading) {
@@ -110,25 +116,39 @@ class _ShowVehiclesState extends State<ShowVehicles> {
                               var vehicle = vehicleList[index];
                               return Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: ListTile(
-                                    leading: getIcon(vehicle.vehicleType),
-                                    title: Text(
-                                      vehicle.regNr,
-                                      style: TextStyle(
-                                          color: Theme.of(context)
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    gradient: LinearGradient(
+                                        begin: Alignment.bottomLeft,
+                                        end: Alignment.center,
+                                        colors: <Color>[
+                                          Colors.white38,
+                                          Theme.of(context)
                                               .colorScheme
-                                              .onSurface),
-                                    ),
-                                    tileColor: Theme.of(context)
-                                        .colorScheme
-                                        .inversePrimary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      side: BorderSide(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSecondary),
-                                    )),
+                                              .inversePrimary
+                                        ]),
+                                  ),
+                                  child: ListTile(
+                                      leading: getIcon(vehicle.vehicleType),
+                                      title: Text(
+                                        vehicle.regNr,
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface),
+                                      ),
+                                      tileColor: Theme.of(context)
+                                          .colorScheme
+                                          .inversePrimary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        side: BorderSide(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary),
+                                      )),
+                                ),
                               );
                             }),
                       );
@@ -142,13 +162,13 @@ class _ShowVehiclesState extends State<ShowVehicles> {
           ),
         ],
       ),
-      floatingActionButton: TextButton.icon(
-        label: const Text('Tillbaka'),
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-      ),
+      // floatingActionButton: TextButton.icon(
+      //   label: const Text('Tillbaka'),
+      //   icon: const Icon(Icons.arrow_back),
+      //   onPressed: () {
+      //     Navigator.of(context).pop();
+      //   },
+      // ),
     );
   }
 }

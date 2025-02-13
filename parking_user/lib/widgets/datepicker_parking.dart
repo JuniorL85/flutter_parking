@@ -35,7 +35,7 @@ class _DatepickerState extends State<Datepicker> {
             child: child ?? Container(),
           );
         },
-        initialTime: TimeOfDay.fromDateTime(now.add(const Duration(hours: 1))),
+        initialTime: TimeOfDay.fromDateTime(now),
       );
 
       setState(() {

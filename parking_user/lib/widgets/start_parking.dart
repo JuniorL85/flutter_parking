@@ -308,24 +308,24 @@ class _StartParkingState extends State<StartParking> {
                                           context.read<ParkingBloc>().add(
                                               CreateParking(
                                                   parking: Parking(
-                                                      vehicle: Vehicle(
-                                                          regNr:
-                                                              _selectedRegNr!,
-                                                          vehicleType:
-                                                              vehicleType,
-                                                          owner: person),
+                                                      vehicle:
+                                                          Vehicle(
+                                                              regNr:
+                                                                  _selectedRegNr!,
+                                                              vehicleType:
+                                                                  vehicleType,
+                                                              owner: person),
                                                       parkingSpace: ParkingSpace(
                                                           id: parkingSpace.id,
-                                                          creatorId: parkingSpace
-                                                              .creatorId,
+                                                          creatorId:
+                                                              parkingSpace
+                                                                  .creatorId,
                                                           address: parkingSpace
                                                               .address,
                                                           pricePerHour:
                                                               parkingSpace
                                                                   .pricePerHour),
-                                                      startTime: DateTime.now()
-                                                          .add(const Duration(
-                                                              hours: 1)),
+                                                      startTime: DateTime.now(),
                                                       endTime: _selectedDate
                                                           .value!)));
                                         }
