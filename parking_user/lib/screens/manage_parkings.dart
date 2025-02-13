@@ -37,6 +37,7 @@ class _ManageParkingsState extends State<ManageParkings> {
   StreamSubscription? _updateParkingSubscription;
   StreamSubscription? _deleteParkingSubscription;
   bool permission = false;
+  String notificationId = '';
 
   @override
   void initState() {
@@ -143,6 +144,7 @@ class _ManageParkingsState extends State<ManageParkings> {
         widget.isActiveParking = foundActiveParking != -1;
 
         if (foundActiveParking != -1 && permission == true) {
+          notificationId = parkingList[foundActiveParking!].id;
           context.read<NotificationBloc>().add(ScheduleNotification(
               id: parkingList[foundActiveParking!].id,
               title: "Din parkering går ut om 15 min",
@@ -469,6 +471,10 @@ class _ManageParkingsState extends State<ManageParkings> {
                                                 bloc.stream.listen((state) {
                                               if (state
                                                   is ActiveParkingsLoaded) {
+                                                context
+                                                    .read<NotificationBloc>()
+                                                    .add(CancelNotification(
+                                                        id: notificationId));
                                                 scaffoldMessenger.showSnackBar(
                                                   const SnackBar(
                                                     duration:
